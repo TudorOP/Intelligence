@@ -1,0 +1,477 @@
+.matrix-page.page-pad {
+  max-width: 1800px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 34px 40px;
+}
+.matrix-monitor {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  margin: 0 0 24px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  font-size: 13px;
+}
+.matrix-monitor small {
+  margin-left: auto;
+  color: var(--muted);
+}
+.matrix-columns {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  align-items: start;
+}
+.matrix-list {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 18px;
+  min-width: 0;
+  max-height: calc(100vh - 390px);
+  overflow-y: auto;
+}
+.matrix-list.active-list {
+  border-color: var(--matrix-working, var(--accent));
+  box-shadow: 0 0 0 1px var(--line-strong);
+}
+.matrix-list > header > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.matrix-list > header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--surface);
+  padding: 4px 0 10px;
+}
+.matrix-list h2 {
+  font-size: 21px;
+  flex: 1;
+  overflow-wrap: anywhere;
+}
+.matrix-list header small {
+  color: var(--muted);
+  font-size: 12px;
+}
+.matrix-marker {
+  display: inline-block;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 1;
+  width: 26px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.matrix-marker.working {
+  animation: matrix-spin 2s linear infinite;
+}
+@keyframes matrix-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .matrix-marker.working {
+    animation: none;
+  }
+}
+.matrix-integrate {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.matrix-integrate input {
+  accent-color: var(--accent);
+  width: 16px;
+  height: 16px;
+}
+.matrix-list-description {
+  margin-top: 16px;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.matrix-list-edit {
+  margin: 14px 0;
+  font-size: 11px;
+  color: var(--muted);
+}
+.matrix-list-edit summary {
+  cursor: pointer;
+}
+.matrix-list-edit label,
+.matrix-task-details > label {
+  display: block;
+  margin: 13px 0;
+  font-size: 11px;
+  color: var(--muted);
+}
+.matrix-list-edit input,
+.matrix-list-edit textarea,
+.matrix-task-details > label input,
+.matrix-task-details > label textarea {
+  display: block;
+  width: 100%;
+  margin-top: 7px;
+  font-size: 12px;
+}
+.matrix-task-details > label select {
+  display: block;
+  width: 100%;
+  margin-top: 7px;
+  font-size: 12px;
+}
+.matrix-task {
+  border-top: 1px solid var(--line);
+}
+.matrix-task-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 14px 0;
+}
+.matrix-page.compact .matrix-task-row {
+  padding: 8px 0;
+}
+.matrix-task-row button {
+  background: transparent;
+  border: 0;
+  padding: 2px;
+  box-shadow: none;
+}
+.matrix-task-title {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  font-size: 13px;
+}
+.matrix-task-title > span {
+  display: block;
+  overflow-wrap: anywhere;
+  line-height: 1.5;
+}
+.matrix-task-title small {
+  display: block;
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 5px;
+}
+.matrix-expand {
+  font-size: 19px;
+  color: var(--muted);
+}
+.matrix-task-details {
+  padding-bottom: 18px;
+}
+.matrix-task-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 14px 0;
+}
+.matrix-task-actions button {
+  font-size: 10px;
+  padding: 7px 9px;
+}
+.matrix-add {
+  display: flex;
+  gap: 5px;
+  margin-top: 14px;
+}
+.matrix-add input {
+  flex: 1;
+  width: 0;
+  min-width: 0;
+  font-size: 12px;
+}
+.matrix-add button {
+  width: 34px;
+}
+.matrix-empty {
+  color: var(--muted);
+  padding: 20px 0 6px;
+  font-size: 12px;
+}
+.matrix-subtasks {
+  margin: 18px 0 0 9px;
+  padding-left: 12px;
+  border-left: 1px solid var(--line);
+}
+.matrix-subtasks h4,
+.matrix-responses h4 {
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+.matrix-files {
+  margin: 14px 0;
+}
+.matrix-file {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  margin: 7px 0;
+}
+.matrix-file img {
+  width: 36px;
+  height: 36px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+.matrix-file > button {
+  flex: 1;
+  text-align: left;
+  border: 0;
+  padding: 2px;
+  background: transparent;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.matrix-file > button.icon-button {
+  flex: none;
+  width: 20px;
+  text-align: center;
+}
+.matrix-file small {
+  display: block;
+  color: var(--muted);
+  margin-top: 4px;
+  font-size: 10px;
+}
+.matrix-result,
+.matrix-responses > div,
+.matrix-approval,
+.matrix-list-attention {
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  margin: 12px 0;
+  font-size: 12px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+.matrix-result b {
+  display: block;
+  margin-bottom: 6px;
+}
+.matrix-result small,
+.matrix-responses small {
+  display: block;
+  color: var(--muted);
+  font-size: 10px;
+}
+.matrix-result pre,
+.matrix-responses pre,
+.matrix-approval pre {
+  overflow: auto;
+  max-height: 200px;
+  white-space: pre-wrap;
+}
+.matrix-result p,
+.matrix-responses p {
+  margin: 8px 0;
+}
+.matrix-result ul,
+.matrix-result ol,
+.matrix-responses ul,
+.matrix-responses ol {
+  padding-left: 18px;
+}
+.matrix-responses {
+  margin-top: 18px;
+}
+.matrix-response-history {
+  color: var(--muted);
+  font-size: 11px;
+}
+.matrix-response-history summary {
+  cursor: pointer;
+  padding: 6px 0;
+}
+.matrix-response-history > div {
+  border-top: 1px solid var(--line);
+  padding: 12px 0;
+}
+.matrix-responses .user-response {
+  background: var(--bg);
+}
+.matrix-reply textarea {
+  width: 100%;
+  font-size: 12px;
+}
+.matrix-verification {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.7;
+  margin: 12px 0;
+}
+.matrix-reply button {
+  margin-top: 7px;
+  font-size: 11px;
+}
+.matrix-approval button {
+  font-size: 11px;
+  margin: 10px 6px 0 0;
+}
+.matrix-list-attention button {
+  font-size: 11px;
+  margin-top: 8px;
+}
+.matrix-settings-colors {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 20px 0;
+}
+.search-key-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0;
+}
+.search-key-actions button {
+  font-size: 12px;
+}
+.search-provider-note {
+  font-size: 12px;
+}
+.search-test-results {
+  margin-top: 20px;
+}
+.search-test-results > div {
+  border-top: 1px solid var(--line);
+  padding: 12px 0;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.search-test-results small {
+  display: block;
+  color: var(--muted);
+  font-size: 10px;
+  overflow-wrap: anywhere;
+}
+.matrix-settings-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin: 20px 0;
+}
+.matrix-settings-grid > label {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+}
+.matrix-settings-grid input,
+.matrix-settings-grid select {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+}
+.matrix-settings-colors label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+}
+.matrix-settings-colors input {
+  width: 40px;
+  height: 32px;
+  padding: 2px;
+}
+@media (max-width: 1100px) {
+  .matrix-columns {
+    grid-template-columns: 1fr;
+  }
+  .matrix-monitor {
+    flex-wrap: wrap;
+  }
+  .matrix-list {
+    padding: 20px;
+    max-height: none;
+  }
+}
+.matrix-model,
+.matrix-trigger-controls {
+  margin: 12px 0;
+  min-width: 0;
+}
+.matrix-model summary {
+  overflow-wrap: anywhere;
+}
+.matrix-model label,
+.matrix-trigger-controls label {
+  display: grid;
+  gap: 6px;
+  margin: 10px 0;
+}
+.matrix-model .check-label,
+.matrix-weekdays label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.matrix-model small,
+.matrix-trigger-controls small {
+  display: block;
+  margin: 8px 0;
+  color: var(--muted);
+}
+.matrix-model .model-picker {
+  flex-wrap: wrap;
+}
+.matrix-model .model-picker select {
+  min-width: 0;
+  width: 100%;
+  flex: 1 1 180px;
+}
+.matrix-weekdays {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.matrix-weekdays small {
+  grid-column: 1 / -1;
+}
+.matrix-model-notice {
+  color: var(--muted);
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow-wrap: anywhere;
+}
+.matrix-settings-grid .matrix-preload-control {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  align-content: start;
+  align-items: center;
+  gap: 12px;
+}
+.matrix-preload-control small {
+  grid-column: 1 / -1;
+}
+.matrix-preload-control input[type='checkbox'] {
+  margin-top: 0;
+  width: auto;
+}

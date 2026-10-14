@@ -1,0 +1,258 @@
+.vault-page {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+.chat-images {
+  display: flex;
+  gap: 10px;
+  margin: 6px 0 12px;
+}
+.chat-images > span {
+  position: relative;
+}
+.chat-images img {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+.chat-images button {
+  position: absolute;
+  right: -5px;
+  top: -5px;
+  padding: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--surface);
+}
+.trash-tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 14px 0;
+}
+.trash-tabs button {
+  font-size: 12px;
+  padding: 8px 10px;
+}
+.trash-tabs button.selected {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.trash-tabs small {
+  margin-left: 5px;
+  color: var(--muted);
+}
+.vault-explorer {
+  width: 265px;
+  flex-shrink: 0;
+  background: var(--local-nav);
+  border-right: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  padding: 18px 12px;
+  gap: 14px;
+}
+.vault-explorer > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.vault-create {
+  display: flex;
+  gap: 6px;
+}
+.vault-create button {
+  padding: 7px 10px;
+  font-size: 12px;
+}
+.vault-tree {
+  flex: 1;
+  overflow: auto;
+  min-height: 0;
+}
+.vault-tree-row {
+  border-radius: 7px;
+}
+.vault-tree-row.selected {
+  background: var(--nav-selected);
+}
+.vault-open {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  padding: 9px 4px;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.vault-explorer footer {
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+  display: grid;
+  gap: 8px;
+}
+.vault-explorer footer small {
+  color: var(--muted);
+  font-size: 11px;
+}
+.vault-document {
+  flex: 1;
+  min-width: 0;
+  overflow: auto;
+}
+.vault-document .note-prose {
+  font-family: var(--vault-font), serif;
+  font-size: 15px;
+}
+.vault-document .note-prose img[data-align='left'] {
+  float: left;
+  margin: 8px 20px 12px 0;
+}
+.vault-document .note-prose img[data-align='right'] {
+  float: right;
+  margin: 8px 0 12px 20px;
+}
+.vault-document .note-prose img[data-align='center'] {
+  display: block;
+  margin: 18px auto;
+}
+.vault-document .note-prose:after {
+  content: '';
+  display: block;
+  clear: both;
+}
+.vault-document[data-vault-font='garamond'] .note-prose {
+  font-size: 18px;
+}
+.vault-document[data-vault-font='lora'] .note-prose {
+  font-size: 16px;
+}
+.vault-heading {
+  padding: 25px 34px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  border-bottom: 1px solid var(--line);
+}
+.vault-heading h1 {
+  margin: 8px 0;
+  font-size: 25px;
+}
+.vault-heading small {
+  color: var(--muted);
+}
+.vault-font {
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.vault-permissions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 34px;
+}
+.vault-permissions label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+.vault-empty {
+  max-width: 600px;
+  margin: 60px auto;
+  text-align: center;
+  padding: 24px;
+}
+.vault-empty .theme-art {
+  margin: 0 auto 20px;
+  width: 150px;
+  height: 150px;
+}
+.vault-empty p {
+  color: var(--muted);
+  line-height: 1.8;
+  margin: 16px 0;
+}
+.vault-linked {
+  padding: 20px 34px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  border-top: 1px solid var(--line);
+}
+.note-prose table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+  margin: 18px 0;
+}
+.note-prose td,
+.note-prose th {
+  border: 1px solid var(--line-strong);
+  padding: 8px;
+  min-width: 80px;
+  vertical-align: top;
+  position: relative;
+}
+.note-prose th {
+  background: var(--accent-soft);
+  font-weight: 600;
+}
+.note-prose .selectedCell:after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--selection);
+  opacity: 0.3;
+  pointer-events: none;
+}
+.note-prose .column-resize-handle {
+  position: absolute;
+  right: -2px;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--accent);
+  pointer-events: none;
+}
+.editor-table-menu {
+  position: relative;
+  font-size: 11px;
+}
+.editor-table-menu[open] {
+  z-index: 5;
+}
+.editor-table-menu[open] > button {
+  display: block;
+  width: 130px;
+  background: var(--popover);
+}
+[data-layout='compact'] .vault-explorer {
+  width: 220px;
+}
+[data-layout='reading'] .vault-document .note-prose {
+  max-width: 820px;
+}
+@media (max-width: 1150px) {
+  .vault-explorer {
+    width: 205px;
+  }
+  .vault-heading {
+    flex-wrap: wrap;
+    padding: 18px;
+  }
+  .vault-permissions {
+    padding: 12px 18px;
+    flex-wrap: wrap;
+  }
+}

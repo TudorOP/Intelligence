@@ -1,0 +1,20 @@
+services:
+  appimage:
+    build: .
+    platform: linux/amd64
+    environment:
+      INTELLIGENCE_ICON: ${INTELLIGENCE_ICON:-original}
+    volumes:
+      - ./release:/project/release
+      - electron-cache:/root/.cache/electron
+      - builder-cache:/root/.cache/electron-builder
+  memory-check:
+    build: .
+    platform: linux/amd64
+    command: ["npm", "run", "test:consolidation"]
+    volumes:
+      - memory-test-models:/project/.test-data/consolidation/models
+volumes:
+  electron-cache:
+  builder-cache:
+  memory-test-models:

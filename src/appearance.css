@@ -1,0 +1,357 @@
+:root {
+  --theme-art: url('/assets/theme-night.webp');
+}
+[data-theme='day'] {
+  --theme-art: url('/assets/theme-day.webp');
+}
+[data-theme='ink'] {
+  --theme-art: url('/assets/day-ink.webp');
+}
+[data-theme='summer'] {
+  color-scheme: light;
+  --theme-art: url('/assets/theme-summer.webp');
+  --bg: #fff9ef;
+  --sidebar: #f5eddd;
+  --local-nav: #faf2e4;
+  --surface: #fffdf6;
+  --assistant: #faf3e7;
+  --input: #fffaf1;
+  --compose: #fffdf6;
+  --popover: #fffdf6;
+  --hover: #eee8d8;
+  --line: #dfd7c4;
+  --line-strong: #cbbfa8;
+  --text: #263d3b;
+  --muted: #536966;
+  --subtle: #71847e;
+  --accent: #236960;
+  --accent-hover: #17564f;
+  --accent-ink: #fffdf4;
+  --accent-dim: #779b8d;
+  --accent-soft: #e0eee3;
+  --selection: #cde4d8;
+  --nav-selected: #e3ecdf;
+  --search-bg: #eee8d9;
+  --shadow: #30473612;
+  --shadow-heavy: #30473630;
+  --overlay: #263d3b66;
+  --danger: #a64031;
+  --mark-filter: none;
+}
+[data-theme='autumn'] {
+  color-scheme: light;
+  --theme-art: url('/assets/theme-autumn.webp');
+  --bg: #f8f1e6;
+  --sidebar: #eee2d0;
+  --local-nav: #f3e9da;
+  --surface: #fff8ed;
+  --assistant: #f3e9da;
+  --input: #faf2e6;
+  --compose: #fff8ed;
+  --popover: #fff8ed;
+  --hover: #ecdfca;
+  --line: #dcd0bb;
+  --line-strong: #c9b69b;
+  --text: #422f25;
+  --muted: #755b47;
+  --subtle: #8c755e;
+  --accent: #8a482b;
+  --accent-hover: #733920;
+  --accent-ink: #fff9ef;
+  --accent-dim: #b7855a;
+  --accent-soft: #efe0ca;
+  --selection: #e6cdae;
+  --nav-selected: #e6d5bb;
+  --search-bg: #eadcc7;
+  --shadow: #58381915;
+  --shadow-heavy: #58381933;
+  --overlay: #39261966;
+  --danger: #ac372c;
+  --mark-filter: none;
+}
+[data-theme='winter'] {
+  color-scheme: dark;
+  --theme-art: url('/assets/theme-winter.webp');
+  --bg: #101d26;
+  --sidebar: #0b1820;
+  --local-nav: #11222c;
+  --surface: #172a34;
+  --assistant: #12232d;
+  --input: #101f28;
+  --compose: #172b36;
+  --popover: #172b36;
+  --hover: #253c46;
+  --line: #2b414a;
+  --line-strong: #48606a;
+  --text: #edf3f1;
+  --muted: #b0c4c8;
+  --subtle: #819fa8;
+  --accent: #d7c394;
+  --accent-hover: #ead6a5;
+  --accent-ink: #182730;
+  --accent-dim: #a99670;
+  --accent-soft: #29393e;
+  --selection: #3d5661;
+  --nav-selected: #223a44;
+  --search-bg: #182b35;
+  --shadow: #00000024;
+  --shadow-heavy: #00000066;
+  --overlay: #07121ab0;
+  --danger: #f4aea6;
+}
+@media (prefers-color-scheme: light) {
+  [data-theme='system'] {
+    --theme-art: url('/assets/theme-day.webp');
+  }
+}
+.theme-art {
+  display: block;
+  flex-shrink: 0;
+  background-image: var(--theme-art);
+  background-size: var(--art-size, 300% 300%);
+  background-position: var(--art-x) var(--art-y);
+  background-repeat: no-repeat;
+  border-radius: 12px;
+}
+.section-art {
+  width: 86px;
+  height: 86px;
+}
+.book-cover .book-theme-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  background-size: auto 300%;
+}
+.section-art-strip {
+  padding: 16px 30px 0;
+}
+.section-art-strip p {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 5px 0 0;
+}
+.matrix-page .page-heading > div {
+  flex: 1;
+}
+.machine-page .capability-grid {
+  margin-bottom: 0;
+}
+.machine-page .machine-tags {
+  margin-top: 8px;
+}
+.machine-page .machine-readings small {
+  margin-top: 0;
+}
+.section-art-strip {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 0 0 18px;
+}
+.welcome .welcome-orbit {
+  width: 170px;
+  height: 115px;
+  margin: 0 auto 20px;
+}
+.welcome-orbit .theme-art {
+  width: 100%;
+  height: 100%;
+  border-radius: 45% 45% 12px 12px;
+  background-size: 300% auto;
+}
+.sidebar nav button .theme-art {
+  width: 25px;
+  height: 25px;
+  border-radius: 6px;
+  margin-right: 8px;
+}
+.theme-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+.theme-options > button {
+  min-width: 0;
+  font-size: 12px;
+}
+.theme-options .theme-art {
+  width: 100%;
+  height: 58px;
+  margin-bottom: 8px;
+}
+.appearance-preview {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px;
+  margin: 16px 0;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.appearance-preview p {
+  margin: 4px 0 0;
+  color: var(--muted);
+}
+.icon-previews {
+  display: flex;
+  gap: 20px;
+  margin: 14px 0;
+}
+.icon-previews > div {
+  flex: 1;
+  text-align: center;
+  padding: 12px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.icon-previews img {
+  width: 58px;
+  height: 58px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto 8px;
+}
+.machine-page .capability-grid header > small {
+  font-size: 11px;
+}
+.machine-page .machine-footer {
+  font-size: 11px;
+}
+[data-theme='summer'] .welcome h1,
+[data-theme='autumn'] .welcome h1,
+[data-theme='winter'] .welcome h1 {
+  font-family: Georgia, serif;
+  letter-spacing: -1.5px;
+}
+[data-theme='autumn'] .theme-art {
+  border-radius: 5px;
+}
+[data-theme='winter'] .theme-art {
+  box-shadow: 0 0 0 1px #b0c4c820;
+}
+.machine-page.page-pad {
+  padding: 25px 34px 18px;
+  max-width: 1700px;
+  margin: 0 auto;
+}
+.machine-page .page-heading {
+  margin-bottom: 15px;
+}
+.machine-page .page-heading h1 {
+  font-size: 30px;
+  margin: 5px 0;
+}
+.machine-page .page-heading p {
+  margin: 0;
+}
+.machine-page .machine-tabs {
+  margin-bottom: 14px;
+}
+.machine-page .machine-overview {
+  padding: 15px 20px;
+  gap: 18px;
+  margin-bottom: 14px;
+}
+.machine-page .machine-overview h2 {
+  font-size: 20px;
+  margin: 3px 0;
+}
+.machine-page .machine-overview p {
+  margin: 3px 0 8px;
+}
+.machine-page .machine-tags {
+  gap: 6px;
+}
+.machine-page .machine-tags span {
+  padding: 3px 8px;
+}
+.machine-page .machine-readings {
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.machine-page .machine-readings section {
+  padding: 14px 18px;
+}
+.machine-page .machine-readings h2 {
+  font-size: 24px;
+  margin: 7px 0;
+}
+.machine-page .machine-readings p {
+  margin: 7px 0 0;
+}
+.machine-page .machine-section-heading {
+  margin: 12px 0 8px;
+}
+.machine-page .machine-section-heading h2 {
+  display: none;
+}
+.machine-page .capability-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.machine-page .capability-grid article {
+  display: grid;
+  grid-template-columns: 110px 135px 190px 1fr;
+  align-items: center;
+  gap: 14px;
+  padding: 11px 16px;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+}
+.machine-page .capability-grid article:last-child {
+  border-bottom: 0;
+}
+.machine-page .capability-grid article header {
+  margin: 0;
+  gap: 10px;
+  justify-content: start;
+}
+.machine-page .capability-grid article header > span {
+  font-size: 21px;
+}
+.machine-page .capability-grid h3,
+.machine-page .capability-grid b,
+.machine-page .capability-grid p {
+  margin: 0;
+  font-size: 13px;
+}
+.machine-page .machine-assistant-setup {
+  padding: 15px 18px;
+  gap: 16px;
+  margin-top: 16px;
+}
+.machine-page .machine-assistant-setup h2 {
+  font-size: 17px;
+  margin: 4px 0;
+}
+.machine-page .machine-assistant-setup p {
+  margin: 0;
+  font-size: 12px;
+}
+.machine-page .machine-assistant-icon {
+  font-size: 25px;
+}
+.machine-page .machine-footer {
+  margin-top: 12px;
+}
+@media (max-width: 1100px) {
+  .machine-page .capability-grid article {
+    grid-template-columns: 90px 1fr 1fr;
+  }
+  .machine-page .capability-grid p {
+    grid-column: 2 / -1;
+  }
+  .theme-options {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

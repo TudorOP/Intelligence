@@ -1,0 +1,23 @@
+Intelligence Kokoro adapter - October 12, 2026
+
+Model: hexgrad/Kokoro-82M v1.0 (82 million parameters), Apache-2.0.
+ONNX conversion and raw numeric Heart/Bella/Michael voice data:
+https://huggingface.co/onnx-community/Kokoro-82M-v1.0-ONNX
+Revision: 1939ad2a8e416c0acfeecc08a694d14ef25f2231
+Runtime: kokoro-onnx 0.6.1, MIT; https://github.com/thewh1teagle/kokoro-onnx
+Phonemizer 3.4.0 / eSpeak NG: GPLv3 family; preserve their notices.
+Loader 0.2.4: MIT wrapper; native library/dictionary terms remain separate.
+Native eSpeak NG upstream: https://github.com/espeak-ng/espeak-ng
+Wrapper upstream: https://github.com/thewh1teagle/espeakng-loader
+
+Only the three named English voices are downloaded; no voice cloning.
+The adapter repacks the verified raw float32 voice arrays into a temporary
+numeric NPZ while loading. Values are not changed; no pickle/object data is used.
+Model weights, engines and native dictionaries are downloaded into user data;
+none are packaged in the Intelligence AppImage or source ZIP.
+
+Exact source revision/build provenance of the espeakng-loader wheel's native
+library and its dictionary constituents must be checked before public
+redistribution; its wheel omits license/source files. Retained upstream license
+text and source links do not replace the required matching corresponding source.
+This update does not complete the existing public-distribution audit.

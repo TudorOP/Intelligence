@@ -1,0 +1,328 @@
+.symbol-icon {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  background: currentColor;
+  mask-image: var(--icon);
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+.runtime-diagnostic {
+  margin: 8px 0;
+  font-size: 11px;
+  color: var(--muted);
+}
+.runtime-diagnostic summary {
+  cursor: pointer;
+}
+.runtime-diagnostic pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 220px;
+  overflow: auto;
+  font-size: 11px;
+}
+.context-only > summary {
+  display: none;
+}
+.machine-resource-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 18px;
+  margin-bottom: 16px;
+}
+.machine-page .machine-readings {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+  margin: 0;
+}
+.machine-left-column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+.machine-left-column .machine-overview {
+  flex: 1;
+  margin: 0;
+}
+.machine-left-column .machine-overview > .theme-banner {
+  width: min(42%, 420px);
+  height: 190px;
+}
+.machine-quick-actions {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  padding: 16px 20px;
+  border-radius: 12px;
+}
+.machine-quick-actions h2 {
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+.machine-quick-actions p,
+.machine-quick-actions small {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+.machine-quick-actions > div {
+  display: flex;
+  gap: 10px;
+  margin: 12px 0;
+}
+.machine-capabilities {
+  border: 1px solid var(--line);
+  padding: 12px 16px;
+  border-radius: 10px;
+}
+.machine-capabilities summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 12px;
+}
+.capability-checklist {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  padding-top: 12px;
+}
+.capability-checklist article {
+  display: flex;
+  gap: 10px;
+  font-size: 12px;
+}
+.capability-checklist small {
+  display: block;
+  color: var(--muted);
+  margin-top: 5px;
+}
+.project-access {
+  margin: 10px 0;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  font-size: 12px;
+}
+@media (max-width: 1100px) {
+  .machine-resource-layout {
+    grid-template-columns: minmax(0, 1fr) 240px;
+  }
+  .machine-left-column .machine-overview {
+    flex-wrap: wrap;
+  }
+  .machine-left-column .machine-overview > .theme-banner {
+    height: 120px;
+    width: 100%;
+  }
+}
+@media (max-width: 800px) {
+  .machine-resource-layout {
+    grid-template-columns: 1fr;
+  }
+  .capability-checklist {
+    grid-template-columns: 1fr;
+  }
+}
+.sidebar .nav-glyph.symbol-icon {
+  width: 19px;
+  height: 19px;
+  margin-right: 10px;
+}
+.settings-dialog {
+  position: relative;
+}
+.settings-dialog > .settings-close {
+  z-index: 3;
+  background: var(--popover);
+  box-shadow: 0 2px 8px var(--shadow);
+}
+.settings-content {
+  padding-top: 44px;
+}
+.floating-actions {
+  position: fixed;
+  z-index: 1300; /* Above the modal backdrop and its blur (1200). */
+  right: auto;
+  max-width: calc(100vw - 16px);
+  max-height: calc(100dvh - 56px);
+  overflow-y: auto;
+  animation: none;
+}
+.theme-options .theme-banner {
+  height: 90px;
+  background-size: cover;
+  background-position: center;
+}
+.model-picker {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  min-width: 0;
+}
+.model-pill .model-name {
+  min-width: 0;
+  font: inherit;
+  padding: 0;
+}
+.compact .composer-bottom {
+  flex-wrap: wrap;
+}
+.compact .model-pill {
+  flex: 1 1 110px;
+  max-width: calc(100% - 84px);
+}
+.compact .composer-bottom > .chat-controls {
+  order: 4;
+  flex: 1;
+}
+.compact .composer-bottom > .chat-controls select {
+  flex: 1;
+  max-width: none;
+}
+.model-picker select {
+  flex: 1;
+  min-width: 100px;
+}
+.model-picker .manual-model {
+  width: 100%;
+}
+.chat-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.chat-controls button {
+  padding: 4px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+}
+.chat-controls .selected {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.chat-controls select {
+  max-width: 140px;
+  padding: 5px;
+  font-size: 11px;
+}
+.chat-controls summary {
+  padding: 3px 5px;
+}
+.chat-controls .model-picker {
+  width: 420px;
+  max-width: calc(100vw - 40px);
+  padding: 10px;
+}
+.chat-metrics {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 11px;
+  padding: 0 0 10px;
+}
+.chat-metrics button {
+  margin-left: auto;
+  font-size: 11px;
+  padding: 4px 8px;
+}
+.model-thinking {
+  font-size: 12px;
+  color: var(--muted);
+  padding: 12px;
+  border-left: 2px solid var(--line-strong);
+  margin: 8px 0;
+}
+.model-thinking pre {
+  white-space: pre-wrap;
+  font: inherit;
+}
+.recent-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.recent-row > button:first-child {
+  flex: 1;
+  min-width: 0;
+}
+.recent-row .trash-shortcut {
+  flex: 0 0 26px;
+  width: 26px;
+  padding: 4px;
+  opacity: 0.6;
+}
+.recent-row:hover .trash-shortcut {
+  opacity: 1;
+}
+.trash-shortcut .symbol-icon {
+  width: 15px;
+  height: 15px;
+}
+.vault-tree-row {
+  display: flex;
+  align-items: center;
+}
+.vault-tree-row .vault-open {
+  flex: 1;
+  min-width: 0;
+}
+.vault-row-delete {
+  padding: 4px;
+  border: 0;
+  background: transparent;
+}
+.vault-row-delete .symbol-icon {
+  width: 15px;
+  height: 15px;
+}
+[data-chat-width='wide'] .chat-surface:not(.compact) .compose-wrap {
+  max-width: none;
+  width: min(100%, 1800px);
+  padding-left: 40px;
+  padding-right: 40px;
+}
+[data-chat-width='wide'] .chat-surface:not(.compact) .composer {
+  max-width: none;
+}
+[data-chat-width='wide'] .chat-surface:not(.compact) .chat-scroll > .message,
+[data-chat-width='wide'] .chat-surface:not(.compact) .chat-scroll > .tool-message,
+[data-chat-width='wide'] .chat-surface:not(.compact) .chat-scroll > .approval {
+  max-width: 1600px;
+}
+.chat-surface:not(.compact) .composer {
+  max-width: none;
+}
+.dialog-sticky-header {
+  position: sticky;
+  top: 0;
+  background: var(--popover);
+  z-index: 2;
+}
+.form-dialog > header,
+.access-dialog > header,
+.trash-dialog > header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--popover);
+}
+.trash-dialog > header {
+  top: 0;
+}
+@media (max-width: 1000px) {
+  .chat-controls select {
+    max-width: 110px;
+  }
+  .chat-controls {
+    gap: 3px;
+  }
+}

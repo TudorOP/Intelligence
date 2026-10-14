@@ -1,0 +1,197 @@
+[
+  {
+    "id": "kokoro-d60d5191f57d79831540",
+    "title": "attrs 26.1.0 · attrs-26.1.0.dist-info/licenses/LICENSE",
+    "file": "kokoro/d60d5191f57d79831540.txt"
+  },
+  {
+    "id": "kokoro-7083a117bf6099c1675c",
+    "title": "cloudpickle 3.1.2 · cloudpickle-3.1.2.dist-info/licenses/LICENSE",
+    "file": "kokoro/7083a117bf6099c1675c.txt"
+  },
+  {
+    "id": "kokoro-9eb7b39b457c7b77c4c9",
+    "title": "dlinfo 2.0.0 · dlinfo-2.0.0.dist-info/LICENSE",
+    "file": "kokoro/9eb7b39b457c7b77c4c9.txt"
+  },
+  {
+    "id": "kokoro-ed16b9d5d634db945ba2",
+    "title": "joblib 1.6.0 · joblib-1.6.0.dist-info/licenses/LICENSE.txt",
+    "file": "kokoro/ed16b9d5d634db945ba2.txt"
+  },
+  {
+    "id": "kokoro-c18c756f1813e7e70819",
+    "title": "kokoro-onnx 0.6.1 · kokoro_onnx-0.6.1.dist-info/licenses/LICENSE",
+    "file": "kokoro/c18c756f1813e7e70819.txt"
+  },
+  {
+    "id": "kokoro-librosa",
+    "title": "Kokoro trimming code · librosa ISC notice",
+    "file": "kokoro/LIBROSA-ISC.txt"
+  },
+  {
+    "id": "kokoro-61aa97fbf0fb4db02a7a",
+    "title": "numpy 2.5.4 · numpy/_core/include/numpy/random/LICENSE.txt",
+    "file": "kokoro/61aa97fbf0fb4db02a7a.txt"
+  },
+  {
+    "id": "kokoro-b08571f12224a8e9493c",
+    "title": "numpy 2.5.4 · numpy/ma/LICENSE",
+    "file": "kokoro/b08571f12224a8e9493c.txt"
+  },
+  {
+    "id": "kokoro-30cac031621d8c41722d",
+    "title": "numpy 2.5.4 · numpy/random/LICENSE.md",
+    "file": "kokoro/30cac031621d8c41722d.txt"
+  },
+  {
+    "id": "kokoro-08181b23d0d69bd90bcf",
+    "title": "numpy 2.5.4 · numpy-2.5.4.dist-info/licenses/LICENSE.txt",
+    "file": "kokoro/08181b23d0d69bd90bcf.txt"
+  },
+  {
+    "id": "kokoro-308904704b5e82b6db22",
+    "title": "numpy 2.5.4 · numpy-2.5.4.dist-info/licenses/numpy/_core/include/numpy/libdivide/LICENSE.txt",
+    "file": "kokoro/308904704b5e82b6db22.txt"
+  },
+  {
+    "id": "kokoro-1179dc3296353b7e427e",
+    "title": "numpy 2.5.4 · numpy-2.5.4.dist-info/licenses/numpy/_core/src/common/pythoncapi-compat/COPYING",
+    "file": "kokoro/1179dc3296353b7e427e.txt"
+  },
+  {
+    "id": "kokoro-40965117a59b5fc528f6",
+    "title": "numpy 2.5.4 · numpy-2.5.4.dist-info/licenses/numpy/_core/src/highway/LICENSE",
+    "file": "kokoro/40965117a59b5fc528f6.txt"
+  },
+  {
+    "id": "kokoro-a1e81c15ec1b76d52fa6",
+    "title": "numpy 2.5.4 · numpy-2.5.4.dist-info/licenses/numpy/_core/src/npysort/x86-simd-sort/LICENSE.md",
+    "file": "kokoro/a1e81c15ec1b76d52fa6.txt"
+  },
+  {
+    "id": "kokoro-92bd6d0529a6fd64e937",
+    "title": "numpy 2.5.4 · numpy-2.5.4.dist-info/licenses/numpy/_core/src/umath/svml/LICENSE",
+    "file": "kokoro/92bd6d0529a6fd64e937.txt"
+  },
+  {
+    "id": "kokoro-dfae7beae95e7f623401",
+    "title": "numpy 2.5.4 · numpy-2.5.4.dist-info/licenses/numpy/fft/pocketfft/LICENSE.md",
+    "file": "kokoro/dfae7beae95e7f623401.txt"
+  },
+  {
+    "id": "kokoro-b0ea7fd5325ea1fb8c72",
+    "title": "numpy 2.5.4 · numpy-2.5.4.dist-info/licenses/numpy/linalg/lapack_lite/LICENSE.txt",
+    "file": "kokoro/b0ea7fd5325ea1fb8c72.txt"
+  },
+  {
+    "id": "kokoro-e7fe848e9b069dfbf612",
+    "title": "numpy 2.5.4 · numpy-2.5.4.dist-info/licenses/numpy/ma/LICENSE",
+    "file": "kokoro/e7fe848e9b069dfbf612.txt"
+  },
+  {
+    "id": "kokoro-041b9f0ed3a06bf7a663",
+    "title": "numpy 2.5.4 · numpy-2.5.4.dist-info/licenses/numpy/random/LICENSE.md",
+    "file": "kokoro/041b9f0ed3a06bf7a663.txt"
+  },
+  {
+    "id": "kokoro-eab2f8683822c06c9c51",
+    "title": "numpy 2.5.4 · numpy-2.5.4.dist-info/licenses/numpy/random/src/distributions/LICENSE.md",
+    "file": "kokoro/eab2f8683822c06c9c51.txt"
+  },
+  {
+    "id": "kokoro-a66209336ae253c3b259",
+    "title": "numpy 2.5.4 · numpy-2.5.4.dist-info/licenses/numpy/random/src/mt19937/LICENSE.md",
+    "file": "kokoro/a66209336ae253c3b259.txt"
+  },
+  {
+    "id": "kokoro-b922e1ae5a5a1a93c6fe",
+    "title": "numpy 2.5.4 · numpy-2.5.4.dist-info/licenses/numpy/random/src/pcg64/LICENSE.md",
+    "file": "kokoro/b922e1ae5a5a1a93c6fe.txt"
+  },
+  {
+    "id": "kokoro-b73659927bafd9aa08c0",
+    "title": "numpy 2.5.4 · numpy-2.5.4.dist-info/licenses/numpy/random/src/philox/LICENSE.md",
+    "file": "kokoro/b73659927bafd9aa08c0.txt"
+  },
+  {
+    "id": "kokoro-6289f0a2c6e032e538b3",
+    "title": "numpy 2.5.4 · numpy-2.5.4.dist-info/licenses/numpy/random/src/sfc64/LICENSE.md",
+    "file": "kokoro/6289f0a2c6e032e538b3.txt"
+  },
+  {
+    "id": "kokoro-44831c683c9aa1131c08",
+    "title": "numpy 2.5.4 · numpy-2.5.4.dist-info/licenses/numpy/random/src/splitmix64/LICENSE.md",
+    "file": "kokoro/44831c683c9aa1131c08.txt"
+  },
+  {
+    "id": "kokoro-71eebed3bef9aed8d194",
+    "title": "onnxruntime 1.31.0 · onnxruntime/LICENSE",
+    "file": "kokoro/71eebed3bef9aed8d194.txt"
+  },
+  {
+    "id": "kokoro-1cc76638b72d71633f6b",
+    "title": "onnxruntime 1.31.0 · onnxruntime/ThirdPartyNotices.txt",
+    "file": "kokoro/1cc76638b72d71633f6b.txt"
+  },
+  {
+    "id": "kokoro-8a29c8412b1e1819e677",
+    "title": "packaging 26.3 · packaging-26.3.dist-info/licenses/LICENSE",
+    "file": "kokoro/8a29c8412b1e1819e677.txt"
+  },
+  {
+    "id": "kokoro-86a5defa7492d1f1712e",
+    "title": "packaging 26.3 · packaging-26.3.dist-info/licenses/LICENSE.APACHE",
+    "file": "kokoro/86a5defa7492d1f1712e.txt"
+  },
+  {
+    "id": "kokoro-44484c816563432c2bb6",
+    "title": "packaging 26.3 · packaging-26.3.dist-info/licenses/LICENSE.BSD",
+    "file": "kokoro/44484c816563432c2bb6.txt"
+  },
+  {
+    "id": "kokoro-bbe776c6565e7e9279b2",
+    "title": "phonemizer 3.4.0 · phonemizer-3.4.0.dist-info/licenses/LICENSE",
+    "file": "kokoro/bbe776c6565e7e9279b2.txt"
+  },
+  {
+    "id": "kokoro-6408d91f998e16709d9d",
+    "title": "protobuf 7.36.2 · protobuf-7.36.2.dist-info/LICENSE",
+    "file": "kokoro/6408d91f998e16709d9d.txt"
+  },
+  {
+    "id": "kokoro-8600b2f5ceef55a91713",
+    "title": "typing_extensions 4.16.0 · typing_extensions-4.16.0.dist-info/licenses/LICENSE",
+    "file": "kokoro/8600b2f5ceef55a91713.txt"
+  },
+  {
+    "id": "kokoro-ESPEAK-LOADER-MIT.txt",
+    "title": "eSpeak NG loader · MIT",
+    "file": "kokoro/ESPEAK-LOADER-MIT.txt"
+  },
+  {
+    "id": "kokoro-ESPEAK-GPL-3.0.txt",
+    "title": "eSpeak NG · GPLv3",
+    "file": "kokoro/ESPEAK-GPL-3.0.txt"
+  },
+  {
+    "id": "kokoro-MODEL-APACHE-2.0.txt",
+    "title": "Kokoro-82M weights and voices · Apache 2.0",
+    "file": "kokoro/MODEL-APACHE-2.0.txt"
+  },
+  {
+    "id": "kokoro-FLATBUFFERS-APACHE-2.0.txt",
+    "title": "FlatBuffers · Apache 2.0",
+    "file": "kokoro/FLATBUFFERS-APACHE-2.0.txt"
+  },
+  {
+    "id": "kokoro-MODEL-CARD.txt",
+    "title": "Kokoro-82M · model provenance and attribution",
+    "file": "kokoro/MODEL-CARD.txt"
+  },
+  {
+    "id": "kokoro-source",
+    "title": "Kokoro module · sources, voice conversion and release audit",
+    "file": "kokoro/SOURCE-NOTICES.txt"
+  }
+]

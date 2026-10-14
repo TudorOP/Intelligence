@@ -1,0 +1,418 @@
+/* One shared reading measure for every chat item, including live thinking. */
+.chat-surface {
+  --chat-measure: 1040px;
+  --chat-gutter: clamp(20px, 3vw, 56px);
+  --chat-scrollbar: 0px;
+}
+[data-chat-width='wide'] .chat-surface:not(.compact) {
+  --chat-measure: 1720px;
+}
+.chat-surface.compact {
+  --chat-measure: 100%;
+  --chat-gutter: 16px;
+}
+.chat-surface .chat-scroll {
+  padding: 0 var(--chat-gutter) 24px;
+  scrollbar-gutter: stable both-edges;
+}
+.chat-surface
+  .chat-scroll
+  > :is(
+    .message,
+    .tool-message,
+    .model-thinking,
+    .thinking,
+    .approval,
+    .welcome,
+    .context-welcome
+  ) {
+  width: 100%;
+  max-width: var(--chat-measure);
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
+}
+[data-chat-width='wide']
+  .chat-surface:not(.compact)
+  .chat-scroll
+  > :is(
+    .message,
+    .tool-message,
+    .model-thinking,
+    .thinking,
+    .approval,
+    .welcome,
+    .context-welcome
+  ) {
+  max-width: var(--chat-measure);
+}
+.chat-surface .chat-scroll > .message.assistant {
+  padding-left: 0;
+  padding-right: 0;
+}
+.chat-surface .message > .model-thinking {
+  width: 100%;
+  max-width: none;
+  margin: 0 0 14px;
+}
+.chat-surface .model-thinking {
+  margin-bottom: 18px;
+  overflow-wrap: anywhere;
+}
+.chat-surface .model-thinking pre {
+  margin-bottom: 0;
+}
+.chat-surface .thinking {
+  margin-top: 10px;
+  margin-bottom: 12px;
+}
+.chat-surface .compose-wrap,
+.chat-surface:not(.compact) .compose-wrap,
+[data-chat-width='wide'] .chat-surface:not(.compact) .compose-wrap {
+  max-width: var(--chat-measure);
+  width: calc(100% - var(--chat-gutter) * 2 - var(--chat-scrollbar));
+  padding: 0 0 22px;
+  margin: 0 auto;
+}
+.chat-surface .composer {
+  width: 100%;
+  max-width: none;
+}
+.chat-metrics {
+  gap: 10px;
+  font-size: 11px;
+  margin-bottom: 0;
+  padding-bottom: 6px;
+}
+.context-meter {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: help;
+}
+.context-pie {
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  border: 1px solid var(--line-strong);
+  background: conic-gradient(
+    var(--accent) 0 var(--context-angle),
+    var(--hover) var(--context-angle) 360deg
+  );
+}
+.model-menu {
+  width: min(600px, calc(100vw - 32px));
+  padding: 10px;
+}
+.model-menu-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px 12px;
+  font-size: 12px;
+}
+.model-menu-heading small {
+  color: var(--muted);
+}
+.model-options {
+  max-height: min(420px, calc(100dvh - 190px));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.model-options .model-option {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 10px;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  padding: 10px;
+  font-size: 13px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.model-option > span:first-child {
+  width: 18px;
+  flex-shrink: 0;
+}
+.model-option[aria-selected='true'] {
+  background: var(--accent-soft);
+}
+.model-option:hover {
+  background: var(--hover);
+}
+.model-menu-error {
+  color: var(--muted);
+  padding: 6px 10px;
+  font-size: 12px;
+}
+/* Keep empty tracks so one card never stretches across the whole canvas. */
+.resource-grid {
+  grid-template-columns: repeat(auto-fill, minmax(min(290px, 100%), 1fr));
+  align-items: start;
+  gap: 16px;
+}
+.projects-page .resource-grid {
+  grid-template-columns: repeat(auto-fill, minmax(min(330px, 100%), 1fr));
+}
+.skills-learning-control {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 24px;
+  width: 100%;
+  max-width: 660px;
+  margin: 0 0 20px;
+  padding: 14px 18px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+}
+.skills-learning-control > span {
+  flex: 1 1 180px;
+  min-width: 0;
+  line-height: 1.5;
+}
+.skills-learning-control > select {
+  flex: 1 1 260px;
+  min-width: 0;
+  width: 260px;
+  margin: 0;
+}
+.skills-grid {
+  grid-template-columns: repeat(auto-fill, minmax(min(270px, 100%), 1fr));
+}
+.skills-grid .resource-card {
+  padding: 20px;
+}
+.skills-grid .resource-icon {
+  margin-bottom: 14px;
+}
+.skills-grid .resource-card h2 {
+  font-size: 17px;
+}
+.skills-grid.resource-list {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+}
+.skills-grid.resource-list .resource-card {
+  display: grid;
+  grid-template-columns: 28px minmax(150px, 1fr) minmax(150px, 1fr) auto auto;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 42px 12px 16px;
+}
+.skills-grid.resource-list .resource-icon,
+.skills-grid.resource-list h2,
+.skills-grid.resource-list p,
+.skills-grid.resource-list label {
+  margin: 0;
+}
+.skills-grid.resource-list p {
+  font-size: 12px;
+}
+.skills-grid.resource-list .resource-card > button {
+  margin: 0;
+}
+.note-area {
+  --note-measure: 1480px;
+}
+.note-area :is(.note-heading, .editor-tools, .note-prose, .linked-items) {
+  max-width: var(--note-measure);
+  width: calc(100% - 48px);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 26px;
+  padding-right: 26px;
+}
+.note-area .note-heading {
+  padding-top: 32px;
+}
+.task-card-shell {
+  position: relative;
+  margin-bottom: 14px;
+}
+.task-card-shell > .task-card {
+  width: 100%;
+  margin: 0;
+  padding-right: 38px;
+}
+.task-card-shell > .dropdown {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+}
+/* Feather the bitmap itself, retaining its rounded outline without a painted frame. */
+.overview-art,
+.welcome-orbit > .theme-banner,
+.machine-overview > .theme-banner,
+.matrix-page .page-heading > .theme-banner,
+.vault-empty > .theme-banner {
+  mask-image:
+    linear-gradient(to right, transparent, #000 14px, #000 calc(100% - 14px), transparent),
+    linear-gradient(to bottom, transparent, #000 12px, #000 calc(100% - 12px), transparent);
+  mask-composite: intersect;
+}
+.overview-art {
+  border-radius: 16px;
+}
+.help-tooltip {
+  position: fixed;
+  z-index: 2000;
+  width: max-content;
+  max-width: min(340px, calc(100vw - 24px));
+  padding: 9px 12px;
+  background: var(--popover);
+  color: var(--text);
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  box-shadow: 0 5px 20px var(--shadow-heavy);
+  font-size: 12px;
+  line-height: 1.5;
+  pointer-events: none;
+}
+@media (max-width: 1100px) {
+  .skills-grid.resource-list .resource-card {
+    grid-template-columns: 24px minmax(120px, 1fr) auto auto;
+  }
+  .skills-grid.resource-list p {
+    grid-column: 2 / -1;
+  }
+}
+@media (max-width: 700px) {
+  .skills-grid.resource-list .resource-card {
+    grid-template-columns: 24px minmax(0, 1fr);
+  }
+  .skills-grid.resource-list label,
+  .skills-grid.resource-list .resource-card > button {
+    grid-column: 2;
+  }
+  .note-area :is(.note-heading, .editor-tools, .note-prose, .linked-items) {
+    width: 100%;
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+}
+.cover-picker {
+  display: grid;
+  gap: 12px;
+}
+.cover-swatches {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+.cover-swatches > button {
+  height: 38px;
+  border: 2px solid transparent;
+  box-shadow: inset 0 0 0 1px #0003;
+}
+.cover-swatches > button[aria-pressed='true'] {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+}
+.cover-custom-color {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.cover-custom-color input {
+  width: 66px;
+  height: 36px;
+  padding: 2px;
+}
+.kanban-list.card-drop-list {
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--accent) 5%, transparent);
+}
+.task-card-shell.card-dragging {
+  opacity: 0.45;
+}
+.task-card-shell.card-drop-before::before {
+  content: '';
+  position: absolute;
+  z-index: 3;
+  left: 0;
+  right: 0;
+  top: -6px;
+  height: 4px;
+  border-radius: 4px;
+  background: var(--accent);
+  box-shadow: none;
+  pointer-events: none;
+}
+.card-drop-end {
+  border: 0;
+  border-top: 3px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 7%, transparent);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 10px;
+  color: var(--text);
+  font-size: 12px;
+  text-align: center;
+}
+.vault-sort {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  font-size: 12px;
+}
+.vault-sort select {
+  min-width: 0;
+  flex: 1;
+  padding: 6px;
+}
+.vault-tree-row > .dropdown {
+  flex-shrink: 0;
+}
+.vault-tree-row {
+  position: relative;
+}
+.vault-tree-row.vault-drop-before::before,
+.vault-tree-row.vault-drop-after::after {
+  content: '';
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  height: 3px;
+  background: var(--accent);
+  box-shadow: 0 0 0 1px var(--text);
+  pointer-events: none;
+  z-index: 2;
+}
+.vault-tree-row.vault-drop-before::before {
+  top: -2px;
+}
+.vault-tree-row.vault-drop-after::after {
+  bottom: -2px;
+}
+
+.thinking-panel { margin: 8px 0 14px; border: 1px solid var(--line); border-radius: 12px; background: color-mix(in srgb,var(--accent) 4%,var(--surface)); padding: 10px 14px; }
+.thinking-toggle { display:flex; align-items:center; gap:8px; margin:0 0 6px; padding:2px 0; color:var(--muted); border:0; background:transparent; font-size:12px; }
+.thinking-toggle .symbol-icon { width:17px; height:17px; }
+.thinking-panel pre { margin:0; white-space:pre-wrap; overflow-wrap:anywhere; font:inherit; font-size:12px; line-height:1.6; color:var(--muted); }
+.thinking-panel.vignette pre { max-height:4.8em; overflow:hidden; mask-image:linear-gradient(to bottom,#000 65%,transparent); }
+.thinking-panel.expanded pre { max-height:50dvh; overflow:auto; }
+.chat-surface .message-symbol-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 6px;
+  margin: 8px 6px 0 0;
+  vertical-align: middle;
+  color: var(--muted);
+  background: transparent;
+}
+.chat-surface .message-symbol-button:hover { background: var(--hover); color: var(--text); }
+.message-symbol-button .symbol-icon { width: 16px; height: 16px; }
+.message-speech-status { margin-right: 8px; color: var(--muted); font-size: 11px; }
+.tool-group-body { padding: 10px 0 0 14px; border-left: 1px solid var(--line); }
+.tool-call { margin: 8px 0; }
+.tool-call pre { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 320px; overflow: auto; }
+.tool-failure { color: var(--danger); }

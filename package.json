@@ -1,0 +1,158 @@
+{
+  "name": "intelligence",
+  "version": "0.9.4",
+  "private": true,
+  "description": "A thoughtful local-first AI companion for your Linux desktop.",
+  "desktopName": "app.intelligence.desktop.desktop",
+  "author": "Intelligence",
+  "type": "module",
+  "main": "electron/entry.cjs",
+  "scripts": {
+    "format": "prettier --write src electron scripts tests *.json *.ts *.html",
+    "dev": "node scripts/dev.mjs",
+    "dev:web": "vite --host 127.0.0.1",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "test": "node --test --test-skip-pattern=\"^(context discovery prefers|manual and automatic compaction|failed, cancelled or revoked compaction|Matrix context and manual compaction)\" tests/*.test.mjs",
+    "test:desktop": "node scripts/verify-desktop.mjs",
+    "test:matrix": "node scripts/verify-matrix.mjs",
+    "test:matrix:wake": "node --expose-gc scripts/verify-matrix-wake.mjs",
+    "test:matrix:archive": "node scripts/verify-matrix-archive.mjs",
+    "test:search": "node scripts/verify-search.mjs",
+    "test:appearance": "node scripts/verify-appearance.mjs",
+    "test:workspace": "node scripts/verify-workspace.mjs",
+    "test:identity": "node scripts/verify-identity.mjs",
+    "package:linux": "node scripts/package-linux.mjs",
+    "runtime:linux": "node scripts/install-linux-runtime.mjs",
+    "test:consolidation": "node scripts/verify-consolidation.mjs",
+    "test:update": "node scripts/verify-update.mjs",
+    "test:comfort": "node scripts/verify-comfort.mjs",
+    "test:organization": "node scripts/verify-organization.mjs",
+    "test:usability": "node scripts/verify-usability.mjs",
+    "test:startup": "node scripts/verify-startup.mjs",
+    "version:commit": "node scripts/commit-version.mjs",
+    "test:polish": "node scripts/verify-polish.mjs",
+    "test:settings": "node scripts/verify-settings.mjs",
+    "test:vault": "node scripts/verify-vault.mjs",
+    "test:profiles": "node scripts/verify-profiles.mjs",
+    "test:calendar-reports": "node scripts/verify-calendar-reports.mjs",
+    "test:modules": "node scripts/verify-modules.mjs",
+    "test:speech-reports": "node scripts/verify-speech-reports.mjs",
+    "test:chat-tools": "node scripts/verify-chat-tools.mjs",
+    "test:themes": "node scripts/verify-themes.mjs",
+    "test:chat-memory-order": "node scripts/verify-chat-memory-order.mjs"
+  },
+  "dependencies": {
+    "@fontsource-variable/eb-garamond": "5.3.0",
+    "@fontsource-variable/inter": "^5.2.8",
+    "@fontsource-variable/jetbrains-mono": "5.3.0",
+    "@fontsource-variable/lora": "5.3.0",
+    "@huggingface/transformers": "4.3.1",
+    "@modelcontextprotocol/sdk": "1.32.1",
+    "@tiptap/extension-image": "3.31.4",
+    "@tiptap/extension-placeholder": "3.31.4",
+    "@tiptap/extension-table": "3.31.4",
+    "@tiptap/extension-task-item": "3.31.4",
+    "@tiptap/extension-task-list": "3.31.4",
+    "@tiptap/markdown": "3.31.4",
+    "@tiptap/react": "3.31.4",
+    "@tiptap/starter-kit": "3.31.4",
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1",
+    "node-llama-cpp": "3.22.1",
+    "pdf2json": "4.1.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-markdown": "10.1.0",
+    "remark-gfm": "4.0.1",
+    "marked": "17.0.6"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "electron": "44.6.0",
+    "electron-builder": "26.15.3",
+    "playwright": "1.58.2",
+    "prettier": "^3.6.2",
+    "typescript": "5.9.3",
+    "vite": "8.3.3"
+  },
+  "build": {
+    "toolsets": {
+      "appimage": "1.0.3"
+    },
+    "appId": "app.intelligence.desktop",
+    "productName": "Intelligence",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "src/locales/**/*.json",
+      "build/icon.png",
+      "build/icon-prism.png",
+      "build/icon-aurora.png",
+      "package.json",
+      "!node_modules/onnxruntime-node/bin/napi-v*/win32/**",
+      "!node_modules/onnxruntime-node/bin/napi-v*/darwin/**",
+      "!node_modules/@node-llama-cpp/win-*/**",
+      "!node_modules/@node-llama-cpp/mac-*/**",
+      "!node_modules/@node-llama-cpp/*-cuda*/**",
+      "!node_modules/@node-llama-cpp/*-vulkan/**",
+      "!node_modules/node-llama-cpp/llama/gitRelease.bundle",
+      "!node_modules/node-llama-cpp/templates/**",
+      "LICENSE",
+      "COPYRIGHT"
+    ],
+    "asarUnpack": [
+      "node_modules/onnxruntime-node/**",
+      "node_modules/@node-llama-cpp/**",
+      "node_modules/node-llama-cpp/bins/**",
+      "node_modules/@img/**"
+    ],
+    "linux": {
+      "syncDesktopName": true,
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "category": "Utility",
+      "icon": "build/icon.png",
+      "artifactName": "Intelligence-${version}-${arch}.AppImage",
+      "synopsis": "Your local-first AI desktop companion"
+    },
+    "extraResources": [
+      {
+        "from": "public/licenses/kokoro",
+        "to": "licenses/kokoro",
+        "filter": [
+          "**/*"
+        ]
+      },
+      {
+        "from": "node_modules/@img/sharp-libvips-linux-x64",
+        "to": "app.asar.unpacked/node_modules/@img/sharp-libvips-linux-x64",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "afterPack": "scripts/verify-packaged-runtime.cjs"
+  },
+  "overrides": {
+    "node-llama-cpp": {
+      "simple-git": "4.0.2"
+    }
+  },
+  "allowScripts": {
+    "onnxruntime-node@1.30.0": true,
+    "protobufjs@7.6.6": true
+  },
+  "license": "GPL-3.0-only"
+}

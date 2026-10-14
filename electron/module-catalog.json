@@ -1,0 +1,452 @@
+{
+  "schema": 1,
+  "platform": "linux",
+  "arch": "x64",
+  "recordedDate": "2026-10-12",
+  "runtime": {
+    "pythonVersion": "3.12.15",
+    "uvVersion": "0.13.0",
+    "uv": {
+      "url": "https://github.com/astral-sh/uv/releases/download/0.13.0/uv-x86_64-unknown-linux-gnu.tar.gz",
+      "sha256": "1468ebd5a5541121837c5a2817b9972ba6090fa6caa3d142620850a47fb75154",
+      "bytes": 17380567
+    },
+    "python": {
+      "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20261009/cpython-3.12.15%2B20261009-x86_64-unknown-linux-gnu-install_only.tar.gz",
+      "sha256": "5864001bf969db329fadc2b654c4878c6027d170c6bd77e28f88666260bcaf63",
+      "bytes": 66913335
+    },
+    "licenseSources": [
+      "https://github.com/astral-sh/uv/blob/0.13.0/LICENSE-APACHE",
+      "https://github.com/astral-sh/uv/blob/0.13.0/LICENSE-MIT",
+      "https://docs.astral.sh/python-build-standalone/distributions.html#licenses"
+    ]
+  },
+  "modules": [
+    {
+      "id": "tts",
+      "name": "Piper speech",
+      "version": "1.8.0",
+      "import": "piper",
+      "license": "GPL-3.0-or-later",
+      "source": "https://github.com/OHF-Voice/piper1-gpl",
+      "requirementsSHA256": "a80457c82e09f40c16d730f46a82c3dc734ce4b9f164e3e74392177bf335ae80",
+      "model": {
+        "id": "ljspeech-en",
+        "revision": "c10ece1aade47bb51c153c893d14e5bf8e5b7117",
+        "license": "Public domain (author declaration)",
+        "source": "https://brycebeattie.com/files/tts/",
+        "files": [
+          {
+            "name": "MODEL_CARD",
+            "url": "https://huggingface.co/rhasspy/piper-voices/resolve/c10ece1aade47bb51c153c893d14e5bf8e5b7117/en/en_US/ljspeech/high/MODEL_CARD",
+            "sha256": "289f7421072d689a3d91f6c632f486af46f9b8b04417536104a4ea667b8a394b",
+            "bytes": 513
+          },
+          {
+            "name": "en_US-ljspeech-high.onnx",
+            "url": "https://huggingface.co/rhasspy/piper-voices/resolve/c10ece1aade47bb51c153c893d14e5bf8e5b7117/en/en_US/ljspeech/high/en_US-ljspeech-high.onnx",
+            "sha256": "5d4f08ba6a2a48c44592eed3ce56bf85e9de3dd4e20df90541ae68a8310c029a",
+            "bytes": 114199011
+          },
+          {
+            "name": "en_US-ljspeech-high.onnx.json",
+            "url": "https://huggingface.co/rhasspy/piper-voices/resolve/c10ece1aade47bb51c153c893d14e5bf8e5b7117/en/en_US/ljspeech/high/en_US-ljspeech-high.onnx.json",
+            "sha256": "7e1f4634af596d83cca997fb7a931ba80b70f8a316a2655ee69c55365e0ace14",
+            "bytes": 4970
+          }
+        ],
+        "name": "LJSpeech Â· English",
+        "language": "en-US"
+      },
+      "wheels": [
+        {
+          "name": "flatbuffers-25.12.19-py2.py3-none-any.whl",
+          "url": "https://files.pythonhosted.org/packages/e8/2d/d2a548598be01649e2d46231d151a6c56d10b964d94043a335ae56ea2d92/flatbuffers-25.12.19-py2.py3-none-any.whl",
+          "sha256": "7634f50c427838bb021c2d66a3d1168e9d199b0607e6329399f04846d42e20b4",
+          "bytes": 26661,
+          "package": "flatbuffers",
+          "version": "25.12.19",
+          "license": "License :: OSI Approved :: Apache Software License",
+          "source": "https://github.com/google/flatbuffers"
+        },
+        {
+          "name": "numpy-2.5.4-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+          "url": "https://files.pythonhosted.org/packages/43/a3/c799c62e19c337e6d3770b08e475887fb30ce8477d3c09efca6b2f0228a6/numpy-2.5.4-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+          "sha256": "fbde6962867ee75b48b0ee29b2b9372ec5d617799dbaf38e82dc0596f2f7738a",
+          "bytes": 16727283,
+          "package": "numpy",
+          "version": "2.5.4",
+          "license": "BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0",
+          "source": "https://pypi.org/project/numpy/2.5.4/"
+        },
+        {
+          "name": "onnxruntime-1.31.0-cp312-cp312-manylinux_2_28_x86_64.whl",
+          "url": "https://files.pythonhosted.org/packages/6c/44/1e9e762b95b7da0a8424913a1ed7c38cdaf88624a3c41ddba24ebac88bc9/onnxruntime-1.31.0-cp312-cp312-manylinux_2_28_x86_64.whl",
+          "sha256": "5e129d6c56abd53e659cb70f00a108d6824086470ff99c2e47a82e5786563db3",
+          "bytes": 23760984,
+          "package": "onnxruntime",
+          "version": "1.31.0",
+          "license": "License :: OSI Approved :: MIT License",
+          "source": "https://onnxruntime.ai"
+        },
+        {
+          "name": "packaging-26.3-py3-none-any.whl",
+          "url": "https://files.pythonhosted.org/packages/63/34/ba1c580383c9eada3711951fef0795c80b829a078d72188184bcab9dd527/packaging-26.3-py3-none-any.whl",
+          "sha256": "d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c",
+          "bytes": 129956,
+          "package": "packaging",
+          "version": "26.3",
+          "license": "Apache-2.0 OR BSD-2-Clause",
+          "source": "https://github.com/pypa/packaging"
+        },
+        {
+          "name": "pathvalidate-3.3.1-py3-none-any.whl",
+          "url": "https://files.pythonhosted.org/packages/9a/70/875f4a23bfc4731703a5835487d0d2fb999031bd415e7d17c0ae615c18b7/pathvalidate-3.3.1-py3-none-any.whl",
+          "sha256": "5263baab691f8e1af96092fa5137ee17df5bdfbd6cff1fcac4d6ef4bc2e1735f",
+          "bytes": 24305,
+          "package": "pathvalidate",
+          "version": "3.3.1",
+          "license": "License :: OSI Approved :: MIT License",
+          "source": "https://github.com/thombashi/pathvalidate"
+        },
+        {
+          "name": "piper_tts-1.8.0-cp39-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_28_x86_64.whl",
+          "url": "https://files.pythonhosted.org/packages/84/81/0112a7d510911f33018dc24023d1655bb772f84a4e95fe7f0180f66bbd17/piper_tts-1.8.0-cp39-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_28_x86_64.whl",
+          "sha256": "25b4d3f31ff70c8fa7151908e00aaa5650cbdf16bca8fcf21299f3941b89a7d3",
+          "bytes": 34131442,
+          "package": "piper-tts",
+          "version": "1.8.0",
+          "license": "See package license notices",
+          "source": "http://github.com/OHF-voice/piper1-gpl"
+        },
+        {
+          "name": "protobuf-7.36.2-cp310-abi3-manylinux2014_x86_64.whl",
+          "url": "https://files.pythonhosted.org/packages/db/f3/3996583dd2906297a637af12114deddf7658af6e683fedb83be061983fb5/protobuf-7.36.2-cp310-abi3-manylinux2014_x86_64.whl",
+          "sha256": "89f23aa53c24553a2416fd4fd1ec06f74fa42b14b546d8883128813f775bbfd2",
+          "bytes": 343223,
+          "package": "protobuf",
+          "version": "7.36.2",
+          "license": "See package license notices",
+          "source": "https://developers.google.com/protocol-buffers/"
+        }
+      ]
+    },
+    {
+      "id": "stt",
+      "name": "Streaming speech recognition",
+      "version": "1.13.8",
+      "import": "sherpa_onnx",
+      "license": "Apache-2.0",
+      "source": "https://github.com/k2-fsa/sherpa-onnx",
+      "requirementsSHA256": "2f702def94fc3cfc9416461479f795e9d330e51d22e4878fb514446c9bcc9ce6",
+      "model": {
+        "id": "english-20m",
+        "revision": "d42f2d9f7ca24806fb667456a18a9f1b60f70d16",
+        "license": "Apache-2.0",
+        "source": "https://huggingface.co/csukuangfj/sherpa-onnx-streaming-zipformer-en-20M-2023-02-17",
+        "files": [
+          {
+            "name": "README.md",
+            "url": "https://huggingface.co/csukuangfj/sherpa-onnx-streaming-zipformer-en-20M-2023-02-17/resolve/d42f2d9f7ca24806fb667456a18a9f1b60f70d16/README.md",
+            "sha256": "505f6b0e8a39f066a0794c4fb0b5689533d3bcd9d1dc5e5f47ccffeef1af9877",
+            "bytes": 304
+          },
+          {
+            "name": "decoder-epoch-99-avg-1.int8.onnx",
+            "url": "https://huggingface.co/csukuangfj/sherpa-onnx-streaming-zipformer-en-20M-2023-02-17/resolve/d42f2d9f7ca24806fb667456a18a9f1b60f70d16/decoder-epoch-99-avg-1.int8.onnx",
+            "sha256": "21e2a2acd961b3ac72f55be2f10f1a285e1b0b0ba010d7c0b6eab141411b163c",
+            "bytes": 539499
+          },
+          {
+            "name": "encoder-epoch-99-avg-1.int8.onnx",
+            "url": "https://huggingface.co/csukuangfj/sherpa-onnx-streaming-zipformer-en-20M-2023-02-17/resolve/d42f2d9f7ca24806fb667456a18a9f1b60f70d16/encoder-epoch-99-avg-1.int8.onnx",
+            "sha256": "3810755ce7c3ab26b42a8bcf39d191308fa27fb0f53358823ba46141d03b7eb3",
+            "bytes": 42845182
+          },
+          {
+            "name": "joiner-epoch-99-avg-1.int8.onnx",
+            "url": "https://huggingface.co/csukuangfj/sherpa-onnx-streaming-zipformer-en-20M-2023-02-17/resolve/d42f2d9f7ca24806fb667456a18a9f1b60f70d16/joiner-epoch-99-avg-1.int8.onnx",
+            "sha256": "e085d73b593cf9b0707f370dbd656d58327d3fe36d80d849202ef81df02cb01e",
+            "bytes": 259572
+          },
+          {
+            "name": "tokens.txt",
+            "url": "https://huggingface.co/csukuangfj/sherpa-onnx-streaming-zipformer-en-20M-2023-02-17/resolve/d42f2d9f7ca24806fb667456a18a9f1b60f70d16/tokens.txt",
+            "sha256": "49e3c2646595fd907228b3c6787069658f67b17377c60aeb8619c4551b2316fb",
+            "bytes": 5048
+          }
+        ],
+        "name": "English Zipformer · Lightweight (20M)",
+        "language": "en"
+      },
+      "wheels": [
+        {
+          "name": "sherpa_onnx-1.13.8-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl",
+          "url": "https://files.pythonhosted.org/packages/13/78/2f712b7408ddbb64614c20388912414705b728516224e737b63f2adec94a/sherpa_onnx-1.13.8-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl",
+          "sha256": "6949773017647febc0c3696dffb2c67dd3febd4737b87e3dd135a42773704a06",
+          "bytes": 4400575,
+          "package": "sherpa-onnx",
+          "version": "1.13.8",
+          "license": "See package license notices",
+          "source": "https://github.com/k2-fsa/sherpa-onnx"
+        },
+        {
+          "name": "sherpa_onnx_core-1.13.8-py3-none-manylinux2014_x86_64.whl",
+          "url": "https://files.pythonhosted.org/packages/b6/ca/e27c1fb5c54b181d4a5450f3d5c789d9da02eb42dc9b20cfdab5dda4c864/sherpa_onnx_core-1.13.8-py3-none-manylinux2014_x86_64.whl",
+          "sha256": "4da90acf435373d7b2ba9cc0be806e7e274d28f63f5780880b5dea6721626e36",
+          "bytes": 10642497,
+          "package": "sherpa-onnx-core",
+          "version": "1.13.8",
+          "license": "See package license notices",
+          "source": "https://github.com/k2-fsa/sherpa-onnx"
+        }
+      ],
+      "models": [
+        {
+          "id": "zipformer-en-libri-giga",
+          "storageId": "stt-larger",
+          "revision": "9a65b6ea94c311ca770c2bf895b30f456a22d703",
+          "license": "Apache-2.0",
+          "source": "https://huggingface.co/csukuangfj/sherpa-onnx-streaming-zipformer-en-2023-06-21",
+          "name": "English Zipformer · Larger (LibriSpeech + GigaSpeech)",
+          "language": "en-US",
+          "files": [
+            {
+              "name": "encoder-epoch-99-avg-1.int8.onnx",
+              "url": "https://huggingface.co/csukuangfj/sherpa-onnx-streaming-zipformer-en-2023-06-21/resolve/9a65b6ea94c311ca770c2bf895b30f456a22d703/encoder-epoch-99-avg-1.int8.onnx",
+              "sha256": "32c98281c7bd8b63e3e142d007251b37f120572e8fdea9a4f5a79ce22b10ec4f",
+              "bytes": 187823992
+            },
+            {
+              "name": "decoder-epoch-99-avg-1.onnx",
+              "url": "https://huggingface.co/csukuangfj/sherpa-onnx-streaming-zipformer-en-2023-06-21/resolve/9a65b6ea94c311ca770c2bf895b30f456a22d703/decoder-epoch-99-avg-1.onnx",
+              "sha256": "9da02b77cb08826756ec6a88635f35a40374e4164e7c6359121a9145958a6ceb",
+              "bytes": 2092566
+            },
+            {
+              "name": "joiner-epoch-99-avg-1.int8.onnx",
+              "url": "https://huggingface.co/csukuangfj/sherpa-onnx-streaming-zipformer-en-2023-06-21/resolve/9a65b6ea94c311ca770c2bf895b30f456a22d703/joiner-epoch-99-avg-1.int8.onnx",
+              "sha256": "831477d390e59a61f1b6a6f763b9903e6c6366ff6034f1ddba613be82637122f",
+              "bytes": 259335
+            },
+            {
+              "name": "tokens.txt",
+              "url": "https://huggingface.co/csukuangfj/sherpa-onnx-streaming-zipformer-en-2023-06-21/resolve/9a65b6ea94c311ca770c2bf895b30f456a22d703/tokens.txt",
+              "sha256": "49e3c2646595fd907228b3c6787069658f67b17377c60aeb8619c4551b2316fb",
+              "bytes": 5048
+            },
+            {
+              "name": "MODEL_CARD",
+              "url": "https://huggingface.co/csukuangfj/sherpa-onnx-streaming-zipformer-en-2023-06-21/resolve/9a65b6ea94c311ca770c2bf895b30f456a22d703/README.md",
+              "sha256": "eca6e2608d835c6b7ad596b659006dab216ab364928358a96d414e3e1ea4de04",
+              "bytes": 231
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "zim",
+      "name": "Offline ZIM knowledge",
+      "version": "3.13.1",
+      "import": "libzim",
+      "license": "GPL-3.0-or-later",
+      "source": "https://github.com/openzim/python-libzim",
+      "requirementsSHA256": "59fab2b010fed458b70ac45c8d2bd6bcbca34af097abc033ce8f21923f63e512",
+      "wheels": [
+        {
+          "name": "libzim-3.13.1-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+          "url": "https://files.pythonhosted.org/packages/ed/6b/ecad9a66d86f87f82806007f97d40a5de3c1781dc29e8de8b292651909ae/libzim-3.13.1-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+          "sha256": "1f313d5930021efdf1f45ccb4f294a01cfcebcdbba4ae8d1a1aadcea82e8682d",
+          "bytes": 10695335,
+          "package": "libzim",
+          "version": "3.13.1",
+          "license": "GPL-3.0-or-later",
+          "source": "https://pypi.org/project/libzim/3.13.1/"
+        }
+      ]
+    },
+    {
+      "id": "kokoro",
+      "name": "Kokoro speech",
+      "version": "0.6.1",
+      "license": "MIT runtime · GPLv3 phonemizer",
+      "source": "https://github.com/thewh1teagle/kokoro-onnx",
+      "requirementsSHA256": "96dccfabab6f5cc583fe4853d177e2fe318de9a3ca2c7d4183f883b91214b55c",
+      "model": {
+        "id": "kokoro-82m-v1-fp32-en",
+        "revision": "1939ad2a8e416c0acfeecc08a694d14ef25f2231",
+        "license": "Apache-2.0",
+        "source": "https://huggingface.co/onnx-community/Kokoro-82M-v1.0-ONNX",
+        "files": [
+          {
+            "name": "model.onnx",
+            "url": "https://huggingface.co/onnx-community/Kokoro-82M-v1.0-ONNX/resolve/1939ad2a8e416c0acfeecc08a694d14ef25f2231/onnx/model.onnx",
+            "sha256": "8fbea51ea711f2af382e88c833d9e288c6dc82ce5e98421ea61c058ce21a34cb",
+            "bytes": 325532232
+          },
+          {
+            "name": "af_heart.bin",
+            "url": "https://huggingface.co/onnx-community/Kokoro-82M-v1.0-ONNX/resolve/1939ad2a8e416c0acfeecc08a694d14ef25f2231/voices/af_heart.bin",
+            "sha256": "d583ccff3cdca2f7fae535cb998ac07e9fcb90f09737b9a41fa2734ec44a8f0b",
+            "bytes": 522240
+          },
+          {
+            "name": "af_bella.bin",
+            "url": "https://huggingface.co/onnx-community/Kokoro-82M-v1.0-ONNX/resolve/1939ad2a8e416c0acfeecc08a694d14ef25f2231/voices/af_bella.bin",
+            "sha256": "f69d836209b78eb8c66e75e3cda491e26ea838a3674257e9d4e5703cbaf55c8b",
+            "bytes": 522240
+          },
+          {
+            "name": "am_michael.bin",
+            "url": "https://huggingface.co/onnx-community/Kokoro-82M-v1.0-ONNX/resolve/1939ad2a8e416c0acfeecc08a694d14ef25f2231/voices/am_michael.bin",
+            "sha256": "1d1f21dd8da39c30705cd4c75d039d265e9bc4a2a93ed09bc9e1b1225eb95ba1",
+            "bytes": 522240
+          },
+          {
+            "name": "README.md",
+            "url": "https://huggingface.co/onnx-community/Kokoro-82M-v1.0-ONNX/resolve/1939ad2a8e416c0acfeecc08a694d14ef25f2231/README.md",
+            "sha256": "b8fd888b4782f4d4ae85e2f1587cafd727037f4f138f72429ef1bd5908c0e9d8",
+            "bytes": 10627
+          }
+        ],
+        "name": "Kokoro-82M · English",
+        "language": "en-US"
+      },
+      "wheels": [
+        {
+          "name": "attrs-26.1.0-py3-none-any.whl",
+          "url": "https://files.pythonhosted.org/packages/64/b4/17d4b0b2a2dc85a6df63d1157e028ed19f90d4cd97c36717afef2bc2f395/attrs-26.1.0-py3-none-any.whl",
+          "sha256": "c647aa4a12dfbad9333ca4e71fe62ddc36f4e63b2d260a37a8b83d2f043ac309",
+          "bytes": 67548,
+          "package": "attrs",
+          "version": "26.1.0",
+          "license": "MIT",
+          "source": "https://pypi.org/project/attrs/26.1.0/"
+        },
+        {
+          "name": "cloudpickle-3.1.2-py3-none-any.whl",
+          "url": "https://files.pythonhosted.org/packages/88/39/799be3f2f0f38cc727ee3b4f1445fe6d5e4133064ec2e4115069418a5bb6/cloudpickle-3.1.2-py3-none-any.whl",
+          "sha256": "9acb47f6afd73f60dc1df93bb801b472f05ff42fa6c84167d25cb206be1fbf4a",
+          "bytes": 22228,
+          "package": "cloudpickle",
+          "version": "3.1.2",
+          "license": "BSD-3-Clause",
+          "source": "https://github.com/cloudpipe/cloudpickle"
+        },
+        {
+          "name": "dlinfo-2.0.0-py3-none-any.whl",
+          "url": "https://files.pythonhosted.org/packages/da/90/022c79d6e5e6f843268c10b84d4a021ee3afba0621d3c176d3ff2024bfc8/dlinfo-2.0.0-py3-none-any.whl",
+          "sha256": "b32cc18e3ea67c0ca9ca409e5b41eed863bd1363dbc9dd3de90fedf11b61e7bc",
+          "bytes": 3654,
+          "package": "dlinfo",
+          "version": "2.0.0",
+          "license": "MIT",
+          "source": "https://github.com/fphammerle/python-dlinfo"
+        },
+        {
+          "name": "espeakng_loader-0.2.4-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+          "url": "https://files.pythonhosted.org/packages/de/1e/25ec5ab07528c0fbb215a61800a38eca05c8a99445515a02d7fa5debcb32/espeakng_loader-0.2.4-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+          "sha256": "08721baf27d13d461f6be6eed9a65277e70d68234ff484fd8b9897b222cdcb6d",
+          "bytes": 10078484,
+          "package": "espeakng-loader",
+          "version": "0.2.4",
+          "license": "MIT loader; GPL-3.0-or-later eSpeak NG",
+          "source": "https://pypi.org/project/espeakng-loader/0.2.4/"
+        },
+        {
+          "name": "flatbuffers-25.12.19-py2.py3-none-any.whl",
+          "url": "https://files.pythonhosted.org/packages/e8/2d/d2a548598be01649e2d46231d151a6c56d10b964d94043a335ae56ea2d92/flatbuffers-25.12.19-py2.py3-none-any.whl",
+          "sha256": "7634f50c427838bb021c2d66a3d1168e9d199b0607e6329399f04846d42e20b4",
+          "bytes": 26661,
+          "package": "flatbuffers",
+          "version": "25.12.19",
+          "license": "Apache 2.0",
+          "source": "https://github.com/google/flatbuffers"
+        },
+        {
+          "name": "joblib-1.6.0-py3-none-any.whl",
+          "url": "https://files.pythonhosted.org/packages/18/53/84099323c2ec4be98d935f63c033ac4151ee83836ca1050ede3b3aadf155/joblib-1.6.0-py3-none-any.whl",
+          "sha256": "3dbbf9f6e4b592a2357b854608e980fe6390d131d7a82f011a377ef2ebef7aba",
+          "bytes": 306115,
+          "package": "joblib",
+          "version": "1.6.0",
+          "license": "BSD-3-Clause",
+          "source": "https://github.com/joblib/joblib"
+        },
+        {
+          "name": "kokoro_onnx-0.6.1-py3-none-any.whl",
+          "url": "https://files.pythonhosted.org/packages/60/e1/a27e5a70a525a5ee1fd5357596f07b724d02ff317f134e86cb6e3d9db968/kokoro_onnx-0.6.1-py3-none-any.whl",
+          "sha256": "50c8de4950d601df41428ee5462a48c8a78bef441bf671f2492e070ef44d8a32",
+          "bytes": 26084,
+          "package": "kokoro-onnx",
+          "version": "0.6.1",
+          "license": "MIT",
+          "source": "https://github.com/thewh1teagle/kokoro-onnx"
+        },
+        {
+          "name": "numpy-2.5.4-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+          "url": "https://files.pythonhosted.org/packages/43/a3/c799c62e19c337e6d3770b08e475887fb30ce8477d3c09efca6b2f0228a6/numpy-2.5.4-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+          "sha256": "fbde6962867ee75b48b0ee29b2b9372ec5d617799dbaf38e82dc0596f2f7738a",
+          "bytes": 16727283,
+          "package": "numpy",
+          "version": "2.5.4",
+          "license": "BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0",
+          "source": "https://pypi.org/project/numpy/2.5.4/"
+        },
+        {
+          "name": "onnxruntime-1.31.0-cp312-cp312-manylinux_2_28_x86_64.whl",
+          "url": "https://files.pythonhosted.org/packages/6c/44/1e9e762b95b7da0a8424913a1ed7c38cdaf88624a3c41ddba24ebac88bc9/onnxruntime-1.31.0-cp312-cp312-manylinux_2_28_x86_64.whl",
+          "sha256": "5e129d6c56abd53e659cb70f00a108d6824086470ff99c2e47a82e5786563db3",
+          "bytes": 23760984,
+          "package": "onnxruntime",
+          "version": "1.31.0",
+          "license": "MIT License",
+          "source": "https://onnxruntime.ai"
+        },
+        {
+          "name": "packaging-26.3-py3-none-any.whl",
+          "url": "https://files.pythonhosted.org/packages/63/34/ba1c580383c9eada3711951fef0795c80b829a078d72188184bcab9dd527/packaging-26.3-py3-none-any.whl",
+          "sha256": "d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c",
+          "bytes": 129956,
+          "package": "packaging",
+          "version": "26.3",
+          "license": "Apache-2.0 OR BSD-2-Clause",
+          "source": "https://github.com/pypa/packaging"
+        },
+        {
+          "name": "phonemizer-3.4.0-py3-none-any.whl",
+          "url": "https://files.pythonhosted.org/packages/37/41/09bafd0ccf4f4ddd1530c9f9d10e75a24056e10e120b9daa97f691fcabc3/phonemizer-3.4.0-py3-none-any.whl",
+          "sha256": "5ff1215d0efa3606dd1b92449f6d71b5c1741efcc84c6d40c17bfaf64f6ded5f",
+          "bytes": 108529,
+          "package": "phonemizer",
+          "version": "3.4.0",
+          "license": "GPL-3.0-or-later",
+          "source": "https://github.com/bootphon/phonemizer"
+        },
+        {
+          "name": "protobuf-7.36.2-cp310-abi3-manylinux2014_x86_64.whl",
+          "url": "https://files.pythonhosted.org/packages/db/f3/3996583dd2906297a637af12114deddf7658af6e683fedb83be061983fb5/protobuf-7.36.2-cp310-abi3-manylinux2014_x86_64.whl",
+          "sha256": "89f23aa53c24553a2416fd4fd1ec06f74fa42b14b546d8883128813f775bbfd2",
+          "bytes": 343223,
+          "package": "protobuf",
+          "version": "7.36.2",
+          "license": "3-Clause BSD License",
+          "source": "https://developers.google.com/protocol-buffers/"
+        },
+        {
+          "name": "typing_extensions-4.16.0-py3-none-any.whl",
+          "url": "https://files.pythonhosted.org/packages/49/d3/b8441a820a491ddfc024b0b0cf0393375b75ea13866d9c66727e54c2fc80/typing_extensions-4.16.0-py3-none-any.whl",
+          "sha256": "481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8",
+          "bytes": 45571,
+          "package": "typing_extensions",
+          "version": "4.16.0",
+          "license": "PSF-2.0",
+          "source": "https://github.com/python/typing_extensions"
+        }
+      ],
+      "import": "kokoro_onnx"
+    }
+  ]
+}
