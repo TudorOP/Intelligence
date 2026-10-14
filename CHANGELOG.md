@@ -1,5 +1,11 @@
 # Releases
 
+## Unreleased planning on dev
+
+- Created the dev-first development workflow; main remains the default branch for reviewed releases.
+- Added the proposed 1.0 onboarding, written help and agent configuration/access plan, with four ImageGen concepts and retained prompts/provenance.
+- This is documentation and design work for review. Application behavior and the 0.94 / package 0.9.4 version are unchanged.
+
 ## 0.94
 
 - Local-first Linux desktop workspace with persistent chat, conversation branches, agent profiles, live permissions and protected provider credentials.

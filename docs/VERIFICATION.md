@@ -1,5 +1,7 @@
 # Intelligence 0.94 — verification
 
+The unreleased 1.0 planning change on `dev` adds documentation and four ImageGen concepts only. Its tracked-source audit passes; local Markdown targets, provenance JSON, image files and diff whitespace are checked, and the source ZIP is refreshed. Application tests/builds below describe the existing 0.94 baseline; they are not evidence that the proposed setup or permission features are implemented.
+
 The backend suite passes all **207 enabled checks**, and the TypeScript/production renderer build passes in this checkout. The production Electron desktop smoke fixture also passes with isolated data and no renderer runtime errors. Reproduce source verification with npm ci, npm test and npm run build. Context-length benchmarks remain deferred and token-overhead work is not queued.
 
 Source-publication checks also pass: 880 tracked files, 442 indexed complete notices, matching GPL copies, preserved original artwork/provenance and no optional runtime/model/data/credential artifacts. Three regression checks reject extra initial history, force-added private/download files, disguised model data, key-like text and missing notices. GitHub CI runs the same source guard, backend suite and renderer build with read-only repository permissions.

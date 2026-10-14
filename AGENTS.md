@@ -1,6 +1,6 @@
 # Intelligence project handoff
 
-Read README.md, TODO.md and UI_UX.md before starting. Main is the sole maintained branch. Target 1920×1080 first, support larger/shorter windows and preserve English/Romanian UI and user-authored content.
+Read README.md, TODO.md and UI_UX.md before starting. Develop new work on dev; main holds reviewed releases and remains the GitHub default branch. Push new changes to dev first only when authorized; merge to main and publish only on an explicit user request. Target 1920×1080 first, support larger/shorter windows and preserve English/Romanian UI and user-authored content.
 
 Release 0.94 uses package 0.9.4. Normal updates add 0.01 to the public label: 0.95, 0.96, etc. Use scripts/bump-version.mjs; it maps the public label to a valid semantic package version. After verification, update release docs and Intelligence-source.zip, then run scripts/commit-version.mjs for a local commit. Do not push or publish without an explicit user request.
 

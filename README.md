@@ -67,6 +67,10 @@ Data normally lives in `~/.config/Intelligence/`, follows `XDG_CONFIG_HOME`, and
 
 ## Development and release
 
+`main` holds reviewed releases and remains the default branch. New work is developed on `dev` and pushed there first when authorized. Merging to `main` and publishing a release are separate, explicit actions.
+
+The [1.0 onboarding and agent setup plan](docs/ONBOARDING_1_0_PLAN.md) proposes resumable first-use setup, an in-app written guide and scoped permission requests. It is a review proposal; the current application is still 0.94.
+
 Use `npm ci`, `npm run dev`, `npm run build` and `npm test`. Run `node scripts/verify-source.mjs` before sharing source. Desktop fixtures use isolated data under `.test-data/`. See [verification](docs/VERIFICATION.md), [architecture and development](docs/DEVELOPMENT.md), [appearance](docs/APPEARANCE.md) and [release acceptance](docs/RELEASE_CHECKLIST.md).
 
 The public release label is 0.94 (package 0.9.4). Normal updates add 0.01: 0.95, 0.96 and so on. `node scripts/bump-version.mjs` advances the label and its semantic package version together.

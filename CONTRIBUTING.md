@@ -2,7 +2,7 @@
 
 Intelligence is a personal AI harness for non-technical people. Prefer understandable workflows, consistent controls and useful explanations. Keep Linux as the release target, English/Romanian UI, user-authored content and the native permission/revision/approval boundaries.
 
-Read README.md, TODO.md, UI_UX.md and AGENTS.md before changing the application. Use main for maintained development. Install dependencies with npm ci, run npm run dev, then verify with npm test and npm run build. Desktop fixtures use isolated .test-data directories; never point them at real user data. Run node scripts/verify-source.mjs before sharing source.
+Read README.md, TODO.md, UI_UX.md and AGENTS.md before changing the application. Develop new work on dev; main holds reviewed releases and remains the default branch. Push to dev first only when authorized. Merging to main and publishing require separate explicit requests. Install dependencies with npm ci, run npm run dev, then verify with npm test and npm run build. Desktop fixtures use isolated .test-data directories; never point them at real user data. Run node scripts/verify-source.mjs before sharing source.
 
 For a bug report, describe the steps, expected result, actual result, app version, OS and relevant provider/model. Smaller-model tool failures are useful reports. Share minimal, sanitized examples; omit API keys, private conversations, database files, backups, model weights and downloaded engines. Use private reporting for security issues as described in SECURITY.md.
 
