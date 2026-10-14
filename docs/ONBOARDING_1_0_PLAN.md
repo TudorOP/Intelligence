@@ -66,15 +66,17 @@ stateDiagram-v2
     Memory --> Review
     Review --> Completed: explicit finish
     Model --> Settings: advanced setup with saved return target
-    Settings --> Model: return to setup
-    Settings --> Deferred: close or leave settings
+    Settings --> Model: return or close setup-origin Settings
+    Settings --> Deferred: save and exit setup
     Model --> Deferred: save and exit
     Deferred --> Model: continue setup at saved stage
 ```
 
-All stages support backtracking and deferral; the diagram emphasizes the current broken model detour. Prefer inline provider forms so the detour is usually unnecessary. When full Settings is needed, suspend setup, record the stage/focus target, show a persistent “Return to setup” action in Settings and restore that stage afterward. Closing Settings returns to setup if it was entered from setup; otherwise the incomplete checklist remains accessible. Use one active modal at a time, with one focus trap. Revalidate readiness on return instead of trusting the old success badge.
+All stages support backtracking and deferral; the diagram emphasizes the current broken model detour. Prefer inline provider forms so the detour is usually unnecessary. When full Settings is needed, suspend setup, save progress and create a session-only return target with stage/focus information. Show “Return to setup” only in Settings entered from that active setup session. Closing those Settings returns to the suspended stage. Save & exit ends the setup session and clears the return target. Use one active modal at a time, with one focus trap. Revalidate readiness on return instead of trusting the old success badge.
 
-Offer Continue setup in Help & setup and a small dismissible workspace prompt while incomplete. Dismissing the prompt does not mark completion. Completed users see Review setup and can revisit individual sections without reapplying defaults. Do not reopen the whole guide on every launch.
+**Ordinary Settings never starts or resumes onboarding.** Opening Settings from the gear, command palette, a normal help link or another app surface opens the requested section directly, even if setup is incomplete or no model is configured. Saving a provider or closing ordinary Settings stays in the normal workspace flow. An incomplete setup flag is not a navigation trigger. Keep the return target separate from persisted progress; clear it on setup exit, ordinary Settings navigation and application restart, so a previous setup detour cannot hijack a later Settings visit. Continue/Review setup remains an explicit user action in Help & setup. Opening the written guide or a feature lesson does not launch first-use setup.
+
+Offer Continue setup in Help & setup and a small dismissible workspace prompt while incomplete. Dismissing the prompt does not mark completion. Completed users see Review setup and can revisit individual sections without reapplying defaults. A fresh installation may show the welcome invitation once, with Explore first available; subsequent launches offer explicit resume without automatically reopening the whole guide. Existing users are not forced into onboarding by an update, missing model or incomplete setup status.
 
 Migration must preserve existing users' completed flag even though the old detour may have set it too early. Offer a nonblocking 1.0 setup review rather than guessing who finished. If a stage disappears in a later version, map its stable ID to the next relevant stage. Restored backups keep configured preferences; transient credentials and approval state are never revived as live permissions.
 
@@ -226,6 +228,7 @@ Focused native tests and isolated Electron fixtures should verify meaningful lif
 
 - Enter profile and companion data, continue without blurring, go Back and reopen: values persist. Failed save stays visible on the current stage. Description sharing stays independent from writing it.
 - Configure a model inline or through full Settings, save, return to the same setup stage, select a model and continue. Closing Settings, app reload/restart and external documentation links never mark setup complete or lose progress. Keyboard focus returns correctly.
+- Open Settings normally from the gear, command palette and regular deep links with setup complete, incomplete, deferred and no model configured: no onboarding opens. Saving/changing a provider and closing ordinary Settings never resumes setup. Only a current setup-origin Settings detour returns to the suspended stage. Save & exit, ordinary Settings navigation and restart clear that session-only return target. Written guide/feature lessons never start first-use setup, and upgrades never force it on existing users.
 - Skip model setup, finish and browse the workspace: the app clearly says chat still needs a model. Resume does not erase completed configuration. Review setup after completion does not reset it.
 - Provider changes invalidate tests; stale discovery responses are ignored. Test offline/refused ports, empty model lists, rejected keys, session-only secure storage, authenticated servers, manual IDs, response timeout and unsupported tools. No provider fallback, secret leakage or unauthorized data sent by diagnosis.
 - New installs require the chosen memory/download/background actions. Upgrades preserve old preferences and completed state. Backup restoration and missing-resource cases recover without silently granting access or resuming expired approvals.
