@@ -28,3 +28,4 @@ Develop on `dev`; `main` holds reviewed releases. This list records proposed wor
 - [ ] Add an offline English/Romanian written guide under Settings → Help & setup.
 - [ ] Add native requests for narrowly scoped access and reviewed configuration, with current-request and per-agent persistent choices in both chat surfaces.
 - [ ] Verify lifecycle, stale/revoked approvals, localization, keyboard access, ten themes, responsive layouts and Linux/live-provider release gates.
+- [ ] Record the current performance baseline and compare startup, idle resources, bundle size and Settings/Chat responsiveness as the 1.0 phases land; keep closed setup/help features free of recurring work.

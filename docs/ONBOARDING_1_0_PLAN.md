@@ -210,6 +210,21 @@ For every interactive control, provide enough help either on screen or through a
 
 `src/Tooltips.tsx` currently repeats label `<small>` and `aria-describedby` text as tooltips, and checks its help dictionary before those descriptions. Adjust this behavior to suppress redundant help when the explanation is already visible, while preserving semantic descriptions for assistive technology. Avoid stacking native `title` help and custom popups for the same control. Audit the shared controls rather than maintaining separate onboarding-only tooltip rules.
 
+## Performance and resource limits
+
+Keeping the app lightweight is an acceptance requirement, not an assumption. The Settings-entry rule is an event-driven check of a small session flag/return target; it must not introduce a timer, worker, network request or model call. Persisted setup status alone must not mount the wizard or trigger readiness checks.
+
+- Load onboarding, written-guide content and feature-lesson UI on demand. Load only the selected guide language; avoid parsing/indexing the entire guide on startup. Use ordinary local text search for help, without embeddings or an AI service.
+- Keep ImageGen review renders in documentation. Do not load them into the application or add large tutorial screenshots/videos to the runtime by default. Reuse existing components, fonts, icons and theme assets rather than adding a second UI framework or tutorial dependency.
+- Closed setup/help surfaces must have no new periodic work. Attach focus/resize/lesson listeners only while needed and remove them on close. Provider discovery and reply tests happen on explicit user action, with cancellation and bounded results; no repeated background connectivity checks.
+- Save small, validated progress records at navigation/save boundaries and coalesce draft autosaves where needed. Do not trigger a full workspace snapshot/re-render or write the whole database for every tutorial keystroke. Avoid rerendering closed help and both complete chat histories when a single request resolves.
+- Keep native permission-request/grant collections bounded, remove expired entries promptly and use indexed/keyed lookups for active scopes. Optimization must preserve live permission, profile and revision checks; never use a stale authorization cache to improve speed.
+- Optional engines, models and background features stay opt-in during new-user setup. Opening a guide or connecting a provider does not download models, preload inference, enable automation or start extra workers. Existing users' chosen background features remain unchanged.
+
+Before implementation, record a reproducible baseline from the current app on the same machine/data fixture: startup-to-usable time, idle CPU/process memory, renderer bundle/assets, Settings open/close responsiveness and normal Chat/sidebar behavior. Compare after each relevant phase, including repeated open/close and a representative larger workspace. Use lightweight measurements and visual traces only where a regression needs diagnosis; this is not context-length or token-overhead testing.
+
+A closed onboarding/help feature should add no recurring idle work. Resource use after repeated open/close should settle rather than grow steadily. Investigate a reproducible slowdown or sustained resource increase beyond measurement noise before accepting the phase, then agree a concrete budget from the measured baseline. Do not invent a universal RAM/latency target or claim the whole app has no performance regression from source inspection alone. Include target-Linux checks before the release.
+
 ## Implementation sequence and reviewable changes
 
 1. **Setup lifecycle foundation:** versioned native progress record, migration, reliable saves, save/exit/resume, explicit completion, Settings return route and focus behavior. Fix the current interruption before expanding content.
@@ -238,6 +253,7 @@ Focused native tests and isolated Electron fixtures should verify meaningful lif
 - Configuration cards show real before/after changes and correct permanence. Declining creates no settings/download/process effect. Successful changes are verified; failed or partial changes are reported honestly without replaying unrelated mutations.
 - Written guide works offline without a model; search and section links work in English/Romanian. Feature lessons handle hidden/missing controls and preserve drafts. Optional examples are explicit and removable.
 - Inspect all six stages, provider subflows, guide and shared cards at target sizes and all themes. Check contrast, text scaling, keyboard/focus, screen-reader names/status, reduced motion, short-window scrolling and nonredundant tooltips.
+- Compare startup, idle CPU/memory, bundle/assets, Settings response and Chat/sidebar responsiveness against the recorded baseline on the same fixture/hardware. Repeated setup/help/lesson opening and closing must release listeners, requests and active grant records without steady resource growth. Closed features introduce no polling/model/download work; diagnose reproducible regressions before acceptance.
 - Run source checks, appropriate backend tests, build and affected Electron fixtures. Keep live Linux inference, secure keyring, downloads, speech, Wayland/X11 and binary/license/source audit as release gates. Context-length work remains deferred; token-overhead work is not queued; animated backgrounds remain withdrawn.
 
 ## Design concepts
