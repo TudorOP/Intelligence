@@ -168,7 +168,7 @@ try {
       .getByRole('button', { name: 'Stop response', exact: true })
       .waitFor({ state: 'hidden' });
     const thinking = page.locator('.message.assistant').last().locator('.model-thinking');
-    await thinking.locator('summary').click();
+    await thinking.locator('.thinking-toggle').click();
     await aligned([
       '.chat-scroll > .message.assistant:last-of-type',
       '.chat-scroll > .message.assistant:last-of-type .model-thinking',
@@ -192,13 +192,19 @@ try {
     await capture(width + '-saved');
   }
   const modelSelect = page.getByLabel('Choose model');
-  await page.waitForFunction(() => document.querySelector('.chat-model-select')?.querySelectorAll('option').length >= 5);
+  await page.waitForFunction(
+    () => document.querySelector('.chat-model-select')?.querySelectorAll('option').length >= 5,
+  );
   assert.equal(await modelSelect.locator('option').filter({ hasText: modelNames[1] }).count(), 1);
   const modelBounds = await modelSelect.boundingBox();
   assert.ok(modelBounds.width <= 240);
-  assert.ok(modelBounds.x + modelBounds.width <= 1920 && modelBounds.y + modelBounds.height <= 1080);
+  assert.ok(
+    modelBounds.x + modelBounds.width <= 1920 && modelBounds.y + modelBounds.height <= 1080,
+  );
   await capture('model-selector');
-  await modelSelect.selectOption(modelNames[1]);
+  await modelSelect.selectOption(
+    await modelSelect.locator('option').filter({ hasText: modelNames[1] }).getAttribute('value'),
+  );
   await page.getByRole('button', { name: 'Tasks', exact: true }).click();
   await page.getByRole('button', { name: /Right click task/ }).click({ button: 'right' });
   await page
@@ -227,14 +233,14 @@ try {
   assert.ok((await page.locator('.projects-page .resource-card').boundingBox()).width < 500);
   await capture('project-grid');
   await page.getByRole('button', { name: 'Skills', exact: true }).click();
-  assert.ok((await page.locator('.skills-page .resource-card').boundingBox()).width < 420);
+  assert.ok((await page.locator('.skills-page .resource-card').first().boundingBox()).width < 420);
   const positions = await page.getByLabel('Skills view').boundingBox(),
     newSkill = await page.getByRole('button', { name: '＋ New skill', exact: true }).boundingBox();
   assert.ok(positions.x < newSkill.x);
   await capture('skills-cards');
   await page.getByLabel('Skills view').selectOption('list');
   await page.locator('.resource-list').waitFor();
-  assert.ok((await page.locator('.skills-page .resource-card').boundingBox()).height < 120);
+  assert.ok((await page.locator('.skills-page .resource-card').first().boundingBox()).height < 120);
   await capture('skills-list');
   await page.getByRole('button', { name: 'Notebooks', exact: true }).click();
   await page.getByRole('button', { name: 'The Linux notebook', exact: true }).click();

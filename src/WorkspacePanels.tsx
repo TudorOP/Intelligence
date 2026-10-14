@@ -3,7 +3,6 @@ import { api } from './api';
 import { t } from './i18n';
 import type { Entity, Snapshot } from './types';
 import Switch from './Switch';
-import { themes } from './themes';
 import ActionMenu from './ActionMenu';
 function ChangePreview({ before, after }: { before: string; after: string }) {
   const [open, setOpen] = useState(false);
@@ -322,7 +321,12 @@ export function ProjectBrowser({
   const browser = useRef<HTMLElement>(null);
   useEffect(() => {
     if (!focusRequest) return;
-    browser.current?.scrollIntoView({ block: 'start', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+    browser.current?.scrollIntoView({
+      block: 'start',
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        ? 'instant'
+        : 'smooth',
+    });
     browser.current?.focus({ preventScroll: true });
   }, [project.id, focusRequest]);
   const [folder, setFolder] = useState('.'),
@@ -331,7 +335,9 @@ export function ProjectBrowser({
     [file, setFile] = useState<any>(null),
     [draft, setDraft] = useState(''),
     [history, setHistory] = useState<any[]>([]),
-    [busy, setBusy] = useState(false), [fileError,setFileError]=useState(''), [externalPath,setExternalPath]=useState('');
+    [busy, setBusy] = useState(false),
+    [fileError, setFileError] = useState(''),
+    [externalPath, setExternalPath] = useState('');
   const list = async (at = 0) => {
     try {
       const v = await api.workspace({
@@ -353,7 +359,9 @@ export function ProjectBrowser({
     void list();
   }, [project.id, folder]);
   const open = async (name: string) => {
-    setBusy(true);setFileError('');setExternalPath('');
+    setBusy(true);
+    setFileError('');
+    setExternalPath('');
     try {
       let value: any,
         content = '',
@@ -382,14 +390,33 @@ export function ProjectBrowser({
     }
   };
   return (
-    <section ref={browser} className="project-browser" tabIndex={-1} aria-label={t('Project files')}>
+    <section
+      ref={browser}
+      className="project-browser"
+      tabIndex={-1}
+      aria-label={t('Project files')}
+    >
       <header>
         <h2>
           {t('Project files')} · {project.title}
         </h2>
         <button onClick={() => void list()}>{t('Refresh')}</button>
       </header>
-      {fileError ? <p role="status">{t(fileError)} <button disabled={busy} onClick={()=>void api.workspace({action:'project-open',project:project.id,path:externalPath}).catch(onError)}>{t('Open in default app')}</button></p> : null}
+      {fileError ? (
+        <p role="status">
+          {t(fileError)}{' '}
+          <button
+            disabled={busy}
+            onClick={() =>
+              void api
+                .workspace({ action: 'project-open', project: project.id, path: externalPath })
+                .catch(onError)
+            }
+          >
+            {t('Open in default app')}
+          </button>
+        </p>
+      ) : null}
       <div className="project-browser-layout">
         <aside>
           <button
@@ -496,192 +523,6 @@ export function ProjectBrowser({
         </div>
       </div>
     </section>
-  );
-}
-export function Onboarding({
-  snapshot,
-  onClose,
-  onSettings,
-}: {
-  snapshot: Snapshot;
-  onClose: () => void;
-  onSettings: () => void;
-}) {
-  const [step, setStep] = useState(0);
-  const [name, setName] = useState(snapshot.settings.preferredName || ''),
-    [share, setShare] = useState(snapshot.settings.shareName !== false);
-  const [notice, setNotice] = useState('');
-  const agent = snapshot.entities.find((e) => e.id === snapshot.settings.activeAgent);
-  const steps = [
-    [
-      'Welcome to Intelligence',
-      'A local workspace for conversations, notebooks, real Markdown files and tasks. Your work stays on your machine.',
-    ],
-    [
-      'Choose your companion',
-      'Open the agent button to name your companion, choose its image and personality, and manage agent profiles. Ratings are yours to set.',
-    ],
-    [
-      'Connect a model',
-      'Settings contains local Ollama/LM Studio and optional API providers. No chat model is bundled. Provider credentials stay protected.',
-    ],
-    [
-      'Memory and downloads',
-      'Semantic memory and automatic summaries may download CPU models into user data. Keyword search works offline. You can disable automatic features or pause background AI.',
-    ],
-    [
-      'Make it yours',
-      'Choose a theme, notebook look and optional subtle backgrounds in Settings. Ctrl+K finds work and commands; dragging and menus both support organization.',
-    ],
-  ];
-  return (
-    <div className="modal-backdrop onboarding-backdrop">
-      <section
-        className="form-dialog onboarding"
-        role="dialog"
-        aria-modal="true"
-        aria-label={t('Getting started')}
-        onKeyDown={(e) => {
-          if (e.key === 'Escape') {
-            e.stopPropagation();
-            onClose();
-          }
-        }}
-      >
-        <button className="icon-button" onClick={onClose} aria-label={t('Close guide')}>
-          ×
-        </button>
-        <span className="eyebrow">
-          {step + 1} / {steps.length}
-        </span>
-        <h1>{t(steps[step][0])}</h1>
-        <p>{t(steps[step][1])}</p>
-        {step === 0 && (
-          <>
-            <label>
-              {t('What should we call you?')}
-              <input
-                aria-label={t('Your name')}
-                maxLength={100}
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                onBlur={() =>
-                  void api.settings({ preferredName: name }).catch((e) => setNotice(e.message))
-                }
-                placeholder={t('Your name (optional)')}
-              />
-            </label>
-            <label className="switch-line">
-              {t('Share my name with agents')}
-              <Switch
-                checked={share}
-                onChange={(e) => {
-                  setShare(e.target.checked);
-                  void api
-                    .settings({ shareName: e.target.checked, preferredName: name })
-                    .catch((e) => setNotice(e.message));
-                }}
-              />
-            </label>
-            <small>{t('You can change this later in Settings → Your profile.')}</small>
-          </>
-        )}{' '}
-        {step === 1 && agent ? (
-          <label>
-            {t('Agent name')}
-            <input
-              aria-label={t('Agent name')}
-              defaultValue={agent.title}
-              onBlur={(e) => {
-                if (e.target.value.trim() && e.target.value !== agent.title)
-                  void api
-                    .workspace({
-                      action: 'profile-save',
-                      id: agent.id,
-                      revision: agent.revision,
-                      title: e.target.value,
-                      data: {},
-                    })
-                    .catch((e) => setNotice(e.message));
-              }}
-            />
-          </label>
-        ) : null}
-        {step === 2 ? (
-          <button onClick={onSettings}>{t('Configure a model in Settings')}</button>
-        ) : null}
-        {step === 3 ? (
-          <>
-            <label className="setting-switch">
-              <span>{t('Automatic semantic search')}</span>
-              <Switch
-                checked={snapshot.settings.semanticSearch}
-                onChange={(e) =>
-                  void api
-                    .settings({ semanticSearch: e.target.checked })
-                    .catch((e) => setNotice(e.message))
-                }
-              />
-            </label>
-            <label className="setting-switch">
-              <span>{t('Automatic summaries & facts')}</span>
-              <Switch
-                checked={snapshot.settings.autoConsolidation}
-                onChange={(e) =>
-                  void api
-                    .settings({ autoConsolidation: e.target.checked })
-                    .catch((e) => setNotice(e.message))
-                }
-              />
-            </label>
-            <div className="guide-memory-preparation">
-              <button onClick={() => void api.memoryEnable().catch((e) => setNotice(e.message))}>
-                {t('Prepare memory now')}
-              </button>
-              <small>{t(snapshot.memoryStatus ?? '')}</small>
-            </div>
-          </>
-        ) : null}
-        {step === 4 ? (
-          <label>
-            {t('Theme')}
-            <select
-              aria-label={t('Guide theme')}
-              value={snapshot.settings.theme}
-              onChange={(e) =>
-                void api
-                  .settings({ theme: e.target.value as any })
-                  .catch((e) => setNotice(e.message))
-              }
-            >
-              {themes.map((theme) => (
-                <option key={theme.id} value={theme.id}>
-                  {t(theme.label)}
-                </option>
-              ))}
-            </select>
-          </label>
-        ) : null}
-        {notice ? <p role="status">{t(notice)}</p> : null}
-        <footer>
-          <button disabled={!step} onClick={() => setStep(step - 1)}>
-            {t('Back')}
-          </button>
-          {step < steps.length - 1 ? (
-            <button className="primary" onClick={() => setStep(step + 1)}>
-              {t('Next')}
-            </button>
-          ) : (
-            <>
-              <button onClick={onSettings}>{t('Open Settings')}</button>
-              <button className="primary" onClick={onClose}>
-                {t('Start exploring')}
-              </button>
-            </>
-          )}
-        </footer>
-      </section>
-    </div>
   );
 }
 export function BulkBar({
@@ -799,7 +640,8 @@ export function BackupPanel({
   onChanged: () => void;
   onError: (e: any) => void;
 }) {
-  const [includeModelCaches, setIncludeModelCaches] = useState(true),[includeModules,setIncludeModules]=useState(true);
+  const [includeModelCaches, setIncludeModelCaches] = useState(true),
+    [includeModules, setIncludeModules] = useState(true);
   const [preview, setPreview] = useState<any>(null),
     [result, setResult] = useState<any>(null),
     [busy, setBusy] = useState(false);
@@ -838,7 +680,17 @@ export function BackupPanel({
       <button disabled={busy} onClick={() => void act('backup-create')}>
         {t('Create complete backup')}
       </button>
-      <label className="setting-switch"><span>{t('Include installed optional modules')}<small>{t('Includes engines, dependencies and license notices. With model caches included, compatible local modules reconnect offline after verification.')}</small></span><Switch checked={includeModules} onChange={e=>setIncludeModules(e.target.checked)} /></label>
+      <label className="setting-switch">
+        <span>
+          {t('Include installed optional modules')}
+          <small>
+            {t(
+              'Includes engines, dependencies and license notices. With model caches included, compatible local modules reconnect offline after verification.',
+            )}
+          </small>
+        </span>
+        <Switch checked={includeModules} onChange={(e) => setIncludeModules(e.target.checked)} />
+      </label>
       <label className="setting-switch">
         <span>
           {t('Include downloaded model caches')}
@@ -863,8 +715,30 @@ export function BackupPanel({
             {preview.files} {t('files')} · {(preview.bytes / 1024 / 1024).toFixed(1)} MiB ·{' '}
             {new Date(preview.created).toLocaleString()}
           </p>
-          {(preview.offlineModules||[]).map((module:any)=><p key={module.id}><b>{module.id.toUpperCase()}</b> · {t(module.status==='ready'?'Offline artifacts verified · Linux x64':module.status==='remote'?'Remote APIs require a connection and credentials':'Offline restoration needs attention')}{module.missing?.length?' · '+module.missing.map(t).join(', '):''}{module.archiveDirectory?' · '+t('External ZIM directory must be available')+': '+module.archiveDirectory:''}</p>)}
-          <p>{t('External project folders, ZIM archives and models managed by other apps are not included.')}</p>
+          {(preview.offlineModules || []).map((module: any) => (
+            <p key={module.id}>
+              <b>{module.id.toUpperCase()}</b> ·{' '}
+              {t(
+                module.status === 'ready'
+                  ? 'Offline artifacts verified · Linux x64'
+                  : module.status === 'remote'
+                    ? 'Remote APIs require a connection and credentials'
+                    : 'Offline restoration needs attention',
+              )}
+              {module.missing?.length ? ' · ' + module.missing.map(t).join(', ') : ''}
+              {module.archiveDirectory
+                ? ' · ' +
+                  t('External ZIM directory must be available') +
+                  ': ' +
+                  module.archiveDirectory
+                : ''}
+            </p>
+          ))}
+          <p>
+            {t(
+              'External project folders, ZIM archives and models managed by other apps are not included.',
+            )}
+          </p>
           {preview.counts.map((v: any) => (
             <p key={v.kind}>
               {t(v.kind)}: {v.count}
@@ -891,8 +765,16 @@ export function BackupPanel({
           <small>{result.directory ?? result.recovery}</small>
         </p>
       ) : null}
-      {result?.moduleRestore?.offlineReady?.length ? <p role="status">{t('Local modules reconnected offline')}: {result.moduleRestore.offlineReady.join(', ')}</p> : null}
-      {result?.moduleRestore?.attention?.map((item:any)=><p key={item.id} role="status">{item.id}: {t(item.error)}</p>)}
+      {result?.moduleRestore?.offlineReady?.length ? (
+        <p role="status">
+          {t('Local modules reconnected offline')}: {result.moduleRestore.offlineReady.join(', ')}
+        </p>
+      ) : null}
+      {result?.moduleRestore?.attention?.map((item: any) => (
+        <p key={item.id} role="status">
+          {item.id}: {t(item.error)}
+        </p>
+      ))}
     </section>
   );
 }

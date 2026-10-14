@@ -1,11 +1,11 @@
-# Build Intelligence 0.94 on Linux
+# Build Intelligence 1.0 on Linux
 
-Use the matching Intelligence-source.zip or this source checkout. Main is the maintained branch. Install Docker Engine and the Compose plugin; no host Node/compiler/Electron SDK is needed for packaging.
+Use the matching Intelligence-source.zip or this source checkout. Dev holds new work; main remains the default branch for reviewed releases. This local 1.0 source preparation has not been published. Install Docker Engine and the Compose plugin; no host Node/compiler/Electron SDK is needed for packaging.
 
 ```bash
 docker compose run --build --rm appimage
-chmod +x release/Intelligence-0.9.4-x86_64.AppImage
-./release/Intelligence-0.9.4-x86_64.AppImage
+chmod +x release/Intelligence-1.0.0-x86_64.AppImage
+./release/Intelligence-1.0.0-x86_64.AppImage
 ```
 
 The script rejects release packaging outside Linux Docker. Docker is not a runtime dependency. Run the AppImage as a regular user with the Electron sandbox enabled. Validate Wayland/X11, tray, desktop icon, single-instance reopening and mixed-DPI/font/scaling behavior.

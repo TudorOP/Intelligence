@@ -127,8 +127,101 @@
 .models-settings .settings-card {
   padding: 18px;
 }
+.scoped-approval p {
+  font-size: 12px;
+  line-height: 1.6;
+}
+.scoped-approval pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 260px;
+  overflow: auto;
+}
+.scoped-approval details {
+  margin: 12px 0;
+}
+.scoped-approval .grant-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.scoped-approval .grant-actions button {
+  flex: 1 1 190px;
+  white-space: normal;
+}
+.grant-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+.grant-row small {
+  display: block;
+  color: var(--muted);
+}
+.agent-grants {
+  margin-top: 20px;
+}
+.agent-grants-menu {
+  margin-top: 20px;
+  font-size: 13px;
+}
+.chat-context-selection {
+  margin: 4px 0 8px;
+  position: relative;
+}
+.chat-context-selection > button {
+  font-size: 11px;
+  padding: 5px 8px;
+}
+.chat-context-picker {
+  position: absolute;
+  left: 0;
+  bottom: 100%;
+  z-index: 70;
+  width: min(400px, calc(100vw - 70px));
+  max-width: 100%;
+  max-height: 320px;
+  overflow: auto;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+.chat-context-picker > label {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin: 9px 0;
+}
+.chat-context-picker > label:first-child {
+  display: grid;
+}
+.chat-context-picker input[type='checkbox'] {
+  width: 16px;
+  flex-shrink: 0;
+}
+.chat-context-picker small {
+  display: block;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.context-chips span button {
+  margin-left: 5px;
+  padding: 0 4px;
+  background: transparent;
+}
 .models-settings > h2 {
   margin-bottom: 12px;
+}
+.models-settings > p[role='status'] {
+  margin: 14px 0 0;
+}
+.models-settings .settings-card > button {
+  margin: 4px 8px 4px 0;
 }
 .settings-card input:not([type='checkbox']):not([type='color']),
 .settings-card select {

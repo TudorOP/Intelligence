@@ -4,9 +4,12 @@ import { randomUUID, createHash } from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { EventEmitter } from 'node:events';
+import { AsyncLocalStorage } from 'node:async_hooks';
 import { validateMatrixProfile, validateMatrixTrigger } from './matrix-config.mjs';
 import { nextOccurrence } from './schedule.mjs';
 import { searchProviderIds } from './search-providers.mjs';
+import { initialSetup, validateSetup } from './onboarding.mjs';
+import { conversationSources } from './resource-catalog.mjs';
 import {
   inferenceProviders,
   providerInfo,
@@ -71,6 +74,8 @@ export const defaults = {
   pinnedItems: [],
   recentItems: [],
   onboardingComplete: false,
+  setupReminderDismissed: false,
+  onboarding: initialSetup,
   missedTaskPolicy: 'ask',
   externalEventsEnabled: false,
   externalEventsPort: 30091,
@@ -159,6 +164,7 @@ const now = () => new Date().toISOString();
 export class Store extends EventEmitter {
   constructor(directory) {
     super();
+    this.agentScope = new AsyncLocalStorage();
     fs.mkdirSync(directory, { recursive: true });
     this.directory = directory;
     this.db = new DatabaseSync(path.join(directory, 'intelligence.sqlite'));
@@ -212,10 +218,39 @@ export class Store extends EventEmitter {
       settings.connectedProviders = [
         ...new Set([settings.provider, ...Object.keys(settings.providerProfiles)]),
       ];
+    if (!rows.some((r) => r.key === 'onboarding'))
+      settings.onboarding = {
+        ...initialSetup,
+        status: settings.onboardingComplete
+          ? 'completed'
+          : this.firstRun
+            ? 'not-started'
+            : 'deferred',
+      };
     return settings;
   }
   setSettings(value) {
     if (!value || typeof value !== 'object') throw new Error('Invalid settings');
+    const initializingDefaults = value === defaults;
+    if (
+      value.onboarding === undefined &&
+      typeof value.onboardingComplete === 'boolean' &&
+      !initializingDefaults
+    )
+      value = {
+        ...value,
+        onboarding: {
+          ...this.settings().onboarding,
+          status: value.onboardingComplete ? 'completed' : 'deferred',
+        },
+      };
+    if (value.onboarding !== undefined) {
+      value = {
+        ...value,
+        onboarding: validateSetup(value.onboarding),
+        onboardingComplete: value.onboarding.status === 'completed',
+      };
+    }
     validateAppearanceSettings(value);
     if (value.autoReadAloud !== undefined && typeof value.autoReadAloud !== 'boolean')
       throw Error('Invalid automatic reading preference');
@@ -331,10 +366,7 @@ export class Store extends EventEmitter {
         throw new Error('Use an HTTP endpoint without embedded credentials');
       clean.endpoint = u.origin + u.pathname.replace(/\/$/, '');
     }
-    if (
-      clean.theme &&
-      ![...themeIds, 'system'].includes(clean.theme)
-    )
+    if (clean.theme && ![...themeIds, 'system'].includes(clean.theme))
       throw new Error('Invalid theme');
     if (
       clean.returnTheme &&
@@ -387,7 +419,7 @@ export class Store extends EventEmitter {
     )
       throw Error('Tool-step limit must be an integer from 1 to 256');
     delete clean.connectedProviders;
-    if (value.connectedProviders !== undefined && value !== defaults)
+    if (value.connectedProviders !== undefined && !initializingDefaults)
       throw Error('Connections are managed by the app');
     if (clean.language !== undefined && !['en', 'ro'].includes(clean.language))
       throw new Error('Choose English or Romanian');
@@ -525,6 +557,15 @@ export class Store extends EventEmitter {
   }
   access(id, edit = false, seen = new Set(), includeDeleted = false) {
     if (seen.has(id)) return false;
+    const native = this.baseAccess(id, edit, seen, includeDeleted);
+    const scope = this.agentScope.getStore();
+    return scope ? scope(id, edit, native, seen, includeDeleted) : native;
+  }
+  withAgentScope(scope, action) {
+    return this.agentScope.run(scope, action);
+  }
+  baseAccess(id, edit = false, seen = new Set(), includeDeleted = false) {
+    if (seen.has(id)) return false;
     seen.add(id);
     let e = this.get(id, includeDeleted);
     if (!e) return false;
@@ -547,9 +588,8 @@ export class Store extends EventEmitter {
         !e.data.temporary &&
         !e.data.logContext &&
         !e.data.memoryExcluded &&
-        (e.data.context ?? []).every((source) => this.access(source, false, new Set(seen))) &&
-        this.messages(e.id).every((m) =>
-          (m.data.context ?? []).every((source) => this.access(source, false, new Set(seen))),
+        conversationSources(e, this.messages(e.id)).every((source) =>
+          this.access(source, false, new Set(seen)),
         )
       );
     const root = e.kind.startsWith('vault-')
@@ -1188,15 +1228,13 @@ export class Store extends EventEmitter {
         };
       }),
       messageCount: messages.length,
-      messages: messages
-        .slice(0, 12)
-        .map((m) => ({
-          id: m.id,
-          role: m.role,
-          created: m.created,
-          content: redactLog(m.content).slice(0, 800),
-          truncated: m.content.length > 800,
-        })),
+      messages: messages.slice(0, 12).map((m) => ({
+        id: m.id,
+        role: m.role,
+        created: m.created,
+        content: redactLog(m.content).slice(0, 800),
+        truncated: m.content.length > 800,
+      })),
     };
   }
   commitConsolidation(conversation, cursor, summary, facts, messageIds, sourceIds) {
@@ -1370,19 +1408,21 @@ export class Store extends EventEmitter {
       .all(model)
       .map((row) => row.id);
   }
-  snapshot() {
+  snapshot(includeEntities = true) {
     return {
       settings: this.settings(),
-      entities: this.all().map((entity) =>
-        entity.kind === 'card'
-          ? {
-              ...entity,
-              agentAccess: this.access(entity.id),
-              agentEditable: this.access(entity.id, true),
-              agentAssigned: this.assigned(entity.id),
-            }
-          : entity,
-      ),
+      entities: includeEntities
+        ? this.all().map((entity) =>
+            entity.kind === 'card'
+              ? {
+                  ...entity,
+                  agentAccess: this.access(entity.id),
+                  agentEditable: this.access(entity.id, true),
+                  agentAssigned: this.assigned(entity.id),
+                }
+              : entity,
+          )
+        : [],
       runs: this.db.prepare('SELECT * FROM runs ORDER BY start DESC LIMIT 100').all(),
     };
   }

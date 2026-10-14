@@ -1,12 +1,16 @@
 # Releases
 
-## Unreleased planning on dev
+## 1.0 — local development milestone on dev
 
-- Created the dev-first development workflow; main remains the default branch for reviewed releases.
-- Added the proposed 1.0 onboarding, written help and agent configuration/access plan, with four ImageGen concepts and retained prompts/provenance.
-- Queued a verified, behavior-preserving deduplication/code cleanup pass before implementing the 1.0 features.
-- Completed provider-catalog deduplication and shared profile-form extraction; Settings layout fits the verified local/API views at 1080p, with scrolling on shorter windows. All 207 enabled backend checks, production build, desktop smoke and the 27-capture Settings fixture pass before 1.0 implementation.
-- This is documentation and design work for review. Application behavior and the 0.94 / package 0.9.4 version are unchanged.
+- Completed the prerequisite provider catalog/profile-form deduplication and verified cleanup as a separate commit.
+- Replaced the old setup with six resumable, optional stages; shared profile/provider controls, biography/privacy choices, inline novice provider instructions, explicit reply test, Settings return, and safe completion/review.
+- Added a searchable offline English/Romanian written guide and four optional feature lessons under Help & setup.
+- Added exact current-request/per-agent persistent native resource requests in both chats, visible grants/revocation and names-only context selection before authorization. Live scopes, native gates, source checks, revisions and command/MCP approvals stay enforced.
+- Added reviewed current-agent name/style/connected-model proposals with visible before/after values. New collections can receive reviewed temporary or permanent editing access without sharing them globally.
+- Added protected endpoint-bound authentication for local servers, connection-test invalidation and stopped runs when their credentials change.
+- Lazy-loaded Settings/setup/help and selected-language guide content; removed duplicate bootstrap entity/profile work and bounded context/resource pickers.
+- Retained four ImageGen design concepts and provenance. Actual implementation screenshots and test reports are separate fixture artifacts.
+- Prepared package 1.0.0 and public label 1.0 locally. No push, main merge or publication is authorized. Linux/live-provider/device and exact binary/license/source gates remain open.
 
 ## 0.94
 

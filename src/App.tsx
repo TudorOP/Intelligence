@@ -27,7 +27,10 @@ import { coverColor, coverColors } from './coverColors';
 const Machine = lazy(() => import('./Machine'));
 import TrashDialog from './TrashDialog';
 const CognitionMatrix = lazy(() => import('./CognitionMatrix'));
-import SettingsDialog from './SettingsDialog';
+const SettingsDialog = lazy(() => import('./SettingsDialog'));
+const Onboarding = lazy(() => import('./Onboarding'));
+const FeatureLesson = lazy(() => import('./FeatureLesson'));
+import type { HelpArticle } from './HelpGuide';
 const Vault = lazy(() => import('./Vault'));
 import ThemeArt from './ThemeArt';
 import Icon from './Icon';
@@ -35,7 +38,7 @@ import ActionMenu from './ActionMenu';
 import Switch from './Switch';
 import Splitter from './Splitter';
 const AgentScreen = lazy(() => import('./AgentScreen'));
-import { ActivityPanel, BulkBar, Onboarding, ProjectBrowser } from './WorkspacePanels';
+import { ActivityPanel, BulkBar, ProjectBrowser } from './WorkspacePanels';
 import { themes } from './themes';
 import AppBackground from './AppBackground';
 const Calendar = lazy(() => import('./Calendar'));
@@ -161,7 +164,7 @@ export default function App() {
     [assistantConversation, setAssistantConversation] = useState<string | null>(null),
     [assistant, setAssistant] = useState(false),
     [scope, setScope] = useState('current'),
-    [settingsOpen, setSettingsOpen] = useState<string | null>(null),
+    [settingsOpen, setSettingsSection] = useState<string | null>(null),
     [accessOpen, setAccessOpen] = useState(false),
     [form, setForm] = useState<Form | null>(null),
     [error, setError] = useState(''),
@@ -202,6 +205,26 @@ export default function App() {
   }, [page]);
   const [activityOpen, setActivityOpen] = useState(false),
     [guideOpen, setGuideOpen] = useState(false);
+  const [lesson, setLesson] = useState<HelpArticle | null>(null);
+  const [resumeReview, setResumeReview] = useState(false);
+  const setupReturn = useRef(false),
+    guideOrigin = useRef<string | null>(null);
+  const setSettingsOpen = (section: string | null) => {
+    const returning = !section && setupReturn.current;
+    setupReturn.current = false;
+    setSettingsSection(section);
+    if (returning) {
+      setResumeReview(true);
+      setGuideOpen(true);
+    } else if (section) setGuideOpen(false);
+  };
+  const beginGuide = () => {
+    setResumeReview(false);
+    guideOrigin.current = settingsOpen;
+    setupReturn.current = false;
+    setSettingsSection(null);
+    setGuideOpen(true);
+  };
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [pageLimit, setPageLimit] = useState(120);
   useEffect(() => setPageLimit(120), [page, projectId, notebookId, boardId]);
@@ -553,15 +576,14 @@ export default function App() {
         : scope === 'all'
           ? null
           : sectionFocus;
-  const context =
-    contextRoot && allowed(contextRoot, entities, settings)
-      ? ([
-          contextRoot,
-          ...(contextRoot.data.links ?? [])
-            .map((id: string) => find(id))
-            .filter((e: Entity | null) => e && allowed(e, entities, settings)),
-        ] as Entity[])
-      : [];
+  const context = contextRoot
+    ? ([
+        contextRoot,
+        ...(contextRoot.data.links ?? [])
+          .map((id: string) => find(id))
+          .filter((e: Entity | null) => e && allowed(e, entities, settings)),
+      ] as Entity[])
+    : [];
   const contextChat = find(assistantConversation);
   const assistantSettings = chatSettings(contextChat);
   const screenFocus = {
@@ -1140,7 +1162,7 @@ export default function App() {
           .then(boot)
           .catch(fail),
     },
-    { id: 'guide', label: t('Getting started'), run: () => setGuideOpen(true) },
+    { id: 'guide', label: t('Getting started'), run: beginGuide },
     ...Object.entries(labels).map(([id, label]) => ({
       id: 'go-' + id,
       label: t('Go to') + ' ' + t(label),
@@ -1242,7 +1264,7 @@ export default function App() {
         <div className="assistant-focus-summary">
           {scope === 'all' ? t('All accessible work') : contextRoot?.title || t(labels[page])}
         </div>
-        {contextRoot && !context.length ? (
+        {contextRoot && !allowed(contextRoot, entities, settings) ? (
           <button
             className="scope-warning"
             onClick={() =>
@@ -1261,6 +1283,7 @@ export default function App() {
         running={snapshot.activeConversations?.includes(contextChat?.id ?? '')}
         pendingApprovals={snapshot.approvals}
         context={context}
+        resources={entities}
         screenFocus={screenFocus}
         onNew={(ids) => createConversation(ids, true)}
         onSettings={() => setSettingsOpen('models')}
@@ -1447,12 +1470,32 @@ export default function App() {
         </aside>
         <main className="workspace">
           <div className="workspace-top">
+            {!snapshot.settings.onboardingComplete &&
+              snapshot.settings.onboarding?.status !== 'not-started' &&
+              !snapshot.settings.setupReminderDismissed && (
+                <div className="setup-reminder">
+                  <button onClick={beginGuide}>{t('Continue setup')}</button>
+                  <button
+                    aria-label={t('Dismiss setup reminder')}
+                    title={t('Keep setup available in Help & setup.')}
+                    onClick={() => void changeSettings({ setupReminderDismissed: true })}
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
             <button
               className="background-pause"
-              aria-label={t(settings.backgroundPaused ? 'Resume background AI' : 'Pause background AI')}
+              aria-label={t(
+                settings.backgroundPaused ? 'Resume background AI' : 'Pause background AI',
+              )}
               aria-pressed={settings.backgroundPaused}
               data-paused={settings.backgroundPaused}
-              data-tooltip={t(settings.backgroundPaused ? 'Resume automatic tasks and memory processing.' : 'Pause automatic AI work; foreground chat remains available.')}
+              data-tooltip={t(
+                settings.backgroundPaused
+                  ? 'Resume automatic tasks and memory processing.'
+                  : 'Pause automatic AI work; foreground chat remains available.',
+              )}
               title={t(settings.backgroundPaused ? 'Resume background AI' : 'Pause background AI')}
               onClick={() =>
                 void api
@@ -1641,11 +1684,12 @@ export default function App() {
                       conversation={conversation}
                       running={snapshot.activeConversations?.includes(conversation?.id ?? '')}
                       pendingApprovals={snapshot.approvals}
+                      resources={entities}
                       context={
                         conversation
                           ? (conversation.data.context ?? [])
                               .map((id: string) => find(id))
-                              .filter((e: Entity | null) => e && allowed(e, entities, settings))
+                              .filter((e: Entity | null) => e && !e.deleted)
                           : []
                       }
                       onNew={(ids) => createConversation(ids)}
@@ -2358,10 +2402,14 @@ export default function App() {
                               <option value="edit">{t('Read & edit')}</option>
                             </select>
                           </div>
-                          <button onClick={() => {
-                            setProjectId(p.id);
-                            setProjectBrowseRequest(value => value + 1);
-                          }}>{t('Browse files')}</button>
+                          <button
+                            onClick={() => {
+                              setProjectId(p.id);
+                              setProjectBrowseRequest((value) => value + 1);
+                            }}
+                          >
+                            {t('Browse files')}
+                          </button>
                           <small>
                             {entities.filter((e) => e.project === p.id).length}{' '}
                             {t('associated items')}
@@ -2381,7 +2429,13 @@ export default function App() {
                         </div>
                       ) : null}
                     </div>
-                    {project ? <ProjectBrowser project={project} focusRequest={projectBrowseRequest} onError={fail} /> : null}
+                    {project ? (
+                      <ProjectBrowser
+                        project={project}
+                        focusRequest={projectBrowseRequest}
+                        onError={fail}
+                      />
+                    ) : null}
                   </div>
                 ) : null}
                 {page === 'memory' ? (
@@ -2753,8 +2807,14 @@ export default function App() {
                             <label className="check-label">
                               <Check
                                 checked={s.data.access === true}
-                                  onChange={(e) => void patch(s, { access: e.target.checked,
-                                    ...(s.data.generated ? { learningState: e.target.checked ? 'active' : 'review' } : {}) })}
+                                onChange={(e) =>
+                                  void patch(s, {
+                                    access: e.target.checked,
+                                    ...(s.data.generated
+                                      ? { learningState: e.target.checked ? 'active' : 'review' }
+                                      : {}),
+                                  })
+                                }
                               />{' '}
                               {t('Available to agent')}
                             </label>
@@ -2976,42 +3036,44 @@ export default function App() {
           />
         </Suspense>
       )}
-      {pendingReport && pendingReport.delivery !== 'quiet' && (
-        <div className="toast report-ready-toast" role="status">
-          <span>
-            {t('Report ready')} · {pendingReport.summary}
-          </span>
-          <button
-            onClick={() => {
-              setReportId(pendingReport.id);
-              setPage('reports');
-              setPendingReport(null);
-            }}
-          >
-            {t('Open report')}
-          </button>
-          <button aria-label={t('Dismiss notification')} onClick={() => setPendingReport(null)}>
-            ×
-          </button>
-        </div>
-      )}
-      {error ? (
-        <div className="toast error-toast" role="alert">
-          <span>!</span>
-          <p>{t(error)}</p>
-          <button aria-label={t('Dismiss error')} onClick={() => setError('')}>
-            ×
-          </button>
-        </div>
-      ) : null}
-      {saveNotice ? (
-        <div className="toast" role="status">
-          {t(saveNotice)}
-          <button aria-label={t('Dismiss notification')} onClick={() => setSaveNotice('')}>
-            ×
-          </button>
-        </div>
-      ) : null}
+      <div className="toast-stack" style={{ bottom: selectedIds.size ? 112 : 28 }}>
+        {pendingReport && pendingReport.delivery !== 'quiet' && (
+          <div className="toast report-ready-toast" role="status">
+            <span>
+              {t('Report ready')} · {pendingReport.summary}
+            </span>
+            <button
+              onClick={() => {
+                setReportId(pendingReport.id);
+                setPage('reports');
+                setPendingReport(null);
+              }}
+            >
+              {t('Open report')}
+            </button>
+            <button aria-label={t('Dismiss notification')} onClick={() => setPendingReport(null)}>
+              ×
+            </button>
+          </div>
+        )}
+        {error ? (
+          <div className="toast error-toast" role="alert">
+            <span>!</span>
+            <p>{t(error)}</p>
+            <button aria-label={t('Dismiss error')} onClick={() => setError('')}>
+              ×
+            </button>
+          </div>
+        ) : null}
+        {saveNotice ? (
+          <div className="toast" role="status">
+            {t(saveNotice)}
+            <button aria-label={t('Dismiss notification')} onClick={() => setSaveNotice('')}>
+              ×
+            </button>
+          </div>
+        ) : null}
+      </div>
       {form ? <FormDialog form={form} onClose={() => setForm(null)} onError={fail} /> : null}
       {['notebooks', 'projects', 'skills'].includes(page) &&
       (page === 'notebooks'
@@ -3042,20 +3104,39 @@ export default function App() {
           onError={fail}
         />
       ) : null}
-      {guideOpen ? (
-        <Onboarding
-          snapshot={snapshot}
-          onClose={() => {
-            setGuideOpen(false);
-            void changeSettings({ onboardingComplete: true });
-          }}
-          onSettings={() => {
-            setGuideOpen(false);
-            setSettingsOpen('models');
-            void changeSettings({ onboardingComplete: true });
-          }}
-        />
-      ) : null}
+      {guideOpen && (
+        <Suspense fallback={<p role="status">{t('Opening setup…')}</p>}>
+          <Onboarding
+            snapshot={snapshot}
+            resumeReview={resumeReview}
+            onChanged={boot}
+            onClose={(finished) => {
+              setGuideOpen(false);
+              setupReturn.current = false;
+              const origin = guideOrigin.current;
+              guideOrigin.current = null;
+              if (origin && !finished) setSettingsSection(origin);
+              if (finished && snapshot.settings.model) setPage('chat');
+            }}
+            onSettings={(section) => {
+              setGuideOpen(false);
+              setupReturn.current = true;
+              setSettingsSection(section);
+            }}
+            onHelp={() => setSettingsOpen('lessons')}
+          />
+        </Suspense>
+      )}
+      {lesson && !guideOpen && !settingsOpen && (
+        <Suspense fallback={null}>
+          <FeatureLesson
+            article={lesson}
+            settings={snapshot.settings}
+            onChanged={boot}
+            onClose={() => setLesson(null)}
+          />
+        </Suspense>
+      )}
       {searchOpen ? (
         <div className="modal-backdrop" onClick={() => setSearchOpen(false)}>
           <section
@@ -3181,23 +3262,39 @@ export default function App() {
         </div>
       ) : null}
       {settingsOpen && (
-        <SettingsDialog
-          section={settingsOpen}
-          settings={settings}
-          snapshot={snapshot}
-          onSection={setSettingsOpen}
-          onSettings={changeSettings}
-          onChanged={boot}
-          onError={fail}
-          onAgent={() => {
-            setSettingsOpen(null);
-            setPage('agent');
-          }}
-          onGuide={() => setGuideOpen(true)}
-          onTrash={() => setTrashOpen(true)}
-          trashOpen={trashOpen}
-          guideOpen={guideOpen}
-        />
+        <Suspense fallback={<p role="status">{t('Opening settings…')}</p>}>
+          <SettingsDialog
+            section={settingsOpen}
+            settings={settings}
+            snapshot={snapshot}
+            onSection={(section) => {
+              if (section) setSettingsSection(section);
+              else setSettingsOpen(null);
+            }}
+            onSettings={changeSettings}
+            onChanged={boot}
+            onError={fail}
+            onAgent={() => {
+              setupReturn.current = false;
+              guideOrigin.current = null;
+              setSettingsSection(null);
+              setPage('agent');
+            }}
+            onGuide={beginGuide}
+            setupReturn={setupReturn.current}
+            onLesson={(article) => {
+              setupReturn.current = false;
+              guideOrigin.current = null;
+              setSettingsSection(null);
+              setGuideOpen(false);
+              setLesson(article);
+              if (article.page) setPage(article.page as Page);
+            }}
+            onTrash={() => setTrashOpen(true)}
+            trashOpen={trashOpen}
+            guideOpen={guideOpen}
+          />
+        </Suspense>
       )}
       {trashOpen ? <TrashDialog onClose={() => setTrashOpen(false)} /> : null}
     </div>
@@ -3293,7 +3390,12 @@ function FormDialog({
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <form
-        className={'form-dialog' + (form.fields.some(f => f.label === t('SKILL.md instructions')) ? ' skill-editor-dialog' : '')}
+        className={
+          'form-dialog' +
+          (form.fields.some((f) => f.label === t('SKILL.md instructions'))
+            ? ' skill-editor-dialog'
+            : '')
+        }
         role="dialog"
         aria-modal="true"
         aria-labelledby="form-title"

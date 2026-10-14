@@ -75,6 +75,7 @@ try {
     fs.writeFileSync(path.join(directory, name + '.png'), Buffer.from(png, 'base64'));
   };
   const switches = async () => {
+    await page.locator('input.toggle-switch:visible').first().waitFor();
     const geometry = await page.locator('input.toggle-switch:visible').evaluateAll((items) =>
       items.map((e) => {
         const r = e.getBoundingClientRect();
@@ -100,12 +101,18 @@ try {
   assert.equal(await page.locator('.task-report-modal [role=alert]').count(), 0);
   await page.keyboard.press('Escape');
   await page.getByRole('button', { name: 'Settings', exact: true }).click();
-  await page.getByRole('button', { name: 'Cognition Matrix', exact: true }).last().click();
+  await page
+    .locator('.settings-navigation')
+    .getByRole('button', { name: 'Cognition Matrix', exact: true })
+    .click();
   await page.locator('.matrix-preload-control').waitFor();
   await page.keyboard.press('Tab');
   await page.locator('.matrix-preload-control input').focus();
-  await page.getByRole('tooltip').waitFor();
-  assert.match(await page.getByRole('tooltip').innerText(), /Get each list’s model ready/);
+  assert.equal(await page.getByRole('tooltip').count(), 0);
+  assert.match(
+    await page.locator('.matrix-preload-control small').innerText(),
+    /prepare each list/,
+  );
   await switches();
   const aligned = await page
     .locator('.matrix-preload-control')
@@ -150,20 +157,28 @@ try {
   assert.equal(backup.size, '12px');
   assert.equal(backup.weight, '400');
   await shot('backup-1080');
-  await page.locator('.settings-help-menu > summary').click();
+  await page.locator('.settings-help-menu > summary').filter({ hasText: 'Help & setup' }).click();
   await page
     .locator('.settings-help-menu')
-    .getByRole('button', { name: 'Getting started', exact: true })
+    .getByRole('button', { name: 'Review setup', exact: true })
+    .click();
+  await page
+    .locator('.onboarding')
+    .getByRole('button', { name: 'Start setup', exact: true })
     .click();
   await switches();
   await shot('guide-name-1080');
   for (let i = 0; i < 3; i++)
-    await page.locator('.onboarding').getByRole('button', { name: 'Next', exact: true }).click();
+    await page
+      .locator('.onboarding')
+      .getByRole('button', { name: i === 1 ? 'Skip for now' : 'Continue', exact: true })
+      .click();
   await switches();
   await shot('guide-memory-1080');
-  await page.locator('.onboarding').getByRole('button', { name: 'Next', exact: true }).click();
-  assert.equal(await page.getByLabel('Guide theme').locator('option[value=system]').count(), 1);
+  await page.locator('.onboarding').getByRole('button', { name: 'Continue', exact: true }).click();
+  await page.getByRole('heading', { name: 'Review and begin', exact: true }).waitFor();
   await page.getByRole('button', { name: 'Close guide', exact: true }).click();
+  await page.locator('.onboarding').waitFor({ state: 'detached' });
   await page.getByRole('button', { name: 'Close settings', exact: true }).click();
   await page.locator('.sidebar').getByRole('button', { name: 'Notebooks', exact: true }).click();
   await page.locator('.book-notebook').first().click();
@@ -284,7 +299,27 @@ try {
       await page.mouse.move(0, 0);
       await control.hover();
       await page.waitForTimeout(500);
-      if (!(await page.getByRole('tooltip').count()))
+      const visibleHelp = await control.evaluate((element) => {
+        const candidates = [
+          element.closest('label')?.querySelector('small'),
+          ...(element.getAttribute('aria-describedby') || '')
+            .split(/\s+/)
+            .map((id) => document.getElementById(id)),
+        ];
+        return candidates.some((node) => {
+          if (!node?.textContent?.trim()) return false;
+          const rect = node.getBoundingClientRect(),
+            style = getComputedStyle(node);
+          return (
+            rect.width > 2 &&
+            rect.height > 2 &&
+            style.clip === 'auto' &&
+            style.clipPath === 'none' &&
+            style.visibility !== 'hidden'
+          );
+        });
+      });
+      if (!(await page.getByRole('tooltip').count()) && !visibleHelp)
         missingHelp.push(
           await control.evaluate(
             (e) =>
@@ -295,7 +330,11 @@ try {
         );
     }
   }
-  assert.deepEqual(missingHelp, [], 'Every visible Settings field/switch needs meaningful help');
+  assert.deepEqual(
+    missingHelp,
+    [],
+    'Every visible Settings field/switch needs onscreen explanation or meaningful tooltip help',
+  );
   assert.deepEqual(errors, []);
   console.log(
     JSON.stringify(

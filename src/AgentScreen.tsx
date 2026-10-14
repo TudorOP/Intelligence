@@ -296,6 +296,18 @@ export default function AgentScreen({
           </div>
           <h2>{t('Tools and connections')}</h2>
           <small>{t('Profile choices can only restrict the access granted in the app.')}</small>
+          <label className="setting-switch">
+            <span>
+              {t('Allow setup and access requests')}
+              <small>
+                {t('Native review is required before any proposed change or access grant.')}
+              </small>
+            </span>
+            <Switch
+              checked={draft.allowConfigurationRequests !== false}
+              onChange={(e) => setDraft({ ...draft, allowConfigurationRequests: e.target.checked })}
+            />
+          </label>
           {groups
             .filter((g) => ['calendar', 'reports', 'search', 'projects'].includes(g))
             .map((g) => (
@@ -349,7 +361,13 @@ export default function AgentScreen({
                           ? 'Make these saved instructions available to this agent.'
                           : 'Allow this agent to use this connected tool server, subject to app permissions.',
                       )}
-                      checked={kind==='skill'&&e.data.creatorProfile&&e.data.creatorProfile!==profile.id ? !!draft[key]?.includes(e.id) : !draft[key] || draft[key].includes(e.id)}
+                      checked={
+                        kind === 'skill' &&
+                        e.data.creatorProfile &&
+                        e.data.creatorProfile !== profile.id
+                          ? !!draft[key]?.includes(e.id)
+                          : !draft[key] || draft[key].includes(e.id)
+                      }
                       onChange={(event) =>
                         scope(
                           key,

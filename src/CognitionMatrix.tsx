@@ -1,3 +1,4 @@
+import ApprovalCard from './ApprovalCard';
 import { locale } from './i18n';
 import { t } from './i18n';
 import { useState, useEffect } from 'react';
@@ -458,17 +459,11 @@ export default function CognitionMatrix({
               </div>
             ) : null}
             {pending.map((request) => (
-              <div className="matrix-approval" key={request.id}>
-                <b>{t('Approval needed')}</b>
-                <p>{request.summary}</p>
-                <pre>{request.details}</pre>
-                <button onClick={() => void work(task.id, () => api.approve(request.id!, true))}>
-                  {t('Approve')}
-                </button>
-                <button onClick={() => void work(task.id, () => api.approve(request.id!, false))}>
-                  {t('Deny')}
-                </button>
-              </div>
+              <ApprovalCard
+                key={request.id}
+                request={request}
+                onError={(message) => onError(new Error(message))}
+              />
             ))}
             {task.data.result && task.data.result !== responses.at(-1)?.data.content ? (
               <div className={'matrix-result ' + state}>

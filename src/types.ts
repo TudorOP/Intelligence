@@ -95,6 +95,8 @@ export type Settings = {
   pinnedItems: string[];
   recentItems: { id: string; at: number }[];
   onboardingComplete: boolean;
+  setupReminderDismissed?: boolean;
+  onboarding?: import('../electron/onboarding.mjs').SetupProgress;
   missedTaskPolicy: 'ask' | 'skip' | 'run';
   externalEventsEnabled: boolean;
   externalEventsPort: number;
@@ -204,9 +206,20 @@ export type Snapshot = {
   matrixPreparation?: { task: string; list: string } | null;
   activeConversations?: string[];
   approvals?: AgentEvent[];
+  temporaryAccess?: {
+    conversation: string;
+    resource: string;
+    permission: string;
+    profile?: string;
+  }[];
   inference?: {
     providers: { id: string; name: string; endpoint: string; cloud: boolean }[];
-    key: { configured: boolean; storage: string; persistentAvailable: boolean };
+    key: {
+      configured: boolean;
+      storage: string;
+      persistentAvailable: boolean;
+      generation?: number;
+    };
   };
   search?: {
     provider: string;
@@ -239,6 +252,16 @@ export type AgentEvent = {
   id?: string;
   summary?: string;
   details?: string;
+  action?: {
+    kind?: string;
+    choices?: string[];
+    requiresReview?: boolean;
+    agent?: string;
+    resource?: string;
+    permission?: string;
+    reason?: string;
+    changes?: Record<string, { before: string; after: string }>;
+  };
   repair?: string;
 };
 export interface API {
@@ -260,11 +283,17 @@ export interface API {
     action: 'save' | 'remove' | 'status' | 'disconnect';
     key?: string;
     provider?: Settings['provider'];
+    endpoint?: string;
   }): Promise<any>;
+  modelTest(input: { action: 'test' | 'cancel'; id: string }): Promise<any>;
   vault(input: Record<string, any>): Promise<any>;
   chat(input: any): Promise<any>;
   stop(id: string): Promise<any>;
-  approve(id: string, allowed: boolean): Promise<any>;
+  approve(
+    id: string,
+    allowed: boolean | 'temporary' | 'permanent' | 'decline' | 'save',
+  ): Promise<any>;
+  accessRevoke(input: { conversation: string; id: string }): Promise<any>;
   image(purpose?: string): Promise<string | null>;
   export(id: string): Promise<string | null>;
   directory(): Promise<string | null>;

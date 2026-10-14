@@ -124,7 +124,13 @@ try {
     () => document.querySelector('.app-shell').dataset.backgrounds === 'false',
   );
   await page.getByLabel('Search settings').fill('backup');
-  assert.equal(await page.locator('.settings-dialog > aside').getByRole('button', { name: 'Your data', exact: true }).count(), 1);
+  assert.equal(
+    await page
+      .locator('.settings-dialog > aside')
+      .getByRole('button', { name: 'Your data', exact: true })
+      .count(),
+    1,
+  );
   await page.getByRole('button', { name: 'Your data', exact: true }).click();
   await page.getByLabel('Search settings').fill('');
   await capture('settings-data-1080');
@@ -227,13 +233,18 @@ try {
   await page.getByRole('button', { name: 'Settings', exact: true }).click();
   await page.getByRole('button', { name: 'Your data', exact: true }).click();
   await page.locator('.settings-help-menu > summary').filter({ hasText: 'Help & setup' }).click();
-  await page.getByRole('button', { name: 'Getting started', exact: true }).first().click();
+  await page.getByRole('button', { name: 'Review setup', exact: true }).first().click();
   await page.getByRole('dialog', { name: 'Getting started', exact: true }).waitFor();
   await capture('guide-compact');
-  for (let i = 0; i < 4; i++) await page.getByRole('button', { name: 'Next', exact: true }).click();
-  await page.getByLabel('Guide theme').selectOption('day');
-  await page.waitForFunction(() => document.documentElement.dataset.theme === 'day');
+  await page.getByRole('button', { name: 'Start setup', exact: true }).click();
+  for (let i = 0; i < 3; i++)
+    await page
+      .locator('.onboarding')
+      .getByRole('button', { name: 'Continue', exact: true })
+      .click();
+  await capture('guide-memory-compact');
   await page.getByRole('button', { name: 'Close guide', exact: true }).click();
+  await page.locator('.onboarding').waitFor({ state: 'detached' });
   await page.getByRole('button', { name: 'Close settings', exact: true }).click();
   await resize(1920, 1080);
   await page.evaluate(() => {

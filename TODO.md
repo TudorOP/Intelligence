@@ -1,6 +1,6 @@
-# Intelligence 0.94 — release acceptance
+# Intelligence 1.0 — release acceptance
 
-The current workspace features are described in README.md. Source checks, all 207 enabled backend checks, the production build and the isolated desktop smoke pass. Source publication is separate from the remaining binary-release gates. Verification procedures and limitations are documented in docs/VERIFICATION.md.
+The current workspace features are described in README.md. Source checks, all 223 enabled backend checks, the production build and the isolated desktop smoke pass. Source publication is separate from the remaining binary-release gates. Verification procedures and limitations are documented in docs/VERIFICATION.md.
 
 ## Required on the target Linux host
 
@@ -27,16 +27,18 @@ Complete this pass before implementing the new 1.0 settings, onboarding, help or
 - [x] Preserve user data, migrations/backups, English/Romanian content, mandatory harness guidance, live permission/revision/approval checks, artwork/provenance and full license notices. Avoid speculative abstractions, dependency churn and cosmetic rewrites.
 - [x] Run affected regressions/desktop fixtures, backend tests, build and source checks; compare performance with the baseline and document remaining intentional duplication before starting 1.0 feature implementation.
 
-## Proposed for 1.0 — awaiting plan review
+## 1.0 implementation — authorized local work
 
-Develop on `dev`; `main` holds reviewed releases. This list records proposed work, not completed functionality. Details, sequence, design concepts and acceptance criteria are in [ONBOARDING_1_0_PLAN.md](docs/ONBOARDING_1_0_PLAN.md).
+Develop on `dev`; `main` holds reviewed releases. The reviewed plan is implemented locally; final verification and source packaging are recorded below. Details, sequence, design concepts and acceptance criteria are in [ONBOARDING_1_0_PLAN.md](docs/ONBOARDING_1_0_PLAN.md).
 
-- [ ] Review the six-stage first-use setup, provider assistance and optional feature lessons.
+- [x] Review the six-stage first-use setup, provider assistance and optional feature lessons.
 - [x] Complete and verify the prerequisite deduplication/code cleanup pass above before implementing these features.
-- [ ] Implement persisted setup progress, save/exit/resume and safe Settings return paths.
-- [ ] Share profile/companion and provider forms with Settings; add plain-language connection diagnosis.
-- [ ] Add explicit first-use access, memory/download and automation choices without changing existing users' preferences.
-- [ ] Add an offline English/Romanian written guide under Settings → Help & setup.
-- [ ] Add native requests for narrowly scoped access and reviewed configuration, with current-request and per-agent persistent choices in both chat surfaces.
-- [ ] Verify lifecycle, stale/revoked approvals, localization, keyboard access, ten themes, responsive layouts and Linux/live-provider release gates.
-- [ ] Record the current performance baseline and compare startup, idle resources, bundle size and Settings/Chat responsiveness as the 1.0 phases land; keep closed setup/help features free of recurring work.
+- [x] Implement persisted setup progress, save/exit/resume and safe Settings return paths.
+- [x] Share profile/companion and provider forms with Settings; add plain-language connection diagnosis.
+- [x] Add explicit first-use access, memory/download and automation choices without changing existing users' preferences.
+- [x] Add an offline English/Romanian written guide under Settings → Help & setup.
+- [x] Add native requests for narrowly scoped access and reviewed configuration, with current-request and per-agent persistent choices in both chat surfaces.
+- [x] Verify local lifecycle, stale/revoked approvals, localization, keyboard access, ten themes and responsive layouts. Target Linux/live-provider/device acceptance remains separately open above.
+- [x] Record the current performance baseline and compare startup, idle resources, bundle size and Settings/Chat responsiveness as the 1.0 phases land; keep closed setup/help features free of recurring work. The isolated 0.94/1.0 comparison and measurement limits are recorded in docs/VERIFICATION.md.
+
+- [x] Refresh release docs and Intelligence-source.zip after the final build/test/screenshot/performance pass; create the local 1.0 commit with scripts/commit-version.mjs. This completion record is included in the source archive prepared immediately before that commit; no push or publication is authorized.

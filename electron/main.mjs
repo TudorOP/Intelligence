@@ -27,7 +27,7 @@ import { Agent } from './agent.mjs';
 import { Connections } from './connections.mjs';
 import { ensureBuiltinSkills } from './skills.mjs';
 import { ContextManager } from './context.mjs';
-import { listModels } from './provider.mjs';
+import { listModels, completion } from './provider.mjs';
 import { matrixInference, validateMatrixProfile } from './matrix-config.mjs';
 import { Vault } from './vault.mjs';
 import { validateChatImages } from './vision.mjs';
@@ -54,7 +54,11 @@ import { deleteTrashBatch } from './trash-bulk.mjs';
 import { OptionalModules } from './optional-modules.mjs';
 import { importBackgroundImage } from './appearance-settings.mjs';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const setupFixture =
+  process.env.INTELLIGENCE_TEST === '1' && process.env.INTELLIGENCE_TEST_ONBOARDING === '1';
 const iconPath = path.join(root, 'build', 'icon.png');
+let setupInvitationOffered = false;
+const connectionTests = new Map();
 const modelRequests = new Map(),
   modelCatalogs = new Map();
 const iconFor = (style) =>
@@ -118,13 +122,18 @@ const emit = (event) => {
     notice.show();
   }
   if (event.type === 'changed' && agent)
-    for (const controller of agent.active.values()) {
+    for (const [conversation, controller] of agent.active) {
       if (!controller.taskId) continue;
       const task = store.get(controller.taskId);
       if (
         !task ||
-        !store.access(task.id, true) ||
-        !store.assigned(task.id) ||
+        !store.withAgentScope(
+          agent.accessRequests.scope(
+            agent.runProfiles.get(conversation) || profileSettings(store),
+            'task-start',
+          ),
+          () => store.access(task.id, true) && store.assigned(task.id),
+        ) ||
         controller.taskBrief !==
           JSON.stringify([
             task.title,
@@ -141,6 +150,7 @@ const emit = (event) => {
       event.type === 'error' ? 'notice' : event.type,
       event.entity ?? event.conversation,
       event.summary ?? event.error ?? 'Agent response finished',
+      event.data ?? {},
     );
     if (
       store.settings().activityNotifications &&
@@ -509,40 +519,53 @@ function setup() {
       change();
     return result;
   });
-  handle('bootstrap', async () => ({
-    ...store.snapshot(),
-    entities: store
-      .all(false, true)
-      .map((e) =>
-        e.kind === 'card'
-          ? {
-              ...e,
-              agentAccess: store.access(e.id),
-              agentEditable: store.access(e.id, true),
-              agentAssigned: store.assigned(e.id),
-            }
-          : e.kind === 'report'
-            ? { ...e, data: { ...e.data, content: undefined, sections: undefined } }
-            : e.kind === 'vault-file'
-              ? { ...e, data: { ...e.data, content: undefined } }
-              : e.kind === 'connection'
-                ? { ...e, data: { ...e.data, enabled: connections.clients.has(e.id) } }
-                : e,
+  handle('bootstrap', async () => {
+    const actorScope = agent.accessRequests.scope(profileSettings(store), 'bootstrap');
+    return {
+      ...store.snapshot(false),
+      entities: store.withAgentScope(actorScope, () =>
+        store.all(false, true).map((e) =>
+          e.kind === 'card'
+            ? {
+                ...e,
+                agentAccess: store.access(e.id),
+                agentEditable: store.access(e.id, true),
+                agentAssigned: store.assigned(e.id),
+              }
+            : e.kind === 'report'
+              ? { ...e, data: { ...e.data, content: undefined, sections: undefined } }
+              : e.kind === 'vault-file'
+                ? { ...e, data: { ...e.data, content: undefined } }
+                : e.kind === 'connection'
+                  ? { ...e, data: { ...e.data, enabled: connections.clients.has(e.id) } }
+                  : e,
+        ),
       ),
-    desktop: true,
-    showOnboarding: process.env.INTELLIGENCE_TEST !== '1' && !store.settings().onboardingComplete,
-    memoryStatus: memory.status,
-    consolidationStatus: consolidator.status,
-    matrixActive: matrix.running ? { ...matrix.running } : null,
-    matrixPreparation: matrix.preparation
-      ? { task: matrix.preparation.task, list: matrix.preparation.list }
-      : null,
-    activeConversations: [...agent.active.keys()],
-    approvals: [...agent.approvals.values()].map(({ resolve, ...event }) => event),
-    search: webSearch.status(),
-    inference: { providers: inferenceProviders, key: inferenceCredentials.info(store.settings()) },
-    machine: await machineIdentity(),
-  }));
+      desktop: true,
+      showOnboarding:
+        (process.env.INTELLIGENCE_TEST !== '1' || setupFixture) &&
+        store.firstRun &&
+        !setupInvitationOffered &&
+        store.settings().onboarding.status === 'not-started' &&
+        !store.settings().onboardingComplete &&
+        (setupInvitationOffered = true),
+      memoryStatus: memory.status,
+      consolidationStatus: consolidator.status,
+      matrixActive: matrix.running ? { ...matrix.running } : null,
+      matrixPreparation: matrix.preparation
+        ? { task: matrix.preparation.task, list: matrix.preparation.list }
+        : null,
+      activeConversations: [...agent.active.keys()],
+      temporaryAccess: agent.accessRequests.status(),
+      approvals: [...agent.approvals.values()].map(({ resolve, ...event }) => event),
+      search: webSearch.status(),
+      inference: {
+        providers: inferenceProviders,
+        key: inferenceCredentials.info(store.settings()),
+      },
+      machine: await machineIdentity(),
+    };
+  });
   handle('mutate', (input) => {
     const previousCard = store.get(input.id);
     if (
@@ -652,7 +675,12 @@ function setup() {
       store.settings(),
       profile ? { ...profile, model: profile.model || 'discovery' } : null,
     );
-    const cacheKey = settings.provider + ':' + settings.endpoint;
+    const cacheKey =
+      settings.provider +
+      ':' +
+      settings.endpoint +
+      ':' +
+      inferenceCredentials.info(settings).generation;
     const cached = modelCatalogs.get(cacheKey);
     if (!force && cached && Date.now() - cached.at < 30000) return cached.models;
     if (modelRequests.has(cacheKey)) return modelRequests.get(cacheKey);
@@ -666,7 +694,56 @@ function setup() {
     modelRequests.set(cacheKey, request);
     return request;
   });
-  handle('inference-key', ({ action, key, provider }) => {
+  handle('model-test', async ({ action, id }) => {
+    if (typeof id !== 'string' || !/^[a-z0-9-]{1,80}$/i.test(id))
+      throw Error('Invalid connection test');
+    if (action === 'cancel') {
+      connectionTests.get(id)?.abort();
+      return true;
+    }
+    if (action !== 'test') throw Error('Unknown connection test');
+    for (const controller of connectionTests.values()) controller.abort();
+    connectionTests.clear();
+    const controller = new AbortController();
+    connectionTests.set(id, controller);
+    const timer = setTimeout(() => controller.abort(), 15000);
+    const settings = store.settings();
+    const key = inferenceCredentials.get(settings);
+    const generation = inferenceCredentials.info(settings).generation;
+    try {
+      const response = await completion(
+        { ...settings, tools: false, apiMaxTokens: 256 },
+        [{ role: 'user', content: 'Reply with a short greeting. This is a connection test.' }],
+        [],
+        () => {},
+        controller.signal,
+        { key },
+      );
+      if (controller.signal.aborted) throw Error('Connection test cancelled');
+      const current = store.settings();
+      if (
+        settings.provider !== current.provider ||
+        settings.endpoint !== current.endpoint ||
+        settings.model !== current.model ||
+        generation !== inferenceCredentials.info(current).generation
+      )
+        throw Error('The connection changed. Test the current model again.');
+      if (!response.content?.trim())
+        throw Error('The model returned no text. Choose another model or retry.');
+      return { provider: settings.provider, model: settings.model, replied: true };
+    } catch (error) {
+      const message = controller.signal.aborted
+        ? 'Connection test cancelled or timed out. Your settings are saved.'
+        : String(error.message).slice(0, 1500);
+      throw Error(key ? message.replaceAll(key, '[redacted]') : message);
+    } finally {
+      clearTimeout(timer);
+      if (connectionTests.get(id) === controller) connectionTests.delete(id);
+    }
+  });
+  handle('inference-key', ({ action, key, provider, endpoint }) => {
+    if (!['save', 'remove', 'status', 'disconnect'].includes(action))
+      throw Error('Unknown credential action');
     if (action === 'disconnect') {
       const result = disconnectProvider(store, inferenceCredentials, provider);
       for (const [id, run] of agent.runProfiles) if (run.provider === provider) agent.stop(id);
@@ -675,12 +752,24 @@ function setup() {
       return result;
     }
     const settings = store.settings();
+    if (
+      (provider && provider !== settings.provider) ||
+      (endpoint && endpoint !== settings.endpoint)
+    )
+      throw Error('The connection changed. Enter the key again for the current address.');
     const result =
       action === 'save'
         ? inferenceCredentials.save(settings, key)
         : action === 'remove'
           ? inferenceCredentials.forget(settings)
           : inferenceCredentials.info(settings);
+    if (action === 'save' || action === 'remove') {
+      for (const controller of connectionTests.values()) controller.abort();
+      for (const [id, run] of agent.runProfiles)
+        if (run.provider === settings.provider && run.endpoint === settings.endpoint)
+          agent.stop(id);
+      modelCatalogs.clear();
+    }
     change();
     return result;
   });
@@ -723,8 +812,9 @@ function setup() {
     agent.stop(id);
     return true;
   });
+  handle('access-revoke', ({ conversation, id }) => agent.accessRequests.revoke(conversation, id));
   handle('approve', (id, value) => {
-    agent.approve(id, value === true);
+    agent.approve(id, value);
     return true;
   });
   handle('image', importImage);
@@ -1002,6 +1092,12 @@ function setup() {
   );
 }
 async function runTask(id, manual = false) {
+  return store.withAgentScope(
+    agent.accessRequests.scope(profileSettings(store), 'task-start'),
+    () => runTaskScoped(id, manual),
+  );
+}
+async function runTaskScoped(id, manual = false) {
   const card = store.get(id);
   if (!card || card.kind !== 'card') throw new Error('Task not found');
   if (!store.access(id, true)) throw new Error('Enable read & edit access for this card first.');
@@ -1015,7 +1111,11 @@ async function runTask(id, manual = false) {
     kind: 'conversation',
     title: card.title,
     project: card.project,
-    data: { context: [id, ...(card.data.links ?? [])], task: id },
+    data: {
+      context: [id, ...(card.data.links ?? [])],
+      task: id,
+      agentProfile: store.settings().activeAgent,
+    },
   });
   const runId = randomUUID();
   store.db
@@ -1068,7 +1168,10 @@ async function tick() {
     }
     for (const c of store.all(false, true).filter((e) => e.kind === 'card')) {
       if (
-        !store.assigned(c.id) ||
+        !store.withAgentScope(
+          agent.accessRequests.scope(profileSettings(store), 'task-start'),
+          () => store.assigned(c.id),
+        ) ||
         ['running', 'review', 'needs_input', 'paused', 'done'].includes(c.data.status)
       )
         continue;
@@ -1128,7 +1231,21 @@ store = new Store(process.env.INTELLIGENCE_DATA_DIR ?? app.getPath('userData'));
 store.on('changed', ({ entity }) => {
   if (entity && entity.kind !== 'conversation') change();
 });
+if (store.firstRun && (process.env.INTELLIGENCE_TEST !== '1' || setupFixture))
+  store.setSettings({
+    semanticSearch: false,
+    autoConsolidation: false,
+    memoryAccess: false,
+    background: false,
+    matrixPreload: false,
+    shareName: false,
+  });
 ensureProfiles(store);
+if (store.firstRun && (process.env.INTELLIGENCE_TEST !== '1' || setupFixture))
+  store.mutate({
+    id: store.settings().activeAgent,
+    data: { resourcePolicy: 'ask', resourceGrants: [], allowConfigurationRequests: true },
+  });
 ensureBuiltinSkills(store);
 vault = new Vault(store);
 workspace = new Workspace(store, vault);

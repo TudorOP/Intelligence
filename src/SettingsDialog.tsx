@@ -1,5 +1,8 @@
+import AgentAccessPanel from './AgentAccessPanel';
+const HelpGuide = lazy(() => import('./HelpGuide'));
+import type { HelpArticle } from './HelpGuide';
 import UserProfileFields from './UserProfileFields';
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import type { Settings, Snapshot } from './types';
 import { api } from './api';
 import { t } from './i18n';
@@ -25,6 +28,8 @@ export default function SettingsDialog({
   onTrash,
   trashOpen,
   guideOpen,
+  setupReturn = false,
+  onLesson,
 }: {
   section: string;
   settings: Settings;
@@ -38,6 +43,8 @@ export default function SettingsDialog({
   onTrash: () => void;
   trashOpen: boolean;
   guideOpen: boolean;
+  setupReturn?: boolean;
+  onLesson: (article: HelpArticle) => void;
 }) {
   const [settingsQuery, setSettingsQuery] = useState('');
   const [licensesOpen, setLicensesOpen] = useState(false);
@@ -160,7 +167,17 @@ export default function SettingsDialog({
           </a>
           <details className="settings-help-menu">
             <summary>{t('Help & setup')}</summary>
-            <button onClick={onGuide}>{t('Getting started')}</button>
+            <button onClick={onGuide}>
+              {t(
+                settings.onboardingComplete
+                  ? 'Review setup'
+                  : settings.onboarding?.status === 'deferred'
+                    ? 'Continue setup'
+                    : 'Getting started',
+              )}
+            </button>
+            <button onClick={() => onSection('guide')}>{t('Written guide')}</button>
+            <button onClick={() => onSection('lessons')}>{t('Feature lessons')}</button>
           </details>
           <details className="settings-help-menu">
             <summary>{t('Licenses')}</summary>
@@ -176,6 +193,21 @@ export default function SettingsDialog({
           ×
         </button>
         <div className="settings-content" data-section={section}>
+          {setupReturn && (
+            <button className="setup-return" onClick={() => onSection(null)}>
+              {t('Return to setup')}
+            </button>
+          )}
+          {(section === 'guide' || section === 'lessons') && (
+            <Suspense fallback={<p role="status">{t('Opening guide…')}</p>}>
+              <HelpGuide
+                settings={settings}
+                onSetting={(section) => onSection(section)}
+                onLesson={onLesson}
+                lessons={section === 'lessons'}
+              />
+            </Suspense>
+          )}
           {section === 'profile' && (
             <section className="user-profile-settings settings-section">
               <span className="eyebrow">{t('YOUR PROFILE')}</span>
@@ -290,6 +322,10 @@ export default function SettingsDialog({
                   </p>
                 </section>
               </div>
+              <details className="agent-grants-menu">
+                <summary>{t('Access for each agent')}</summary>
+                <AgentAccessPanel snapshot={snapshot} onChanged={boot} onError={fail} />
+              </details>
             </section>
           )}
           {section === 'automation' && (

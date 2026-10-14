@@ -169,9 +169,10 @@ try {
     await fit('Brave');
     await page.getByLabel('Search provider', { exact: true }).selectOption('searxng');
     await page.locator('.settings-help-menu > summary').filter({ hasText: 'Help & setup' }).click();
-    await page.getByRole('button', { name: 'Getting started', exact: true }).click();
+    await page.getByRole('button', { name: 'Review setup', exact: true }).click();
     await page.locator('.onboarding').waitFor();
-    await page.getByRole('button', { name: 'Close guide', exact: true }).click();
+    await page.getByRole('button', { name: 'Explore first', exact: true }).click();
+    await page.locator('.onboarding').waitFor({ state: 'detached' });
     assert.equal(await page.locator('.settings-dialog').count(), 1);
     await nav('Your profile');
     await page.getByLabel('Your name', { exact: true }).fill('Ada');

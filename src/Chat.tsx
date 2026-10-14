@@ -1,5 +1,7 @@
+import { resourceKinds, resourceLabel } from '../electron/resource-catalog.mjs';
+import ApprovalCard from './ApprovalCard';
 import { t } from './i18n';
-import { memo, useEffect, useRef, useState, useId } from 'react';
+import { memo, useMemo, useEffect, useRef, useState, useId } from 'react';
 import ReactMarkdown, { defaultUrlTransform } from 'react-markdown';
 import ZimReader from './ZimReader';
 import remarkGfm from 'remark-gfm';
@@ -141,7 +143,8 @@ const MessageBody = memo(function MessageBody({ content }: { content: string }) 
 export default function Chat({
   settings,
   conversation,
-  context,
+  context: inheritedContext,
+  resources = [],
   onNew,
   onSettings,
   compact = false,
@@ -154,6 +157,7 @@ export default function Chat({
   settings: Settings;
   conversation: Entity | null;
   context: Entity[];
+  resources?: Entity[];
   onNew: (context: string[]) => Promise<Entity>;
   onSettings: () => void;
   compact?: boolean;
@@ -163,6 +167,59 @@ export default function Chat({
   onBranched?: (e: Entity) => void;
   screenFocus?: { section: string; mode: string; entities: string[] };
 }) {
+  const contextPickerId = useId(),
+    contextTrigger = useRef<HTMLButtonElement>(null);
+  const closeContext = () => {
+    setContextOpen(false);
+    contextTrigger.current?.focus();
+  };
+  const [selectedIds, setSelectedIds] = useState<string[]>([]),
+    [contextOpen, setContextOpen] = useState(false),
+    [contextQuery, setContextQuery] = useState('');
+  const [suppressedIds, setSuppressedIds] = useState<string[]>([]);
+  const context = useMemo(
+    () => [
+      ...inheritedContext.filter((e) => !suppressedIds.includes(e.id)),
+      ...(selectedIds.length
+        ? resources.filter(
+            (e) => selectedIds.includes(e.id) && !inheritedContext.some((p) => p.id === e.id),
+          )
+        : []),
+    ],
+    [inheritedContext, resources, selectedIds, suppressedIds],
+  );
+  const toggleContext = (entity: Entity, checked: boolean) => {
+    if (responding) return;
+    const ids = checked
+      ? [...new Set([...context.map((e) => e.id), entity.id])].slice(0, 20)
+      : context.filter((e) => e.id !== entity.id).map((e) => e.id);
+    if (inheritedContext.some((e) => e.id === entity.id))
+      setSuppressedIds((old) =>
+        checked ? old.filter((id) => id !== entity.id) : [...old, entity.id],
+      );
+    else
+      setSelectedIds((old) =>
+        checked ? [...old, entity.id].slice(0, 20) : old.filter((id) => id !== entity.id),
+      );
+    if (conversation)
+      void api
+        .mutate({ id: conversation.id, revision: conversation.revision, data: { context: ids } })
+        .catch((e) => onError(e.message));
+  };
+  const candidates = useMemo(
+    () =>
+      contextOpen
+        ? resources
+            .filter(
+              (e) =>
+                resourceKinds.has(e.kind) &&
+                !e.deleted &&
+                e.title.toLocaleLowerCase().includes(contextQuery.toLocaleLowerCase()),
+            )
+            .slice(0, 100)
+        : [],
+    [contextOpen, resources, contextQuery],
+  );
   const [messages, setMessages] = useState<Message[]>([]),
     [draft, setDraft] = useState(''),
     [stream, setStream] = useState(''),
@@ -323,6 +380,9 @@ export default function Chat({
     setLiveThinkingOpen(false);
     setBusy(false);
     setApprovals([]);
+    setSelectedIds([]);
+    setSuppressedIds([]);
+    setContextOpen(false);
     setImages([]);
     if (conversation) load();
     if (conversation) loadInfo();
@@ -366,7 +426,8 @@ export default function Chat({
           load();
           setThinking('');
         }
-        if (e.type === 'approval') setApprovals((a) => [...a, e]);
+        if (e.type === 'approval')
+          setApprovals((a) => (a.some((p) => p.id === e.id) ? a : [...a, e]));
         if (e.type === 'approval-resolved') setApprovals((a) => a.filter((x) => x.id !== e.id));
       }),
     [],
@@ -649,17 +710,8 @@ export default function Chat({
             {activity || t('Thinking through it…')}
           </div>
         ) : null}
-        {approvals.map((a) => (
-          <div className="approval" key={a.id}>
-            <b>{a.summary}</b>
-            <pre>{a.details}</pre>
-            <div>
-              <button onClick={() => void api.approve(a.id!, false)}>{t('Decline')}</button>
-              <button className="primary" onClick={() => void api.approve(a.id!, true)}>
-                {t('Approve action')}
-              </button>
-            </div>
-          </div>
+        {approvals.map((request) => (
+          <ApprovalCard key={request.id} request={request} onError={onError} />
         ))}
         <div ref={end} />
       </div>
@@ -752,10 +804,82 @@ export default function Chat({
             </button>
           </details>
         ) : null}
+        {resources.length > 0 &&
+          !conversation?.data.matrixTask &&
+          !conversation?.data.readOnlyMachine &&
+          !conversation?.data.reportReadOnly && (
+            <div className="chat-context-selection">
+              <button
+                type="button"
+                ref={contextTrigger}
+                disabled={responding}
+                aria-controls={contextPickerId}
+                aria-expanded={contextOpen}
+                onClick={() => setContextOpen(!contextOpen)}
+              >
+                {t('Choose context')}
+              </button>
+              {contextOpen && (
+                <div
+                  className="chat-context-picker"
+                  id={contextPickerId}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Escape') {
+                      event.stopPropagation();
+                      closeContext();
+                    }
+                  }}
+                >
+                  <label>
+                    {t('Find a resource')}
+                    <input
+                      autoFocus
+                      value={contextQuery}
+                      onChange={(e) => setContextQuery(e.target.value)}
+                    />
+                  </label>
+                  <small>
+                    {t(
+                      'Selecting sends the name and ID. Content is shared only with effective access; the agent can ask for your approval.',
+                    )}
+                  </small>
+                  {candidates.map((e) => (
+                    <label key={e.id}>
+                      <input
+                        aria-label={e.title + ' · ' + t(resourceLabel(e.kind))}
+                        type="checkbox"
+                        checked={context.some((p) => p.id === e.id)}
+                        disabled={responding}
+                        onChange={(event) => toggleContext(e, event.target.checked)}
+                      />
+                      <span>
+                        {e.title}
+                        <small>{t(resourceLabel(e.kind))}</small>
+                      </span>
+                    </label>
+                  ))}
+                  <button type="button" onClick={closeContext}>
+                    {t('Done')}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         {context.length ? (
           <div className="context-chips">
             {context.slice(0, 4).map((e) => (
-              <span key={e.id}>✳ {e.title}</span>
+              <span key={e.id}>
+                ✳ {e.title}
+                {
+                  <button
+                    disabled={responding}
+                    aria-label={t('Remove context') + ' · ' + e.title}
+                    onClick={() => toggleContext(e, false)}
+                  >
+                    ×
+                  </button>
+                }
+              </span>
             ))}
           </div>
         ) : null}

@@ -1,6 +1,6 @@
 # Intelligence 1.0 — onboarding, help and agent setup proposal
 
-Status: proposed for joint review, 2026-10-14. This change contains planning and design concepts; it does not implement the new flows or change the application's 0.94 / package 0.9.4 version. Work belongs on `dev`. `main` remains the GitHub default and holds reviewed releases.
+Status: authorized for implementation, 2026-10-14. The original proposal and design concepts below are retained for traceability. The completed local 1.0 work and scoped choices are described in [implementation notes](ONBOARDING_1_0_IMPLEMENTATION.md); verification is recorded separately. Work belongs on `dev`. `main` remains the GitHub default and holds reviewed releases.
 
 ## Intended experience
 

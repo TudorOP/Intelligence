@@ -66,15 +66,16 @@ try {
       }),
     ),
   );
-  assert.equal(previews.length, 6);
+  assert.equal(previews.length, 11);
   assert.ok(previews.every((width) => width > 100));
-  await page.getByRole('button', { name: '☀ Summer', exact: true }).click();
-  await page.getByLabel('Layout', { exact: true }).selectOption('compact');
+  await page.locator('.theme-options button').filter({ hasText: 'Summer' }).click();
+  assert.equal(await page.getByLabel('Layout', { exact: true }).count(), 0);
+  await page.getByRole('button', { name: 'Icons & identity', exact: true }).click();
   await page.getByLabel('App window icon', { exact: true }).selectOption('prism');
   await page.getByLabel('Tray icon', { exact: true }).selectOption('aurora');
   await page.getByLabel('In-app logo', { exact: true }).selectOption('aurora');
   await page.waitForTimeout(300);
-  assert.match(await page.locator('.brand img').getAttribute('src'), /icon-aurora/);
+  assert.match(await page.locator('.agent-profile img').getAttribute('src'), /icon-aurora/);
   assert.equal(await page.locator('nav .theme-art').count(), 0);
   await page.waitForTimeout(120);
   await desktop.evaluate(async ({ BrowserWindow }) => {
@@ -97,12 +98,12 @@ try {
   fs.writeFileSync(path.join(directory, 'appearance.png'), Buffer.from(image, 'base64'));
   const values = await page.evaluate(() => window.intelligence.bootstrap());
   assert.equal(values.settings.theme, 'summer');
-  assert.equal(values.settings.layout, 'compact');
+  assert.equal(values.settings.layout, 'studio');
   assert.equal(values.settings.appIcon, 'prism');
   assert.equal(values.settings.trayIcon, 'aurora');
   await page.reload();
   await page.getByRole('heading', { name: /Take your time/ }).waitFor();
-  assert.equal(await page.locator('html').getAttribute('data-layout'), 'compact');
+  assert.equal(await page.locator('html').getAttribute('data-layout'), 'studio');
   console.log(JSON.stringify({ directory, icons, result: 'passed' }));
 } finally {
   await desktop.close();

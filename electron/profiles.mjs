@@ -1,5 +1,10 @@
 import { randomUUID } from 'node:crypto';
 import { inferenceProviders, providerInfo } from './inference-providers.mjs';
+import {
+  setupToolNames,
+  validateResourceGrants,
+  normalizeResourceGrants,
+} from './agent-access.mjs';
 export const ratingKeys = ['intelligence', 'knowledge', 'toolUse', 'longTasks'];
 export const profileGroups = [
   'workspace',
@@ -14,7 +19,16 @@ export const profileGroups = [
   'reports',
 ];
 export function validateProfile(data) {
-  if(data.allowSkillCreation!==undefined&&typeof data.allowSkillCreation!=='boolean')throw Error('Invalid skill creation preference');
+  if (data.resourcePolicy !== undefined && !['shared', 'ask'].includes(data.resourcePolicy))
+    throw Error('Invalid agent resource policy');
+  if (data.resourceGrants !== undefined) validateResourceGrants(data.resourceGrants);
+  if (
+    data.allowConfigurationRequests !== undefined &&
+    typeof data.allowConfigurationRequests !== 'boolean'
+  )
+    throw Error('Invalid setup-request preference');
+  if (data.allowSkillCreation !== undefined && typeof data.allowSkillCreation !== 'boolean')
+    throw Error('Invalid skill creation preference');
   if (data.inheritModel !== undefined && typeof data.inheritModel !== 'boolean')
     throw Error('Invalid model inheritance');
   const ratings = Object.fromEntries(ratingKeys.map((key) => [key, data.ratings?.[key] ?? 0]));
@@ -144,7 +158,12 @@ export function profileSettings(store, conversation = null) {
 export function toolGroup(name) {
   if (name === 'calendar_action') return 'calendar';
   if (name === 'reports_action') return 'reports';
-  if (name.startsWith('mcp_') || name === 'discover_connection_tools' || name === 'connection_action') return 'connections';
+  if (
+    name.startsWith('mcp_') ||
+    name === 'discover_connection_tools' ||
+    name === 'connection_action'
+  )
+    return 'connections';
   if (name.startsWith('project_')) return 'projects';
   if (
     /^(remember|recall_memory|search_memory|forget_memory|search_conversations|read_conversation)$/.test(
@@ -152,7 +171,7 @@ export function toolGroup(name) {
     )
   )
     return 'memory';
-  if(name === 'zim_action')return 'search';
+  if (name === 'zim_action') return 'search';
   if (/search_web|web_search|browse_web/.test(name)) return 'search';
   if (/terminal|host_command|run_command/.test(name)) return 'terminal';
   if (name === 'read_file' || name === 'write_file') return 'projects';
@@ -168,7 +187,14 @@ export function mergePreferences(personality = '', legacy = '') {
 export function profileAllows(store, settings, name, connections) {
   const live = store.get(settings.profileId);
   if (settings.profileId && (!live || live.deleted)) return false;
+  if (
+    settings.conversationId &&
+    store.get(settings.conversationId)?.data.agentProfile !== settings.profileId
+  )
+    return false;
   const scopes = [settings.profileScope, live?.data].filter(Boolean);
+  if (setupToolNames.has(name))
+    return scopes.every((scope) => scope.allowConfigurationRequests !== false);
   return scopes.every(
     (scope) =>
       (!scope.toolGroups || scope.toolGroups.includes(toolGroup(name))) &&
@@ -199,11 +225,23 @@ export function profileAction(store, input) {
     if (input.id && old?.kind !== 'agent-profile') throw Error('Agent profile not found');
     if (old && input.revision !== old.revision)
       throw Error('This profile changed. Reload before saving.');
+    if (input.data?.resourceGrants !== undefined)
+      input = {
+        ...input,
+        data: {
+          ...input.data,
+          resourceGrants: normalizeResourceGrants(
+            store,
+            input.data.resourceGrants,
+            old?.data.resourceGrants,
+          ),
+        },
+      };
     return store.mutate({
       id: input.id,
       kind: 'agent-profile',
       revision: input.revision,
-      title: input.title ?? 'New agent',
+      title: input.title ?? old?.title ?? 'New agent',
       data: validateProfile({
         ...old?.data,
         ...input.data,

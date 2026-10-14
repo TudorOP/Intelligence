@@ -1,0 +1,159 @@
+[
+  {
+    "id": "start",
+    "title": "Start here",
+    "paragraphs": [
+      "Intelligence brings conversations, notes, files and tasks into a local workspace. A model produces replies. An agent is your named companion, with its own model, style and permitted tools.",
+      "Your workspace is stored on your computer. An online model provider receives the conversation and the context or images you send. Web search and other connected services can also receive data. A local server address alone does not guarantee that the model runs offline.",
+      "Getting started helps you choose a model and access. You can save and leave at any stage, then use Continue setup in Help & setup. Opening Settings normally never starts onboarding. A missing model prevents chat, but does not prevent writing or browsing."
+    ],
+    "setting": "models"
+  },
+  {
+    "id": "models",
+    "title": "Connect and change models",
+    "paragraphs": [
+      "For LM Studio, download a model, open Developer, start the server and copy the displayed address. The usual same-computer address is http://127.0.0.1:1234. For Ollama, install/start the service and download a model; the usual address is http://127.0.0.1:11434. Intelligence adds the required API paths. Use the address actually configured by your server owner when ports differ.",
+      "For an online service, create an API key in its official account console. Paste it only into the protected Settings field and save it. Check billing and usage limits. A consumer chat subscription does not automatically provide API access. Model Studio keys and endpoints must match their region and billing plan.",
+      "Test connection & find models checks discovery. Choosing a model is separate, and only an actual reply test verifies chat inference. Tool support is another capability. If the server is unreachable, check that it is running and the address matches; if no models appear, download/load one or enter a supported manual model ID. Authentication, quota and timeout errors need different remedies.",
+      "Multiple providers can remain connected. A chat or agent can use its own provider/model; other chats are not changed. Intelligence never silently falls back to a cloud service. Disconnect removes that provider’s saved keys and stops its runs."
+    ],
+    "setting": "models"
+  },
+  {
+    "id": "chat",
+    "title": "Chat and the assistant sidebar",
+    "paragraphs": [
+      "Main Chat and Ask Intelligence use the same chat controls. Choose a model, type a message and send. You can attach images if the model supports them. Selected context tells the model what you are discussing; it does not grant permission to read or edit everything.",
+      "Stop ends the remaining response. Changes already completed stay saved. Steer sends a correction between model/tool steps; it does not interrupt a tool already executing. Branch creates a separate continuation. Thinking shows reasoning returned by a provider, when available.",
+      "Read aloud and dictation need configured optional voice tools. Do not assume the model supports images, tools or speech just because it can reply. Approval requests are native cards with exact actions and scope, not permissions granted by ordinary chat text."
+    ],
+    "page": "chat",
+    "lesson": [
+      "Choose Chat in the sidebar. Select a connected model in the composer. If none is connected, use Settings → Model & providers first.",
+      "Type a short question and send it. Watch the reply and the tool activity if an action is needed. Stop keeps already completed work; Steer applies your correction between steps.",
+      "Open Ask Intelligence from the header. The same controls are available in the sidebar. Close this lesson when you are comfortable returning to your work."
+    ]
+  },
+  {
+    "id": "notes",
+    "title": "Notebooks, chapters and notes",
+    "paragraphs": [
+      "A notebook contains chapters and notes. Chapters organize notes; new writing belongs in an actual note, not its container. Your notes save locally. Watch the saved state before leaving when an error is shown.",
+      "Sharing access and edit permission are independent of selecting context. Access can inherit from a parent, with exceptions on a child. Revisions help recover older content and reject conflicting changes. Move to Trash is recoverable; permanent deletion uses a separate confirmation."
+    ],
+    "page": "notebooks",
+    "lesson": [
+      "Open Notebooks in the sidebar and choose a notebook. Your existing notes stay in place. You can create a clearly named practice note if you want.",
+      "Open or create a note using the visible notebook controls. Type a short line and check the saved state. Editing is your choice; the lesson never creates or changes content for you.",
+      "Use the note menu to inspect revisions or Move to Trash for your practice note. Trash can be opened from Settings → Your data, and restoration remains available."
+    ]
+  },
+  {
+    "id": "files",
+    "title": "Vault and Projects",
+    "paragraphs": [
+      "Vault uses real Markdown files on your computer. App notebooks use notes stored in the workspace database. Projects point to explicitly selected folders and offer file browsing and reviewable edits. Choose the surface that matches where you want your writing to live.",
+      "Read access lets an agent inspect permitted content. Read & edit allows changes within that scope. File paths, revisions and native boundaries are checked again when a tool runs. A project grant is not permission to edit arbitrary host files. Host terminal commands have separate controls and approvals."
+    ],
+    "setting": "access"
+  },
+  {
+    "id": "tasks",
+    "title": "Tasks and Cognition Matrix",
+    "paragraphs": [
+      "Tasks contains your boards, lists and cards. Sharing a card does not automatically assign it to an agent. Assignment, Run now, scheduling and edit access are separate choices. Completed work stays recorded; inspect the actual result before accepting it.",
+      "Cognition Matrix is the agent’s separate work queue. Core is its fixed list name. Secondary and Tertiary can be renamed without changing their identity. Each list can have its own provider/model and integration state.",
+      "Scheduled and recurring work needs explicit configuration. Pause AI stops automatic tasks and memory processing while keeping foreground chat usable. Wake and sleep/resume depend on Linux support. A reported completion does not prove a task succeeded without evidence."
+    ],
+    "page": "tasks",
+    "lesson": [
+      "Open Tasks and choose a board. Look at its lists and cards. Task boards hold your work; Cognition Matrix is a separate agent queue.",
+      "Open a card and review its instructions and completion criteria. Give access only if you want agent controls to appear; assignment is another explicit choice.",
+      "Review its schedule or Run now options without enabling them unless you want execution. Verify actual results when work finishes; closing this lesson changes nothing automatically."
+    ]
+  },
+  {
+    "id": "calendar",
+    "title": "Calendar and reports",
+    "paragraphs": [
+      "Calendar combines selected calendars and eligible scheduled work. Create or edit events explicitly. Recurrence, time zones, missed-work choices and source permissions matter separately from viewing the calendar.",
+      "Reports summarize permitted sources using configured templates. Automatic report generation is an optional background feature; it does not gain extra source access. Review the saved report and its sources, and keep model/provider limitations in mind."
+    ],
+    "setting": "automation"
+  },
+  {
+    "id": "agents",
+    "title": "Agents, skills and connections",
+    "paragraphs": [
+      "An agent profile has a name, image, assistance style, default model and tool scopes. Style changes never replace mandatory app instructions. Ratings are yours to set; they are not measured guarantees of model quality.",
+      "Skills are reusable instructions. You can inspect them and choose learning/review behavior. User notes, memories and tool results never authorize an agent to expand its own permissions.",
+      "Connections expose external tools. MCP server setup always receives native review showing the executable/arguments or HTTP address before configuration changes, even with Full Access. Configuration, connection, tool discovery and verified capability are distinct outcomes. Sign-in, keys and dependency installation use dedicated user workflows."
+    ],
+    "setting": "models"
+  },
+  {
+    "id": "access",
+    "title": "Agent access and approvals",
+    "paragraphs": [
+      "Global resource switches can suspend access. Individual items, inherited access, child exceptions and agent profiles still decide what can be used. Read is not Read & edit; task assignment and host-command approvals remain separate.",
+      "Selected resources only limits this agent to the resources you grant. An agent may ask for a resource you explicitly selected or that it can already discover; it cannot inventory private resources to request wider access. An exact approval can grant the selected scope without changing every agent’s access.",
+      "Allow for this request expires when that user-request run ends, is stopped, steered or cancelled. Another message, chat branch, agent or scheduled task does not inherit it. Always allow for this agent keeps the exact resource and access level enabled for that named profile until revoked. Child exceptions and global gates still apply.",
+      "Decline has no grant effect. Configuration cards show exact before/after changes and tell you whether the change persists. Permanent resource permission does not bypass command approvals or mandatory MCP setup review. Review and revoke saved grants in Agent access."
+    ],
+    "setting": "access"
+  },
+  {
+    "id": "memory",
+    "title": "Memory and sources",
+    "paragraphs": [
+      "Memory distinguishes manually saved entries, extracted facts and conversation summaries. Inspect Stored details & sources to understand what was recorded and what the agent can currently access. Source excerpts and original conversations are separate from stored memory.",
+      "Keyword search works without semantic models. Search by meaning downloads local CPU models into user data. Automatic summaries and facts process eligible conversations; their configured model/provider may receive that content. Choose these features explicitly and inspect exclusions and review entries.",
+      "Your profile description and photo can be available on demand when enabled. They are not automatically inserted into every prompt. Deleting or excluding a source changes future recall; completed transmissions to a provider cannot be undone."
+    ],
+    "page": "memory",
+    "lesson": [
+      "Open Memory in the sidebar. Notice the separate stored entries and review queue, without starting any download.",
+      "Choose a stored entry and expand Stored details & sources. Compare the stored content with its source excerpts and current access.",
+      "Review semantic search and automatic summaries only if you want those features. Keyword search needs no semantic-model download. Close the lesson to keep your choices unchanged."
+    ]
+  },
+  {
+    "id": "automation",
+    "title": "Automatic work and Pause AI",
+    "paragraphs": [
+      "Background work is optional. Assignment, schedules, Matrix integration and reports each have their own controls. Enabling one does not authorize every other feature or source.",
+      "Pause AI pauses automatic tasks and memory processing. Foreground chat remains available, and still decorative backgrounds are unaffected. Missed-task policies and Linux wake controls should be reviewed before relying on unattended work."
+    ],
+    "setting": "automation"
+  },
+  {
+    "id": "optional",
+    "title": "Voice, search and offline archives",
+    "paragraphs": [
+      "Optional Modules installs engines and model/voice files into user data, separate from the application. An explicit installation leaves files installed until uninstalled; a one-time approval does not make installed files temporary. Engines, models and content have their own licenses.",
+      "Read aloud and dictation need supported engines and voice/model downloads. Microphone access is explicit. Romanian interface text does not mean every speech engine understands Romanian; inspect engine language support.",
+      "Web search sends queries to the chosen service. Offline archives use separately acquired ZIM files in a selected directory. Configure only what you need; opening this guide never downloads an engine or starts an AI service."
+    ],
+    "setting": "modules"
+  },
+  {
+    "id": "appearance",
+    "title": "Look and feel",
+    "paragraphs": [
+      "Choose any of the ten themes, interface language and layout controls. Theme selection changes palette/artwork without changing task meaning or permissions. User-authored content keeps its own language.",
+      "Still backgrounds are separate from the theme and background AI. Choose built-in or imported artwork and adjust strength and 0–24 px blur. Zero blur stays sharp. Imported images are bounded and can be retained in backups. Reduced-motion preferences apply to interface transitions. Animated backgrounds remain withdrawn."
+    ],
+    "setting": "appearance"
+  },
+  {
+    "id": "data",
+    "title": "Backups, recovery and troubleshooting",
+    "paragraphs": [
+      "Use Your data to export a complete backup, inspect a restore and open recoverable Trash. Close the app before manually copying its database. External project folders and provider credentials are not automatically included in a portable backup; check its manifest and re-enter keys securely after restoring.",
+      "Optional engine/model backups are explicit and platform compatibility is verified. Imported artwork and required source/license material remain preserved. Restored running work needs review; expired approvals and temporary permissions never resume automatically.",
+      "If a connection fails, check the server, address, key permissions, model availability and quota separately. Include app version, operating system and sanitized steps in a bug report. Never share keys, private conversations or your full database. Full local licenses and third-party notices are available under Settings → Licenses."
+    ],
+    "setting": "data"
+  }
+]

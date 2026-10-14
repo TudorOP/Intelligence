@@ -2528,6 +2528,24 @@ strong {
   font-size: 12px;
   animation: toast-in 0.2s ease;
 }
+.toast-stack {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  max-width: min(660px, 90vw);
+  pointer-events: none;
+}
+.toast-stack > .toast {
+  position: static;
+  transform: none;
+  max-width: 100%;
+  pointer-events: auto;
+}
 .toast > p {
   font-size: 12px;
   line-height: 1.7;

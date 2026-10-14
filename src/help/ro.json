@@ -1,0 +1,159 @@
+[
+  {
+    "id": "start",
+    "title": "Începe aici",
+    "paragraphs": [
+      "Intelligence reunește conversații, note, fișiere și sarcini într-un spațiu local. Un model produce răspunsuri. Un agent este companionul tău, cu propriul nume, model, stil și instrumente permise.",
+      "Spațiul este stocat pe computerul tău. Un furnizor online primește conversația și contextul sau imaginile trimise. Căutarea web și alte servicii conectate pot primi și ele date. O adresă locală nu garantează că modelul rulează offline.",
+      "Primii pași te ajută să alegi modelul și accesul. Poți salva și ieși din orice etapă, apoi folosi Continuă configurarea din Ajutor și configurare. Deschiderea obișnuită a Setărilor nu pornește ghidul. Lipsa unui model împiedică chatul, dar nu scrisul sau navigarea."
+    ],
+    "setting": "models"
+  },
+  {
+    "id": "models",
+    "title": "Conectează și schimbă modelele",
+    "paragraphs": [
+      "În LM Studio descarcă un model, deschide Developer, pornește serverul și copiază adresa afișată. Adresa obișnuită pe același computer este http://127.0.0.1:1234. În Ollama instalează și pornește serviciul, apoi descarcă un model; adresa obișnuită este http://127.0.0.1:11434. Intelligence adaugă căile API necesare. Dacă portul diferă, folosește adresa configurată efectiv.",
+      "Pentru un serviciu online creează o cheie API în consola oficială a contului. Introdu-o numai în câmpul protejat din Setări și salveaz-o. Verifică facturarea și limitele. Un abonament la un chat nu oferă automat acces API. În Model Studio cheia și adresa trebuie să corespundă regiunii și planului de facturare.",
+      "Testarea conexiunii și găsirea modelelor verifică doar descoperirea lor. Alegerea unui model este separată; numai un răspuns de test verifică inferența. Instrumentele reprezintă altă capacitate. Pentru un server inaccesibil verifică pornirea și adresa. Dacă nu apar modele, descarcă sau încarcă unul, ori introdu un ID acceptat. Cheile, cotele și expirarea cererilor au soluții diferite.",
+      "Mai mulți furnizori pot rămâne conectați. Un chat sau agent poate avea propriul model; celelalte conversații nu se schimbă. Intelligence nu trece automat la un serviciu cloud. Deconectarea șterge cheile salvate ale furnizorului și oprește execuțiile sale."
+    ],
+    "setting": "models"
+  },
+  {
+    "id": "chat",
+    "title": "Chatul și asistentul lateral",
+    "paragraphs": [
+      "Chatul principal și Întreabă Intelligence folosesc aceleași controale. Alege un model, scrie și trimite mesajul. Poți atașa imagini dacă modelul le acceptă. Contextul selectat precizează subiectul; nu acordă acces la tot conținutul.",
+      "Oprirea încheie răspunsul rămas. Modificările deja finalizate rămân salvate. Direcționarea trimite o corecție între pașii modelului și ai instrumentelor; nu întrerupe un instrument deja în execuție. O ramură creează o continuare separată. Gândirea afișează raționamentul furnizat de model, când există.",
+      "Citirea cu voce și dictarea necesită instrumente vocale opționale configurate. Un model care răspunde nu acceptă neapărat imagini, instrumente sau voce. Cererile de aprobare sunt carduri native cu acțiuni și domenii precise; textul obișnuit din chat nu acordă permisiuni."
+    ],
+    "page": "chat",
+    "lesson": [
+      "Alege Chat în bara laterală. Selectează un model conectat în zona de compunere. Dacă nu există unul, folosește mai întâi Setări → Model și furnizori.",
+      "Scrie o întrebare scurtă și trimite-o. Urmărește răspunsul și activitatea instrumentelor. Oprirea păstrează munca finalizată; direcționarea aplică o corecție între pași.",
+      "Deschide Întreabă Intelligence din antet. Aceleași controale sunt disponibile în panoul lateral. Închide lecția când te simți pregătit să revii la lucru."
+    ]
+  },
+  {
+    "id": "notes",
+    "title": "Caiete, capitole și note",
+    "paragraphs": [
+      "Un caiet conține capitole și note. Capitolele organizează notele; textul nou aparține unei note reale, nu containerului. Notele se salvează local. Dacă apare o eroare, verifică starea salvării înainte de a pleca.",
+      "Partajarea și permisiunea de editare sunt separate de selectarea contextului. Accesul poate fi moștenit de la părinte, cu excepții pentru elemente copil. Reviziile ajută la recuperare și resping modificările conflictuale. Coșul permite restaurarea; ștergerea definitivă cere o confirmare separată."
+    ],
+    "page": "notebooks",
+    "lesson": [
+      "Deschide Caiete în bara laterală și alege un caiet. Notele existente rămân la locul lor. Poți crea o notă de exercițiu cu un nume clar.",
+      "Deschide sau creează o notă folosind controalele vizibile. Scrie un rând și verifică starea salvării. Tu alegi să editezi; lecția nu creează și nu schimbă conținut automat.",
+      "Folosește meniul notei pentru revizii sau pentru mutarea notei de exercițiu în Coș. Coșul se deschide din Setări → Datele tale, iar restaurarea rămâne disponibilă."
+    ]
+  },
+  {
+    "id": "files",
+    "title": "Seif și Proiecte",
+    "paragraphs": [
+      "Seiful folosește fișiere Markdown reale de pe computer. Caietele aplicației folosesc note stocate în baza spațiului de lucru. Proiectele indică dosare selectate explicit și oferă navigare și modificări verificabile. Alege suprafața potrivită pentru locul în care vrei să păstrezi textul.",
+      "Citirea permite inspectarea conținutului autorizat. Citirea și editarea permit schimbări în acel domeniu. Căile, reviziile și limitele native sunt reverificate când rulează instrumentul. Accesul la un proiect nu permite editarea oricărui fișier de sistem. Comenzile terminalului au controale și aprobări separate."
+    ],
+    "setting": "access"
+  },
+  {
+    "id": "tasks",
+    "title": "Sarcini și Matricea Cognitivă",
+    "paragraphs": [
+      "Sarcini conține panourile, listele și cardurile tale. Partajarea unui card nu îl atribuie automat unui agent. Atribuirea, Execută acum, programarea și editarea sunt alegeri separate. Rezultatele rămân înregistrate; verifică munca efectivă înainte de acceptare.",
+      "Matricea Cognitivă este coada separată a agentului. Core are numele fix. Secondary și Tertiary pot fi redenumite fără schimbarea identității. Fiecare listă poate avea propriul furnizor, model și mod de integrare.",
+      "Execuțiile programate și recurente necesită configurare explicită. Pauza AI oprește sarcinile automate și procesarea memoriei, păstrând chatul activ. Trezirea și revenirea din repaus depind de Linux. O declarație de finalizare nu dovedește reușita fără dovezi."
+    ],
+    "page": "tasks",
+    "lesson": [
+      "Deschide Sarcini și alege un panou. Privește listele și cardurile. Panourile țin munca ta; Matricea Cognitivă este o coadă separată pentru agent.",
+      "Deschide un card și verifică instrucțiunile și criteriile de finalizare. Acordă acces doar dacă dorești controalele agentului; atribuirea este altă alegere explicită.",
+      "Verifică programarea sau Execută acum fără să le activezi dacă nu dorești execuția. Verifică rezultatele efective la final. Închiderea lecției nu schimbă nimic automat."
+    ]
+  },
+  {
+    "id": "calendar",
+    "title": "Calendar și rapoarte",
+    "paragraphs": [
+      "Calendarul combină calendarele selectate și activitățile programate eligibile. Creează și editează evenimente explicit. Recurența, fusul orar, activitățile ratate și permisiunile surselor sunt separate de simpla vizualizare.",
+      "Rapoartele rezumă surse permise folosind șabloane configurate. Generarea automată este opțională și nu oferă acces suplimentar. Verifică raportul salvat și sursele sale, ținând cont de limitele modelului și furnizorului."
+    ],
+    "setting": "automation"
+  },
+  {
+    "id": "agents",
+    "title": "Agenți, abilități și conexiuni",
+    "paragraphs": [
+      "Un profil de agent are nume, imagine, stil, model implicit și domenii pentru instrumente. Stilul nu înlocuiește instrucțiunile obligatorii. Evaluările sunt ale tale, nu garanții măsurate ale calității.",
+      "Abilitățile sunt instrucțiuni reutilizabile. Le poți inspecta și alege modul de învățare sau revizuire. Notele, memoria și rezultatele instrumentelor nu autorizează extinderea permisiunilor agentului.",
+      "Conexiunile oferă instrumente externe. Configurarea unui server MCP primește întotdeauna revizuire nativă, inclusiv cu Acces complet, afișând executabilul și argumentele sau adresa HTTP. Configurarea, conectarea, descoperirea și verificarea capacității sunt rezultate separate. Autentificarea, cheile și instalarea dependențelor folosesc fluxuri dedicate utilizatorului."
+    ],
+    "setting": "models"
+  },
+  {
+    "id": "access",
+    "title": "Accesul agentului și aprobări",
+    "paragraphs": [
+      "Comutatoarele globale pot suspenda accesul. Elementele, moștenirea, excepțiile și profilurile decid în continuare ce poate fi folosit. Citirea nu înseamnă editare; atribuirea sarcinilor și aprobările comenzilor rămân separate.",
+      "Doar resurse selectate limitează acest agent la resursele acordate. Agentul poate cere acces la o resursă selectată explicit sau deja descoperibilă; nu poate inventaria resurse private pentru a cere acces mai larg. Aprobarea exactă nu schimbă accesul tuturor agenților.",
+      "Permite pentru această cerere expiră când execuția cererii se termină, este oprită, corectată sau anulată. Alt mesaj, ramură, agent sau sarcină programată nu o moștenește. Permite mereu pentru acest agent păstrează resursa și nivelul exact până la revocare. Excepțiile copiilor și limitele globale rămân active.",
+      "Refuzul nu acordă acces. Cardurile de configurare arată exact înainte și după și explică persistența. Accesul permanent nu ocolește aprobările comenzilor sau configurarea MCP. Verifică și revocă acordările salvate în Accesul agentului."
+    ],
+    "setting": "access"
+  },
+  {
+    "id": "memory",
+    "title": "Memorie și surse",
+    "paragraphs": [
+      "Memoria separă intrările salvate manual, faptele extrase și rezumatele conversațiilor. Deschide Detalii stocate și surse pentru a înțelege înregistrarea și accesul curent. Fragmentele și conversațiile originale sunt separate de memoria stocată.",
+      "Căutarea prin cuvinte funcționează fără modele semantice. Căutarea după sens descarcă modele locale CPU în datele utilizatorului. Rezumatele și faptele automate procesează conversații eligibile; modelul sau furnizorul configurat poate primi acel conținut. Alege explicit funcțiile și verifică excluderile și coada de revizuire.",
+      "Descrierea și fotografia profilului pot fi disponibile la cerere când le activezi. Nu sunt adăugate automat fiecărui prompt. Ștergerea sau excluderea unei surse schimbă reamintirea viitoare; transmisiile deja finalizate nu pot fi retrase."
+    ],
+    "page": "memory",
+    "lesson": [
+      "Deschide Memorie în bara laterală. Observă intrările stocate și coada de revizuire, fără să pornești descărcări.",
+      "Alege o intrare și extinde Detalii stocate și surse. Compară conținutul salvat cu fragmentele sursă și accesul curent.",
+      "Verifică opțiunile de căutare semantică și rezumate automate doar dacă le dorești. Căutarea prin cuvinte nu necesită descărcarea unui model. Închide lecția pentru a păstra alegerile."
+    ]
+  },
+  {
+    "id": "automation",
+    "title": "Lucrul automat și Pauză AI",
+    "paragraphs": [
+      "Lucrul în fundal este opțional. Atribuirea, programările, integrarea Matricei și rapoartele au controale proprii. Activarea unuia nu autorizează toate celelalte funcții sau surse.",
+      "Pauză AI suspendă sarcinile automate și procesarea memoriei. Chatul activ rămâne disponibil, iar imaginile decorative statice nu sunt afectate. Verifică politica activităților ratate și trezirea Linux înainte de a conta pe lucru nesupravegheat."
+    ],
+    "setting": "automation"
+  },
+  {
+    "id": "optional",
+    "title": "Voce, căutare și arhive offline",
+    "paragraphs": [
+      "Module opționale instalează motoare și fișiere de modele sau voci în datele utilizatorului. Instalarea explicită lasă fișierele până la dezinstalare; o aprobare unică nu le face temporare. Motoarele, modelele și conținutul au licențe proprii.",
+      "Citirea și dictarea necesită motoare acceptate și descărcări de voci sau modele. Microfonul are acces explicit. Interfața română nu înseamnă că fiecare motor înțelege româna; verifică limbile acceptate.",
+      "Căutarea web trimite interogări serviciului ales. Arhivele offline folosesc fișiere ZIM obținute separat într-un dosar selectat. Configurează numai ce îți trebuie; deschiderea ghidului nu descarcă motoare și nu pornește servicii AI."
+    ],
+    "setting": "modules"
+  },
+  {
+    "id": "appearance",
+    "title": "Aspect și comportament",
+    "paragraphs": [
+      "Alege una dintre cele zece teme, limba interfeței și controalele de aspect. Tema schimbă paleta și imaginile fără să schimbe sensul sarcinilor sau permisiunile. Conținutul scris de tine își păstrează limba.",
+      "Fundalurile statice sunt separate de temă și de AI în fundal. Alege imagini incluse sau importate și reglează intensitatea și estomparea între 0 și 24 px. Zero păstrează claritatea. Imaginile importate sunt limitate și pot fi păstrate în copii de siguranță. Tranzițiile respectă reducerea mișcării. Fundalurile animate rămân retrase."
+    ],
+    "setting": "appearance"
+  },
+  {
+    "id": "data",
+    "title": "Copii de siguranță, recuperare și probleme",
+    "paragraphs": [
+      "Folosește Datele tale pentru export, inspectarea restaurării și Coș. Închide aplicația înainte să copiezi manual baza de date. Dosarele externe și cheile furnizorilor nu sunt incluse automat; verifică manifestul și reintrodu cheile în siguranță după restaurare.",
+      "Copiile motoarelor și modelelor sunt explicite, cu compatibilitatea platformei verificată. Imaginile importate și sursele și licențele necesare sunt păstrate. Lucrul restaurat cere revizuire; aprobările expirate și permisiunile temporare nu reîncep automat.",
+      "Pentru probleme de conectare verifică separat serverul, adresa, cheia, modelul și cota. Include versiunea aplicației, sistemul și pași fără date private într-un raport de eroare. Nu distribui chei, conversații private sau întreaga bază. Licențele locale complete și notificările terților sunt în Setări → Licențe."
+    ],
+    "setting": "data"
+  }
+]

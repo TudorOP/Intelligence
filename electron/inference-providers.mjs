@@ -41,8 +41,14 @@ export function disconnectProvider(store, credentials, provider) {
 export function validateInferenceAddress(settings) {
   const url = new URL(settings.endpoint);
   const local = ['localhost', '127.0.0.1', '[::1]'].includes(url.hostname);
-  if (url.username || url.password || !['http:', 'https:'].includes(url.protocol) ||
-    (providerInfo(settings.provider).cloud && url.protocol !== 'https:' && !(settings.provider === 'compatible' && local)))
+  if (
+    url.username ||
+    url.password ||
+    !['http:', 'https:'].includes(url.protocol) ||
+    (providerInfo(settings.provider).cloud &&
+      url.protocol !== 'https:' &&
+      !(settings.provider === 'compatible' && local))
+  )
     throw Error('API providers require HTTPS; local compatible endpoints may use HTTP on loopback');
   return url;
 }
@@ -52,10 +58,18 @@ export class InferenceCredentials {
     this.safeStorage = safeStorage;
     this.platform = platform;
     this.entries = new Map();
+    this.revisions = new Map();
+    this.nextRevision = 0;
+  }
+  revisionKey(settings) {
+    return settings.provider + ':' + new URL(settings.endpoint).href.replace(/\/$/, '');
+  }
+  changed(settings) {
+    this.revisions.set(this.revisionKey(settings), ++this.nextRevision);
+    while (this.revisions.size > 64) this.revisions.delete(this.revisions.keys().next().value);
   }
   credentials(settings) {
     const info = providerInfo(settings.provider);
-    if (!info.cloud) return null;
     const url = validateInferenceAddress(settings);
     const namespace = 'inference:' + info.id + ':' + url.href.replace(/\/$/, '');
     if (!this.entries.has(namespace)) {
@@ -71,21 +85,28 @@ export class InferenceCredentials {
     return this.credentials(settings)?.get() ?? '';
   }
   info(settings) {
-    return (
-      this.credentials(settings)?.info() ?? {
+    return {
+      ...(this.credentials(settings)?.info() ?? {
         configured: false,
         storage: 'none',
         persistentAvailable: false,
-      }
-    );
+      }),
+      generation: this.revisions.get(this.revisionKey(settings)) || 0,
+    };
   }
   save(settings, key) {
     const entry = this.credentials(settings);
-    if (!entry) throw new Error('Local providers do not use an API key');
-    return entry.save(key);
+    const url = validateInferenceAddress(settings);
+    if (url.protocol !== 'https:' && !['localhost', '127.0.0.1', '[::1]'].includes(url.hostname))
+      throw Error('Authentication outside this computer requires HTTPS');
+    const result = entry.save(key);
+    this.changed(settings);
+    return { ...result, generation: this.revisions.get(this.revisionKey(settings)) };
   }
   forget(settings) {
-    return this.credentials(settings)?.forget();
+    const result = this.credentials(settings)?.forget();
+    this.changed(settings);
+    return result;
   }
   disconnect(provider) {
     const prefix = 'inference:' + provider + ':';

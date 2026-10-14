@@ -71,6 +71,12 @@ export function resultSources(store, value) {
 }
 
 export function modelHistory(store, conversation, turnLimit = 12, ids = null, after = null) {
+  const accessCache = new Map();
+  const privacy = store.settings();
+  const accessible = (id) => {
+    if (!accessCache.has(id)) accessCache.set(id, store.access(id));
+    return accessCache.get(id);
+  };
   const rows = (
     turnLimit === 0
       ? after
@@ -84,7 +90,15 @@ export function modelHistory(store, conversation, turnLimit = 12, ids = null, af
     turnLimit === 0 ? rows : rows.slice(starts[Math.max(0, starts.length - turnLimit)] ?? 0);
   return recent.flatMap((row, index) => {
     if (row.data.visionImage) {
-      if(row.data.visionImage.kind==='profile')return [{role:'user',content:store.settings().shareProfile?'The profile photo was retrieved on demand earlier. Request it again only if needed.':'Profile access is disabled.'}];
+      if (row.data.visionImage.kind === 'profile')
+        return [
+          {
+            role: 'user',
+            content: store.settings().shareProfile
+              ? 'The profile photo was retrieved on demand earlier. Request it again only if needed.'
+              : 'Profile access is disabled.',
+          },
+        ];
       try {
         return [visionMessage(store, row.data.visionImage)];
       } catch {
@@ -99,9 +113,24 @@ export function modelHistory(store, conversation, turnLimit = 12, ids = null, af
       }
     }
     if (row.role === 'user') return [{ role: 'user', content: userContent(store, row) }];
+    const scopedAllowed =
+      (!row.data.profileDataRead || privacy.shareProfile) &&
+      (!row.data.sharedNameContext || privacy.shareName) &&
+      !row.data.scopedOverflow &&
+      (row.data.scopedSources || []).every(accessible);
     const saved = row.data.modelMessage;
     if (saved?.role === 'tool') {
-      if(row.data.name==='read_user_profile')return [{...saved,content:JSON.stringify({notice:store.settings().shareProfile?'Profile data was retrieved on demand earlier. Request it again only if needed.':'Profile access is disabled.'})}];
+      if (row.data.name === 'read_user_profile')
+        return [
+          {
+            ...saved,
+            content: JSON.stringify({
+              notice: store.settings().shareProfile
+                ? 'Profile data was retrieved on demand earlier. Request it again only if needed.'
+                : 'Profile access is disabled.',
+            }),
+          },
+        ];
       const memoryTool = ['recall_memory', 'search_conversations', 'read_conversation'].includes(
         row.data.name,
       );
@@ -109,7 +138,7 @@ export function modelHistory(store, conversation, turnLimit = 12, ids = null, af
         (row.data.name !== 'read_user_profile' || store.settings().shareProfile) &&
         (row.data.name !== 'zim_action' || store.settings().optionalModules?.zim?.enabled) &&
         (!memoryTool || store.settings().memoryAccess) &&
-        (row.data.modelSources ?? []).every((id) => store.access(id));
+        (row.data.modelSources ?? []).every(accessible);
       return [
         {
           ...saved,
@@ -121,6 +150,18 @@ export function modelHistory(store, conversation, turnLimit = 12, ids = null, af
     }
     if (saved?.role === 'assistant') {
       const message = { ...saved };
+      if (!scopedAllowed) {
+        message.content =
+          'Historical assistant response includes scoped data outside current access. Retrieve permitted sources again if needed.';
+        delete message.thinking;
+        delete message.reasoning;
+        delete message.reasoning_content;
+        if (message.tool_calls)
+          message.tool_calls = message.tool_calls.map((call) => ({
+            ...call,
+            function: { ...call.function, arguments: '{}' },
+          }));
+      }
       if (message.tool_calls) {
         // Cancellation may leave unanswered calls on disk. Never send orphan calls.
         // Search only this exchange; some providers reuse call IDs across turns.
@@ -136,6 +177,13 @@ export function modelHistory(store, conversation, turnLimit = 12, ids = null, af
       return message.content || message.tool_calls?.length ? [message] : [];
     }
     if (row.data.tool) return [];
-    return [{ role: row.role, content: row.content }];
+    return [
+      {
+        role: row.role,
+        content: scopedAllowed
+          ? row.content
+          : 'Historical assistant response includes scoped data outside current access. Retrieve permitted sources again if needed.',
+      },
+    ];
   });
 }

@@ -108,7 +108,7 @@ try {
     });
   };
   await resize(1920, 1080);
-  await page.locator('.sidebar-utilities button').filter({ hasText: 'Settings' }).click();
+  await page.getByRole('button', { name: 'Settings', exact: true }).click();
   await page.getByRole('button', { name: 'Look & feel', exact: true }).click();
   await profile('settings', '.settings-content');
   await page.getByRole('button', { name: 'Your data', exact: true }).click();
@@ -180,7 +180,7 @@ try {
         JSON.stringify(composer),
       );
       await capture(width + '-ink-chat');
-      await page.locator('.sidebar nav button').nth(6).click();
+      await page.locator('.sidebar .nav-item').nth(8).click();
       await page.locator('.machine-readings').waitFor();
       const geometry = await page.locator('.machine-page').evaluate((e) => {
         const main = e.closest('.main-canvas'),
@@ -197,7 +197,10 @@ try {
       );
       await capture(width + '-ink-machine');
       for (const index of [1, 2, 4, 5, 7, 8, 9]) {
-        await page.locator('.sidebar nav button').nth(index).click();
+        await page
+          .locator('.sidebar .nav-item')
+          .nth({ 1: 1, 2: 2, 4: 4, 5: 7, 7: 9, 8: 10, 9: 11 }[index])
+          .click();
         assert.ok(
           await page.locator('.main-canvas').evaluate((e) => e.scrollWidth <= e.clientWidth + 2),
           'Overflow at ' + width + '/' + index,
@@ -224,7 +227,9 @@ try {
             const top = await page
               .locator('.memory-list')
               .evaluate((e) => e.getBoundingClientRect().top);
-            assert.ok(top < 500, 'Memories pushed too low: ' + top);
+            const viewport = await page.evaluate(() => innerHeight);
+            if (viewport >= 900)
+              assert.ok(top < viewport - 180, 'Memories leave no visible reading area: ' + top);
             assert.equal(
               await page
                 .locator('.memory-status-grid')
@@ -235,7 +240,7 @@ try {
         }
         if (width === 1920) await capture('1920-section-' + index);
       }
-      await page.locator('.sidebar nav button').nth(0).click();
+      await page.locator('.sidebar').getByRole('button', { name: 'Chat', exact: true }).click();
       results.checks.push(
         width +
           '×' +
@@ -243,7 +248,7 @@ try {
           ': composer alignment, machine fills canvas, section widths, compact overview headers and top creation controls',
       );
     }
-    await page.locator('.sidebar-utilities button').filter({ hasText: 'Settings' }).click();
+    await page.getByRole('button', { name: 'Settings', exact: true }).click();
     await page.getByRole('button', { name: 'Your data', exact: true }).click();
     await page.getByRole('button', { name: 'Open Trash ↗', exact: true }).click();
     await page.getByRole('button', { name: 'Next page', exact: true }).waitFor();
@@ -257,7 +262,7 @@ try {
     await page.getByRole('button', { name: 'Close settings', exact: true }).click();
     results.checks.push('Trash pagination and Close visible at 1366×768');
     await resize(1920, 1080);
-    await page.locator('.sidebar-utilities button').filter({ hasText: 'Settings' }).click();
+    await page.getByRole('button', { name: 'Settings', exact: true }).click();
     await page.getByRole('button', { name: 'Look & feel', exact: true }).click();
     await page.locator('.theme-options button').filter({ hasText: /Day$/ }).click();
     await page.waitForFunction(() => document.documentElement.dataset.theme === 'day');

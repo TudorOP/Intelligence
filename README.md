@@ -1,4 +1,4 @@
-# Intelligence 0.94
+# Intelligence 1.0
 
 Intelligence is a personal AI harness for people who do not want to manage a complicated toolchain. It brings conversations, notes, tasks and an assistant into one understandable Linux desktop workspace. The goal is to make working with AI easy to use and easy to understand, with clear controls over what the assistant can access and do.
 
@@ -22,7 +22,8 @@ Ten themes include Ink, Day, Night, Summer, Autumn, Winter Wonderland, Festive, 
 - Organize your writing in notebooks, chapters and notes, or work with ordinary Markdown files.
 - Keep personal work on task boards and assign selected work to the assistant. The separate Cognition Matrix is the assistant's own work queue.
 - Choose local models or cloud services, and keep multiple providers connected.
-- Give the assistant access to selected resources, review actions and steer it while it works.
+- Give each assistant access to selected resources, approve current-request or permanent scopes, review actions and steer it while it works.
+- Follow resumable setup, optional feature lessons and an offline written guide.
 - Add speech, dictation and offline archives when you need them; optional downloads stay separate from the application.
 
 Your workspace is stored locally. Messages sent to a cloud provider, remote tool server or search service follow the choices you configure; local storage does not mean every configured service runs offline.
@@ -51,15 +52,19 @@ Install Docker Engine and Compose, then run from this source directory:
 
 ```bash
 docker compose run --build --rm appimage
-chmod +x release/Intelligence-0.9.4-x86_64.AppImage
-./release/Intelligence-0.9.4-x86_64.AppImage
+chmod +x release/Intelligence-1.0.0-x86_64.AppImage
+./release/Intelligence-1.0.0-x86_64.AppImage
 ```
 
 Release/AppImage packaging runs only inside Linux Docker. Docker is needed to build, not to run. See [the Linux handoff](docs/LINUX_HANDOFF.md) for runtime dependencies, sandbox/desktop checks and the source-distribution checklist.
 
 ## First run
 
-Choose Settings → Model & providers. Connect Ollama, LM Studio or llama.cpp, and configure OpenAI, Mistral, Qwen, OpenRouter or an OpenAI-compatible endpoint. Expand Connected providers to configure or disconnect individual connections. Find models, select a provider/model from the grouped chat picker, and enable only the agent resources you want it to use. Native task, file and host-command controls remain separate.
+Getting started offers six optional stages: welcome, your profile and companion, model connection, agent access, memory/automatic work, and review. Save & exit preserves your place; Continue setup resumes it. Local-server addresses, cloud API keys and model discovery are explained inline. An explicit reply test sends only a short greeting. You can browse without connecting a model.
+
+Settings → Help & setup contains the searchable offline English/Romanian written guide, optional feature lessons and an explicit setup entry. Opening ordinary Settings never starts or resumes setup. Returning from a setup-origin Settings detour resumes that setup session; completed setup stays completed when reviewed.
+
+Fresh users start with selected resources only and optional sharing, automatic memory processing and model preparation off. Existing preferences stay intact. Both chats let you choose resource names as context and review exact access requests: Allow for this request expires with the current response; Always allow for this agent saves a grant for that profile until revoked. Agent access shows saved grants and active temporary access. Global gates, child exceptions, task assignment and native command approvals remain enforced.
 
 Settings → Look & feel owns themes, static artwork, imported images, strength and blur. The compact Pause AI control in the workspace header pauses automatic tasks and memory processing; foreground chat remains available.
 
@@ -69,11 +74,11 @@ Data normally lives in `~/.config/Intelligence/`, follows `XDG_CONFIG_HOME`, and
 
 `main` holds reviewed releases and remains the default branch. New work is developed on `dev` and pushed there first when authorized. Merging to `main` and publishing a release are separate, explicit actions.
 
-The [1.0 onboarding and agent setup plan](docs/ONBOARDING_1_0_PLAN.md) proposes resumable first-use setup, an in-app written guide and scoped permission requests. It is a review proposal; the current application is still 0.94.
+The [1.0 plan](docs/ONBOARDING_1_0_PLAN.md), [implementation notes](docs/ONBOARDING_1_0_IMPLEMENTATION.md) and retained ImageGen concepts document this development milestone. Main still holds the reviewed 0.94 release; 1.0 is prepared locally on dev and is not published.
 
 Use `npm ci`, `npm run dev`, `npm run build` and `npm test`. Run `node scripts/verify-source.mjs` before sharing source. Desktop fixtures use isolated data under `.test-data/`. See [verification](docs/VERIFICATION.md), [architecture and development](docs/DEVELOPMENT.md), [appearance](docs/APPEARANCE.md) and [release acceptance](docs/RELEASE_CHECKLIST.md).
 
-The public release label is 0.94 (package 0.9.4). Normal updates add 0.01: 0.95, 0.96 and so on. `node scripts/bump-version.mjs` advances the label and its semantic package version together.
+The public release label is 1.0 (package 1.0.0). This requested milestone follows 0.94; normal updates continue to add 0.01: 1.01, 1.02 and so on. `node scripts/bump-version.mjs` advances the label and its semantic package version together.
 
 ## License
 
