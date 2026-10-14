@@ -17,11 +17,22 @@ Context-length benchmarks remain deferred. Token-overhead work is not queued. An
 
 Local release preparation does not authorize a push or publication.
 
+## Before 1.0 implementation — deduplication and code cleanup
+
+Complete this pass before implementing the new 1.0 settings, onboarding, help or agent configuration/access flows. Keep cleanup separate from feature changes and preserve current behavior. The sequence and acceptance requirements are included in [the 1.0 plan](docs/ONBOARDING_1_0_PLAN.md).
+
+- [ ] Record the current verification/performance baseline before cleanup.
+- [ ] Inspect repeated UI/forms, provider metadata/connection logic, settings persistence, chat/approval presentation, localization/help and native validation; identify which duplication can safely share one implementation.
+- [ ] Consolidate equivalent logic/components and remove proven unused code/imports and obsolete paths in small, reviewable commits. Preserve intentional differences between Tasks/Matrix, resource access/task assignment and renderer/native authority.
+- [ ] Preserve user data, migrations/backups, English/Romanian content, mandatory harness guidance, live permission/revision/approval checks, artwork/provenance and full license notices. Avoid speculative abstractions, dependency churn and cosmetic rewrites.
+- [ ] Run affected regressions/desktop fixtures, backend tests, build and source checks; compare performance with the baseline and document remaining intentional duplication before starting 1.0 feature implementation.
+
 ## Proposed for 1.0 — awaiting plan review
 
 Develop on `dev`; `main` holds reviewed releases. This list records proposed work, not completed functionality. Details, sequence, design concepts and acceptance criteria are in [ONBOARDING_1_0_PLAN.md](docs/ONBOARDING_1_0_PLAN.md).
 
 - [ ] Review the six-stage first-use setup, provider assistance and optional feature lessons.
+- [ ] Complete and verify the prerequisite deduplication/code cleanup pass above before implementing these features.
 - [ ] Implement persisted setup progress, save/exit/resume and safe Settings return paths.
 - [ ] Share profile/companion and provider forms with Settings; add plain-language connection diagnosis.
 - [ ] Add explicit first-use access, memory/download and automation choices without changing existing users' preferences.
