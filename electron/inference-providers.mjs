@@ -1,25 +1,6 @@
 import { SearchCredentials } from './search-credentials.mjs';
-export const inferenceProviders = [
-  { id: 'ollama', name: 'Ollama', endpoint: 'http://127.0.0.1:11434', cloud: false },
-  { id: 'lmstudio', name: 'LM Studio', endpoint: 'http://127.0.0.1:1234', cloud: false },
-  { id: 'llamacpp', name: 'llama.cpp', endpoint: 'http://127.0.0.1:8080/v1', cloud: false },
-  { id: 'openai', name: 'OpenAI', endpoint: 'https://api.openai.com/v1', cloud: true },
-  { id: 'mistral', name: 'Mistral', endpoint: 'https://api.mistral.ai/v1', cloud: true },
-  {
-    id: 'qwen',
-    name: 'Qwen',
-    endpoint: 'https://dashscope-us.aliyuncs.com/compatible-mode/v1',
-    cloud: true,
-  },
-  { id: 'openrouter', name: 'OpenRouter', endpoint: 'https://openrouter.ai/api/v1', cloud: true },
-  {
-    id: 'compatible',
-    name: 'OpenAI-compatible API',
-    endpoint: 'http://127.0.0.1:8080/v1',
-    cloud: true,
-    optionalKey: true,
-  },
-];
+import { inferenceProviders } from './inference-catalog.mjs';
+export { inferenceProviders } from './inference-catalog.mjs';
 export function providerInfo(id) {
   const provider = inferenceProviders.find((p) => p.id === id);
   if (!provider) throw new Error('Choose a supported inference provider');

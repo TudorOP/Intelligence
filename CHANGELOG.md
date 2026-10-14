@@ -5,6 +5,7 @@
 - Created the dev-first development workflow; main remains the default branch for reviewed releases.
 - Added the proposed 1.0 onboarding, written help and agent configuration/access plan, with four ImageGen concepts and retained prompts/provenance.
 - Queued a verified, behavior-preserving deduplication/code cleanup pass before implementing the 1.0 features.
+- Completed provider-catalog deduplication and shared profile-form extraction; Settings layout fits the verified local/API views at 1080p, with scrolling on shorter windows. All 207 enabled backend checks, production build, desktop smoke and the 27-capture Settings fixture pass before 1.0 implementation.
 - This is documentation and design work for review. Application behavior and the 0.94 / package 0.9.4 version are unchanged.
 
 ## 0.94

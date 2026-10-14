@@ -1,3 +1,4 @@
+import UserProfileFields from './UserProfileFields';
 import { useEffect, useState } from 'react';
 import type { Settings, Snapshot } from './types';
 import { api } from './api';
@@ -213,53 +214,7 @@ export default function SettingsDialog({
                     {t('Your photo stays on this device until you allow the agent to request it.')}
                   </p>
                 </section>
-                <div className="settings-card profile-settings-card">
-                  <label>
-                    {t('Your name')}
-                    <input
-                      aria-label={t('Your name')}
-                      maxLength={100}
-                      value={settings.preferredName || ''}
-                      onChange={(e) => void changeSettings({ preferredName: e.target.value })}
-                    />
-                  </label>
-                  <label className="setting-switch">
-                    <span>
-                      {t('Share my name with agents')}
-                      <small>
-                        {t('Your name is shared as context data with the selected model provider.')}
-                      </small>
-                    </span>
-                    <Switch
-                      checked={settings.shareName}
-                      onChange={(e) => void changeSettings({ shareName: e.target.checked })}
-                    />
-                  </label>
-                  <label>
-                    {t('A little about you')}
-                    <textarea
-                      aria-label={t('A little about you')}
-                      maxLength={2000}
-                      rows={5}
-                      value={settings.profileDescription || ''}
-                      onChange={(e) => void changeSettings({ profileDescription: e.target.value })}
-                    />
-                  </label>
-                  <label className="setting-switch">
-                    <span>
-                      {t('Allow profile access on demand')}
-                      <small>
-                        {t(
-                          'The agent can request your description and photo when useful. They are not added to every prompt.',
-                        )}
-                      </small>
-                    </span>
-                    <Switch
-                      checked={settings.shareProfile || false}
-                      onChange={(e) => void changeSettings({ shareProfile: e.target.checked })}
-                    />
-                  </label>
-                </div>
+                <UserProfileFields settings={settings} onUpdate={changeSettings} />
               </div>
             </section>
           )}
