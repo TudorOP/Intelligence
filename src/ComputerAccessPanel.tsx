@@ -27,7 +27,7 @@ export default function ComputerAccessPanel({
         >
           <option value="projects">{t('Authorized project folders')}</option>
           <option value="folders">{t('Projects and selected folders')}</option>
-          <option value="system">{t('All files available to my account')}</option>
+          <option value="system">{t('Any file on the computer')}</option>
         </select>
       </label>
       <small>
@@ -35,6 +35,13 @@ export default function ComputerAccessPanel({
           'File tools enforce this scope. Intelligence storage stays protected. Profiles can restrict access further.',
         )}
       </small>
+      {settings.computerScope === 'system' && (
+        <p className="settings-note">
+          {t(
+            'Includes Downloads, Documents, mounted drives and other folders your account can access. Agents can read and edit files there. Operating system permissions, protected Intelligence data and agent restrictions still apply. File changes follow your approval settings; terminal commands have a separate switch.',
+          )}
+        </p>
+      )}
       {settings.computerScope === 'folders' && (
         <>
           {(settings.computerFolders || []).map((f, i) => (

@@ -1,4 +1,5 @@
 import { createHash, randomUUID } from 'node:crypto';
+import { computerAccessInfo } from './computer-access.mjs';
 export const setupToolNames = new Set([
   'inspect_configuration',
   'request_access',
@@ -491,6 +492,10 @@ export class AgentAccess {
       requestPolicy: profile.data.allowConfigurationRequests !== false,
       resourcePolicy: profile.data.resourcePolicy || 'shared',
       toolGroups: profile.data.toolGroups,
+      computerAccess: computerAccessInfo(this.store, {
+        settings,
+        project: this.store.get(this.store.get(ctx.conversation)?.project),
+      }),
       notice:
         'Credentials and private resource inventory are not exposed. Configuration changes require native user review.',
     };

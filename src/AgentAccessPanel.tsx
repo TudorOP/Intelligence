@@ -21,7 +21,7 @@ export default function AgentAccessPanel({
   const [query, setQuery] = useState('');
   const profile = profiles.find((e) => e.id === (profileId || selected)) || profiles[0];
   const [overview, setOverview] = useState<{ id: string; title: string; reason: string }[]>([]);
-  const [overviewOpen, setOverviewOpen] = useState(false);
+  const [overviewOpen, setOverviewOpen] = useState(!!profileId);
   useEffect(() => {
     let live = true;
     if (profile && overviewOpen)
@@ -124,84 +124,91 @@ export default function AgentAccessPanel({
           'Global switches and profile tool scopes still apply. Child exceptions, task assignment and host-command approvals stay separate.',
         )}
       </p>
-      <details onToggle={(event) => setOverviewOpen(event.currentTarget.open)}>
+      <details
+        open={profileId ? true : undefined}
+        onToggle={(event) => setOverviewOpen(event.currentTarget.open)}
+      >
         <summary>{t('Effective access')}</summary>
-        {overview.map((item) => (
-          <p key={item.id}>
-            {item.title} · <small>{t(item.reason)}</small>
-          </p>
-        ))}
-        <small>{t('Shows up to 100 matching collections. Child exceptions still apply.')}</small>
+        <div className="agent-choice-list">
+          {overview.map((item) => (
+            <p key={item.id}>
+              {item.title} · <small>{t(item.reason)}</small>
+            </p>
+          ))}
+          <small>{t('Shows up to 100 matching collections. Child exceptions still apply.')}</small>
+        </div>
       </details>
-      <details className="resource-grants">
+      <details className="resource-grants" open={profileId ? true : undefined}>
         <summary>
           {t('Resource grants')} <small>{grants.length + temporaryGrants.length}</small>
         </summary>
-        {grants.map((g) => (
-          <div className="grant-row" key={g.id}>
-            <span>
-              {snapshot.entities.find((e) => e.id === g.id)?.title || t('Unavailable resource')}
-              <small>{t(g.permission === 'edit' ? 'Read & edit' : 'Read')}</small>
-            </span>
-            <button
+        <div className="agent-grant-list">
+          {grants.map((g) => (
+            <div className="grant-row" key={g.id}>
+              <span>
+                {snapshot.entities.find((e) => e.id === g.id)?.title || t('Unavailable resource')}
+                <small>{t(g.permission === 'edit' ? 'Read & edit' : 'Read')}</small>
+              </span>
+              <button
+                disabled={busy}
+                onClick={() => void save({ resourceGrants: grants.filter((p) => p.id !== g.id) })}
+              >
+                {t('Revoke')}
+              </button>
+            </div>
+          ))}
+          {!grants.length && <p>{t('No permanent resource grants for this agent.')}</p>}
+          <label>
+            {t('Grant read access to a selected resource')}
+            <input
+              aria-label={t('Find a resource')}
+              placeholder={t('Find a resource')}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+            <select
+              value=""
               disabled={busy}
-              onClick={() => void save({ resourceGrants: grants.filter((p) => p.id !== g.id) })}
+              onChange={(e) => {
+                if (e.target.value)
+                  void save({
+                    resourceGrants: [...grants, { id: e.target.value, permission: 'read' }],
+                  });
+              }}
             >
-              {t('Revoke')}
-            </button>
-          </div>
-        ))}
-        {!grants.length && <p>{t('No permanent resource grants for this agent.')}</p>}
-        <label>
-          {t('Grant read access to a selected resource')}
-          <input
-            aria-label={t('Find a resource')}
-            placeholder={t('Find a resource')}
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
-          <select
-            value=""
-            disabled={busy}
-            onChange={(e) => {
-              if (e.target.value)
-                void save({
-                  resourceGrants: [...grants, { id: e.target.value, permission: 'read' }],
-                });
-            }}
-          >
-            <option value="">{t('Choose a resource')}</option>
-            {choices.map((e) => (
-              <option key={e.id} value={e.id}>
-                {e.title} · {t(resourceLabel(e.kind))}
-              </option>
-            ))}
-          </select>
-        </label>
-        <small>
-          {t(
-            'To change read access to editing, approve an exact agent request or remove and reselect the grant during setup.',
-          )}
-        </small>
-        {temporaryGrants.map((g) => (
-          <div className="grant-row" key={g.conversation + g.resource}>
-            <span>
-              {snapshot.entities.find((e) => e.id === g.resource)?.title ||
-                t('Unavailable resource')}
-              <small>{t('Temporary — current request only')}</small>
-            </span>
-            <button
-              onClick={() =>
-                void api
-                  .accessRevoke({ conversation: g.conversation, id: g.resource })
-                  .then(onChanged)
-                  .catch(onError)
-              }
-            >
-              {t('Revoke')}
-            </button>
-          </div>
-        ))}
+              <option value="">{t('Choose a resource')}</option>
+              {choices.map((e) => (
+                <option key={e.id} value={e.id}>
+                  {e.title} · {t(resourceLabel(e.kind))}
+                </option>
+              ))}
+            </select>
+          </label>
+          <small>
+            {t(
+              'To change read access to editing, approve an exact agent request or remove and reselect the grant during setup.',
+            )}
+          </small>
+          {temporaryGrants.map((g) => (
+            <div className="grant-row" key={g.conversation + g.resource}>
+              <span>
+                {snapshot.entities.find((e) => e.id === g.resource)?.title ||
+                  t('Unavailable resource')}
+                <small>{t('Temporary — current request only')}</small>
+              </span>
+              <button
+                onClick={() =>
+                  void api
+                    .accessRevoke({ conversation: g.conversation, id: g.resource })
+                    .then(onChanged)
+                    .catch(onError)
+                }
+              >
+                {t('Revoke')}
+              </button>
+            </div>
+          ))}
+        </div>
       </details>
     </section>
   );

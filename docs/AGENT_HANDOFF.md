@@ -21,7 +21,7 @@ If starting from `Intelligence-source.zip`, remember that it contains source, no
 
 ## Current checkpoint
 
-As of 15 October 2026, the app is **1.03**, package **1.0.3**, prepared locally on `dev`. This follow-up repairs mixed-content collection cards and learned-skill list rows missed in the 1.02 UI review; see the [collection review](design/collection-layout-2026-10-15/README.md). The prior 1.02 commit `7abc941` and four preceding commits were pushed to `origin/dev` at the user's request. No push of this new 1.03 work is authorized. Read `git log` for its local commit. The prior 1.01 feature implementation is `d7a380b`. The last observed `main` was reviewed 0.94 at `12a56d2`. These are a dated checkpoint, not a substitute for checking current refs. Remote-tracking refs can be stale.
+As of 15 October 2026, the app is **1.04**, package **1.0.4**, prepared locally on `dev`. This update repairs profile density/ratings, home paths, computer-wide file discoverability and prompt-prefix stability; see [implementation and inference notes](PROFILE_FILES_AND_PROMPT.md) and [verification](VERIFICATION.md). The prior local 1.03 commit is `0dec533`. The 1.02 commit `7abc941` and four preceding commits were pushed to `origin/dev` at the user's request; this new work has no push authorization. Read `git log` for its local commit. The prior 1.01 feature implementation is `d7a380b`. The last observed `main` was reviewed 0.94 at `12a56d2`. These are a dated checkpoint, not a substitute for checking current refs. Remote-tracking refs can be stale.
 
 The 1.01 implementation includes saved project/window state, shared searchable model/agent pickers, Add sources with retention, Matrix/Tasks agent assignments, computer scopes, managed commands and durable inbox monitoring. The completed checklist is [WORKSPACE_1_01_PLAN.md](WORKSPACE_1_01_PLAN.md). The implementation passed 232 enabled backend checks, TypeScript, the production build and the desktop fixtures recorded in VERIFICATION.md. This is source verification on Windows, not a verified Linux binary release.
 
@@ -29,7 +29,7 @@ Monitoring needs the application open or in the tray. It reconciles missed files
 
 The 1.02 [UI repair checklist](design/ui-repairs-2026-10-15/README.md) retains the six original visual references and feedback. It covers spacing, consolidated access controls, independent profile columns, bounded model-picker scrolling, normalized Autumn Chat artwork and a full UI review across all ten themes. Secondary text contrast is improved within the existing palettes. See VERIFICATION.md for the actual Windows fixture results, capture coverage and remaining target-Linux/live-provider limits. Permission and revision enforcement remains native; no artwork assets or user data were replaced.
 
-The next work comes from the user's request or the still-open target-Linux acceptance checklist in TODO.md. Do not automatically resume context-length benchmarks, token-overhead testing/estimation or animated backgrounds; those are explicitly deferred or excluded.
+The next work comes from the user's request or the still-open target-Linux acceptance checklist in TODO.md. The user explicitly requested the bounded prompt/file changes in 1.04; that is not a standing benchmark queue. Do not automatically resume context-length benchmarks, token-overhead testing/estimation or animated backgrounds; those are explicitly deferred or excluded.
 
 ## Branches, commits and publication
 
@@ -101,7 +101,7 @@ Normal application updates advance the public label by 0.01 using:
 node scripts/bump-version.mjs
 ```
 
-The script updates package.json and both lockfile versions. Public 1.03 maps to package 1.0.3; the next normal app update is public 1.04/package 1.0.4. Do not manually assume the public label is a semantic version. Documentation-only follow-ups retain the current application version unless the user requests a new release. Internal schema versions are independent.
+The script updates package.json and both lockfile versions. Public 1.04 maps to package 1.0.4; the next normal app update is public 1.05/package 1.0.5. Do not manually assume the public label is a semantic version. Documentation-only follow-ups retain the current application version unless the user requests a new release. Internal schema versions are independent.
 
 After verification, update README, CHANGELOG, TODO, UI_UX and related docs as applicable. Distinguish completed source work from open Linux/live-provider/binary gates. Review `git diff` and `git diff --cached`, then stage only the intended source/doc paths, including new files. Stage new files **before** the audit/archive: both use `git ls-files` and would otherwise omit them.
 

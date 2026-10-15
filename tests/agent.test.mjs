@@ -6,6 +6,7 @@ import path from 'node:path';
 import { createServer } from 'node:http';
 import { Store } from '../electron/store.mjs';
 import { Agent } from '../electron/agent.mjs';
+import { ensureProfiles, profileSettings } from '../electron/profiles.mjs';
 
 test('workspace discovery traverses permitted boards, lists and cards with current edit access', async (t) => {
   const store = new Store(fs.mkdtempSync(path.join(os.tmpdir(), 'intelligence-discovery-')));
@@ -91,6 +92,11 @@ test('LM Studio turns extend the prior request across changing recall, tool call
       data: { content: title + ' content', access: true },
     }),
   );
+  const skill = store.mutate({
+    kind: 'skill',
+    title: 'First procedure',
+    data: { access: true, generated: true, triggers: 'First', content: 'Fixture procedure body' },
+  });
   const requests = [],
     answers = [];
   const connectedTool = {
@@ -168,7 +174,18 @@ test('LM Studio turns extend the prior request across changing recall, tool call
   store.close();
   store = new Store(directory);
   store.mutate({ id: note.id, data: { content: 'Latest selected revision' } });
-  await makeAgent().chat({ conversation: conversation.id, text: 'Second', context: [note.id] });
+  store.mutate({ id: skill.id, data: { content: 'Updated procedure body' } });
+  const secondNote = store.mutate({
+    kind: 'note',
+    parent: note.parent,
+    title: 'New selection',
+    data: { access: true },
+  });
+  await makeAgent().chat({
+    conversation: conversation.id,
+    text: 'Second',
+    context: [note.id, secondNote.id],
+  });
   assert.equal(requests.length, 3);
   assert.deepEqual(
     requests[1].messages.slice(0, requests[0].messages.length),
@@ -185,6 +202,20 @@ test('LM Studio turns extend the prior request across changing recall, tool call
   assert.ok(requests[2].messages.at(-1).content.includes('Second recall content'));
   assert.ok(requests[2].messages.at(-1).content.includes('Latest selected revision'));
   assert.ok(!requests[2].messages[0].content.includes('recall content'));
+  assert.ok(!requests[0].messages[0].content.includes(skill.title));
+  assert.ok(requests[0].messages[1].content.includes(skill.title));
+  assert.ok(!JSON.stringify(requests).includes('Fixture procedure body'));
+  assert.ok(!JSON.stringify(requests).includes('Updated procedure body'));
+  assert.ok(requests[2].messages.at(-1).content.includes(secondNote.id));
+  const skillRead = await makeAgent().execute(
+    'skill_action',
+    { action: 'read', id: skill.id },
+    {
+      profileSettings: (await import('../electron/profiles.mjs')).profileSettings(store),
+      conversation: conversation.id,
+    },
+  );
+  assert.equal(skillRead.data.content, 'Updated procedure body');
   connected = false;
   await makeAgent().chat({ conversation: conversation.id, text: 'Connection disabled' });
   assert.ok(!requests[3].tools.some((t) => t.function.name === 'mcp_fixture'));
@@ -392,4 +423,127 @@ test('agent cannot read excluded items or execute host commands without enabling
     () => agent.execute('run_command', { command: 'echo hello', purpose: 'test' }, ctx),
     /terminal access is disabled/,
   );
+});
+
+test('computer-wide scope works through actual agent tool rounds with and without a project', async (t) => {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'intelligence-computer-agent-'));
+  const store = new Store(path.join(directory, 'data'));
+  t.after(() => {
+    store.close();
+    fs.rmSync(directory, { recursive: true, force: true });
+  });
+  const projectDirectory = path.join(directory, 'project');
+  const outside = path.join(directory, 'Downloads');
+  fs.mkdirSync(projectDirectory);
+  fs.mkdirSync(outside);
+  fs.writeFileSync(path.join(outside, 'fixture.AppImage'), 'Fixture bytes');
+  store.setSettings({
+    provider: 'lmstudio',
+    model: 'fixture',
+    computerScope: 'system',
+    terminalAccess: false,
+    semanticSearch: false,
+  });
+  ensureProfiles(store);
+  const project = store.mutate({
+    kind: 'project',
+    title: 'Active project',
+    data: { directory: projectDirectory, access: true, permission: 'edit' },
+  });
+  for (const projectId of [null, project.id]) {
+    const conversation = store.mutate({
+      kind: 'conversation',
+      title: 'Outside files',
+      project: projectId,
+      data: {},
+    });
+    const requests = [];
+    const calls = [
+      ['computer_files', { action: 'access' }],
+      ['computer_files', { action: 'list', path: outside }],
+      ['read_file', { path: path.join(outside, 'fixture.AppImage') }],
+    ];
+    const agent = new Agent(
+      store,
+      { search: async () => [], index: async () => {} },
+      { tools: () => [] },
+      () => {},
+    );
+    agent.approval = async () => {
+      throw Error('In-scope reads must not ask for another folder approval');
+    };
+    agent.providerRuntime = () => ({
+      fetch: async (_url, options) => {
+        const request = JSON.parse(options.body);
+        requests.push(request);
+        const call = calls[requests.length - 1];
+        const delta = call
+          ? {
+              tool_calls: [
+                {
+                  index: 0,
+                  id: 'file-' + requests.length,
+                  type: 'function',
+                  function: { name: call[0], arguments: JSON.stringify(call[1]) },
+                },
+              ],
+            }
+          : { content: 'Found fixture.AppImage' };
+        return new Response(
+          'data: ' + JSON.stringify({ choices: [{ delta }] }) + '\n\ndata: [DONE]\n',
+        );
+      },
+    });
+    await agent.chat({ conversation: conversation.id, text: 'Check Downloads for AppImages' });
+    assert.equal(requests.length, 4);
+    assert.ok(requests[0].messages.at(-1).content.includes('"scope":"system"'));
+    assert.ok(
+      requests[0].messages[0].content.includes('without asking the user to create a project'),
+    );
+    const results = requests
+      .at(-1)
+      .messages.filter((m) => m.role === 'tool')
+      .map((m) => JSON.parse(m.content));
+    assert.equal(results[0].scope, 'system');
+    assert.equal(results[0].terminalEnabled, false);
+    assert.equal(results[0].workingDirectory, projectId ? projectDirectory : os.homedir());
+    assert.equal(results[1].items[0].name, 'fixture.AppImage');
+    assert.equal(results[2].content, 'Fixture bytes');
+    const ctx = {
+      conversation: conversation.id,
+      project: projectId ? project : null,
+      profileSettings: profileSettings(store, store.get(conversation.id)),
+      signal: new AbortController().signal,
+    };
+    let approvals = 0;
+    agent.approval = async () => {
+      approvals++;
+      return true;
+    };
+    const output = path.join(outside, 'result.txt');
+    const saved = await agent.execute(
+      'computer_files',
+      { action: 'write', path: output, content: 'Saved outside project' },
+      ctx,
+    );
+    assert.equal(fs.readFileSync(output, 'utf8'), 'Saved outside project');
+    await agent.execute(
+      'computer_files',
+      { action: 'write', path: output, content: 'Edited', revision: saved.revision },
+      ctx,
+    );
+    assert.equal(approvals, 2);
+    store.setSettings({ computerScope: 'projects' });
+    agent.approval = async () => false;
+    assert.equal(
+      (await agent.execute('computer_files', { action: 'access' }, ctx)).scope,
+      'projects',
+    );
+    await assert.rejects(
+      agent.execute('computer_files', { action: 'read', path: output }, ctx),
+      /not approved/,
+    );
+    store.setSettings({ computerScope: 'system' });
+    fs.unlinkSync(output);
+  }
 });

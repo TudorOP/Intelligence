@@ -1,4 +1,16 @@
-# Intelligence 1.03 — verification
+# Intelligence 1.04 — verification
+
+## 1.04 profile, computer files and prompt follow-up — 15 October 2026
+
+The [implementation/inference notes](PROFILE_FILES_AND_PROMPT.md) record the requests, native file semantics and primary-source comparison with Hermes/OpenCode. This is source verification on Windows with isolated fixture files and local model responses, not a live LM Studio/Qwen throughput or cache test.
+
+TypeScript and the production build pass. **52 affected backend checks pass** in agent, chat-history, skills, harness-routing, setup-access, workspace-automation and release-version tests. They exercise stable request prefixes across recall/selection/skill changes and restart, on-demand skill reads, historical revocation, native approvals, project/profile/symlink/read-only boundaries, home expansion and actual outside-project agent tool rounds with terminal access disabled. Listing/reading works with and without an active project; writes/edits remain approved and switching back to project scope requires review for outside reads. No full suite, deferred context/compaction benchmarks or token-overhead estimation was run.
+
+The focused profile fixture passes **23 captures**: 21 profile captures across all ten themes, 1080p/2560/3440, shorter/narrower windows, 125% zoom, Romanian, an open assistant, long preferences and 20 added skills/servers; plus English/Romanian computer-wide setting captures with label and persistence assertions. Standard full profile cards fit inside the 1080p workspace, including Romanian; ratings are always open and start at the top. Long catalogs scroll independently. Rating save/reload, live grant add/revoke with a dirty preference draft, no horizontal card/workspace overflow and no renderer errors pass. Representative captures were inspected. The workspace-automation desktop fixture also passes its affected project/window, sources, assignment, inbox, computer-permission and responsive/localization checks.
+
+Final artifacts: `.test-data/profile-layout-1792086613682` (23 captures), `.test-data/workspace-automation-1792086544111`, `.test-data/profile-backend.log` and `.test-data/profile-build.log`. During fixture development a new note needed a valid parent and generic input/action selectors needed correction. The first visual attempt showed ratings below the viewport; the final layout puts them at the top. Earlier attempts are not passing acceptance evidence. The build retains its existing Tiptap module-directive and large-chunk warnings.
+
+Local Markdown links and staged/unstaged whitespace checks pass. The tracked-source audit passes with 947 files, 442 complete license notices and no optional artifacts. The ignored local source ZIP is refreshed from those staged source paths and current file bytes. No push, main merge, AppImage build or publication was performed. Linux OS permissions/mounts and the actual inference runtime/template/cache still need target-host acceptance; the JSON request-prefix regression does not establish internal KV-cache reuse or a smaller model's decision quality.
 
 ## 1.03 collection layout follow-up — 15 October 2026
 

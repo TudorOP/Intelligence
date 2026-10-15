@@ -2132,7 +2132,6 @@
   "Give the collection a name": "Dă colecției un nume",
   "Add folder": "Adaugă dosar",
   "Add sources": "Adaugă surse",
-  "All files available to my account": "Toate fișierele accesibile contului meu",
   "Also process files already present when monitoring starts": "Procesează și fișierele prezente la pornirea monitorizării",
   "Any file or folder change": "Orice modificare a unui fișier sau dosar",
   "Approve for me accepts supported actions within file scope. Full Access approves ordinary commands automatically. Protected destructive or unclassified commands still ask. Reviewed shell commands can access files available to your account; file-tool scopes are not a shell sandbox. MCP setup always requires review.": "Aprobă pentru mine acceptă acțiunile recunoscute în limitele accesului la fișiere. Acces complet aprobă automat comenzile obișnuite. Comenzile distructive sau neclasificate protejate cer în continuare aprobare. Comenzile shell aprobate pot accesa fișierele contului tău; limitele instrumentelor pentru fișiere nu izolează shell-ul. Configurarea MCP necesită întotdeauna verificare.",
@@ -2234,5 +2233,9 @@
   "Set app-wide access, then choose what each agent can use.": "Stabilește accesul general al aplicației, apoi alege ce poate folosi fiecare agent.",
   "Resource access": "Acces la resurse",
   "Resource grants": "Permisiuni pentru resurse",
-  "Tool categories": "Categorii de instrumente"
+  "Tool categories": "Categorii de instrumente",
+  "Any file on the computer": "Orice fișier de pe calculator",
+  "Computer & project files": "Fișierele calculatorului și proiectelor",
+  "Includes Downloads, Documents, mounted drives and other folders your account can access. Agents can read and edit files there. Operating system permissions, protected Intelligence data and agent restrictions still apply. File changes follow your approval settings; terminal commands have a separate switch.": "Include Descărcări, Documente, unități montate și alte dosare accesibile contului tău. Agenții pot citi și edita fișiere acolo. Permisiunile sistemului de operare, datele protejate Intelligence și restricțiile agenților rămân active. Modificările fișierelor respectă setările de aprobare; comenzile de terminal au un comutator separat.",
+  "Choose project folders, selected additional folders or any file on the computer. Operating system permissions and agent restrictions still apply.": "Alege dosarele proiectelor, dosare suplimentare selectate sau orice fișier de pe calculator. Permisiunile sistemului de operare și restricțiile agenților rămân active."
 }

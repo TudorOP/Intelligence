@@ -8,7 +8,7 @@ const help: Record<string, string> = {
     'Choose the profile that performs this work, including its model, skills and permission limits.',
   'Search choices': 'Filter the list by name, provider or model.',
   'File access scope':
-    'Choose authorized projects, selected additional folders or system-wide file access. Native app resources keep their own permissions.',
+    'Choose project folders, selected additional folders or any file on the computer. Operating system permissions and agent restrictions still apply.',
   'Folder permission': 'Allow reading only, or reading and editing, in this additional folder.',
   'Ask before destructive or unclassified actions':
     'Require native review for destructive computer-file operations and shell commands that cannot be classified safely.',

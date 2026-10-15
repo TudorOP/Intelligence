@@ -1,5 +1,13 @@
 # Releases
 
+## 1.04 — visible profile ratings, computer files and stable prompts on dev
+
+- Use four compact profile columns at 1080p with ratings first, expanded tool/access sections and independent scrolling for long catalogs. Preserve rating saves, unsaved preferences and live grants.
+- Expand current-user home paths before native scopes/approvals. Replace the broad file-scope label with Any file on the computer, explain OS/profile limits in EN/RO and clarify the Computer & project files category.
+- Give chat a native effective-file-scope/home/working-directory snapshot and computer_files(action=access) for live scope. Correct the misleading read_file instruction that always demanded approval outside projects; verify outside-project reads/writes with terminal access off and with/without an active project.
+- Consolidate repeated mandatory guidance. Supply relevant skill metadata in saved user-turn context and load current full instructions through skill_action; selected names no longer rewrite the system message. Keep native authority and historical source filtering.
+- Explain repeated context transmission versus engine prompt-cache reuse without claiming live inference speedups. Prepare 1.04/package 1.0.4 locally; no push or publication.
+
 ## 1.03 — collection card and Skills list repairs on dev
 
 - Give Skills, Projects and Connections matching card dimensions within each collection, including across rows. Wrap long titles/paths/descriptions and align card actions.

@@ -369,9 +369,10 @@ try {
   await closeSettings();
   await page.locator('.agent-profile').click();
   await page.getByRole('button', { name: 'Edit profile', exact: true }).first().click();
-  await page.locator('.agent-ratings-card > summary').click();
+  if (baseline) await page.locator('.agent-ratings-card > summary').click();
+  else await page.locator('.agent-ratings-card h2').waitFor();
   if (!baseline) {
-    await page.locator('.agent-tool-choices > summary').click();
+    await page.locator('.agent-tool-choices').evaluate((e) => (e.open = true));
     assert.equal(await page.locator('.agent-tool-choices .setting-switch').count(), 10);
     await shot('agent-tools-expanded');
     await page.locator('.agent-tool-choices > summary').click();
@@ -489,7 +490,8 @@ try {
         await shot(theme + '-agent-list');
         await page.getByRole('button', { name: 'Edit profile', exact: true }).first().click();
         await shot(theme + '-agent-profile');
-        await page.locator('.agent-ratings-card > summary').click();
+        if (baseline) await page.locator('.agent-ratings-card > summary').click();
+        else await page.locator('.agent-ratings-card h2').waitFor();
         await shot(theme + '-agent-ratings');
         await page.locator('.assistant-toggle').click();
         await shot(theme + '-assistant');

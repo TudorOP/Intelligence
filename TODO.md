@@ -1,6 +1,14 @@
-# Intelligence 1.03 — release acceptance
+# Intelligence 1.04 — release acceptance
 
 The current workspace features are described in README.md. The 1.0 baseline passed 223 enabled backend checks. Current verification is recorded in docs/VERIFICATION.md. Source publication is separate from the remaining binary-release gates. Verification procedures and limitations are documented in docs/VERIFICATION.md.
+
+## Profile, computer files and prompt follow-up — 1.04, 15 October 2026
+
+- [x] Keep ratings open and prominent; use the available width so the standard 1080p profile fits, with expanded tools/access and bounded long catalogs.
+- [x] Resolve home paths before native file checks; clarify and verify computer-wide file access outside projects, without requiring terminal commands or a project.
+- [x] Rename the broad scope to Any file on the computer, explain its behavior in English/Romanian and give the agent native scope/home/working-directory information plus live access discovery.
+- [x] Consolidate repeated mandatory guidance, load skill bodies on demand and preserve request prefixes across changing selections/skills/recall. Record the distinction between API history and engine cache reuse; real LM Studio/Qwen acceptance stays open below.
+- [x] Run affected source/backend/UI checks, update release docs/source ZIP and commit locally. No push or publication.
 
 ## Collection layout follow-up — 1.03, 15 October 2026
 

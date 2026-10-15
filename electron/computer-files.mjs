@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import { constants } from 'node:fs';
 import path from 'node:path';
 import { createHash, randomUUID } from 'node:crypto';
-import { computerPath } from './computer-access.mjs';
+import { computerPath, computerAccessInfo } from './computer-access.mjs';
 import { extractDocument } from './document-extract.mjs';
 import { computerImageReference } from './computer-images.mjs';
 const str = { type: 'string' };
@@ -11,18 +11,18 @@ export const computerFileTool = {
   function: {
     name: 'computer_files',
     description:
-      'List/read/write/move/trash files in user-authorized computer folders. Paths are absolute or relative to the current project. Follow offsets. Read returns a revision required for overwriting. Outside current access needs native approval. Trash is recoverable. Never use these tools on Intelligence storage.',
+      'Use action=access (no path) for live file scope, home and working directory. List/read/write/move/trash host files, including outside projects when scope=system. Paths: absolute, ~/home-relative, or working-directory-relative. Follow offsets; overwrites require the read revision. Folder access and write approvals are separate. Trash is recoverable. Intelligence storage is protected.',
     parameters: {
       type: 'object',
       properties: {
-        action: { type: 'string', enum: ['list', 'read', 'write', 'move', 'trash'] },
+        action: { type: 'string', enum: ['access', 'list', 'read', 'write', 'move', 'trash'] },
         path: str,
         destination: str,
         content: str,
         revision: str,
         offset: { type: 'integer' },
       },
-      required: ['action', 'path'],
+      required: ['action'],
       additionalProperties: false,
     },
   },
@@ -76,6 +76,11 @@ export async function authorizeFile(agent, input, ctx, edit = false, destructive
   return latest.file;
 }
 export async function computerFiles(agent, args, ctx) {
+  if (args.action === 'access')
+    return computerAccessInfo(agent.store, {
+      project: ctx.project,
+      settings: ctx.profileSettings || agent.store.settings(),
+    });
   const edit = ['write', 'move', 'trash'].includes(args.action);
   const options = {
     project: ctx.project,

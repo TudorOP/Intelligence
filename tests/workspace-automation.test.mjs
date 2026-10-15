@@ -8,7 +8,7 @@ import { Store } from '../electron/store.mjs';
 import { ensureProfiles, profileSettings } from '../electron/profiles.mjs';
 import { requireAssignedAgent } from '../electron/assignments.mjs';
 import { restoreWindow } from '../electron/window-state.mjs';
-import { computerPath } from '../electron/computer-access.mjs';
+import { computerPath, resolveComputerPath } from '../electron/computer-access.mjs';
 import { authorizeFile, computerFiles } from '../electron/computer-files.mjs';
 import { automaticApproval } from '../electron/approval-policy.mjs';
 import { ChatFiles } from '../electron/chat-files.mjs';
@@ -27,6 +27,57 @@ function fixture(t) {
   });
   return { root, store };
 }
+test('home paths expand before native scopes and never resolve inside the active project', async (t) => {
+  const { root, store } = fixture(t);
+  const project = { data: { directory: root } };
+  assert.equal(resolveComputerPath('~', project), os.homedir());
+  assert.equal(resolveComputerPath('~/Downloads', project), path.join(os.homedir(), 'Downloads'));
+  assert.equal(resolveComputerPath('~\\Downloads', project), path.join(os.homedir(), 'Downloads'));
+  assert.equal(resolveComputerPath('ordinary.txt', project), path.join(root, 'ordinary.txt'));
+  assert.throws(() => resolveComputerPath('~another/Downloads', project), /~username/);
+  // Resolve a fixture path via ~, never touch the real Downloads directory.
+  const relative = path.relative(os.homedir(), root).split(path.sep).join('/');
+  const input = '~/' + relative + '/fixture.txt';
+  fs.writeFileSync(path.join(root, 'fixture.txt'), 'fixture');
+  store.setSettings({ computerScope: 'projects' });
+  assert.equal((await computerPath(store, input, { project })).allowed, false);
+  let approvals = 0;
+  const agent = {
+    store,
+    approval: async () => {
+      approvals++;
+      return false;
+    },
+  };
+  await assert.rejects(
+    computerFiles(agent, { action: 'read', path: input }, { project }),
+    /not approved/,
+  );
+  assert.equal(approvals, 1);
+  store.setSettings({
+    computerScope: 'folders',
+    computerFolders: [{ directory: root, permission: 'read' }],
+  });
+  assert.equal(
+    (await computerFiles(agent, { action: 'read', path: input }, { project })).content,
+    'fixture',
+  );
+  await assert.rejects(computerPath(store, input, { project, edit: true }), /read-only/);
+  await assert.rejects(
+    computerPath(
+      store,
+      '~/' + path.relative(os.homedir(), store.directory).split(path.sep).join('/'),
+    ),
+    /structured tools/,
+  );
+  await assert.rejects(
+    computerPath(store, input, {
+      project,
+      settings: { profileScope: { computerAccess: 'projects' } },
+    }),
+    /restricted/,
+  );
+});
 test('window restoration clamps disconnected displays, keeps normal size and validates persisted project selection', (t) => {
   const display = { x: 0, y: 0, width: 1920, height: 1040 };
   assert.deepEqual(restoreWindow({}, [display]), {

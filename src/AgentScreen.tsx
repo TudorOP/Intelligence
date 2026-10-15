@@ -27,7 +27,7 @@ const groups = [
 ];
 const groupLabels: Record<string, string> = {
   workspace: 'Workspace',
-  projects: 'Project files',
+  projects: 'Computer & project files',
   memory: 'Memory',
   search: 'Web search',
   machine: 'Machine tools',
@@ -194,7 +194,7 @@ export default function AgentScreen({
   if (!draft || !profile) return <p className="page-pad">{t('Opening agent profiles…')}</p>;
   const performance = ratings.reduce((sum, [key]) => sum + (draft.ratings?.[key] ?? 0), 0) / 4;
   return (
-    <div className="page-pad agent-screen">
+    <div className="page-pad agent-screen agent-editor">
       <header className="agent-screen-heading">
         <div>
           <span className="eyebrow">{t('YOUR COMPANION')}</span>
@@ -262,7 +262,7 @@ export default function AgentScreen({
             <label>
               {t('Personality & preferences')}
               <textarea
-                rows={6}
+                rows={4}
                 aria-label={t('Personality & preferences')}
                 value={draft.personality ?? ''}
                 onChange={(e) => setDraft({ ...draft, personality: e.target.value })}
@@ -272,8 +272,22 @@ export default function AgentScreen({
               {t('Internal app instructions remain active.')}
             </small>
           </section>
-          <details className="agent-ratings-card">
-            <summary>{t('Your ratings')}</summary>
+          <section className="agent-user-context">
+            <h3>{t('User context')}</h3>
+            <p>
+              {t('Preferred name')}:{' '}
+              {snapshot.settings.shareName
+                ? snapshot.settings.preferredName || t('Not configured')
+                : t('Not shared')}
+            </p>
+            <small>
+              {t('Change your name and sharing preference in Settings → Your profile.')}
+            </small>
+          </section>
+        </div>
+        <div className="agent-profile-column">
+          <section className="agent-ratings-card">
+            <h2>{t('Your ratings')}</h2>
             <p className="muted">{t('Your assessment, from 0 to 5 stars.')}</p>
             {ratings.map(([key, label]) => (
               <div className="star-rating" key={key}>
@@ -322,21 +336,7 @@ export default function AgentScreen({
               </span>
               <small>{t('Average of your four ratings; calculated automatically.')}</small>
             </div>
-            <section className="agent-user-context">
-              <h3>{t('User context')}</h3>
-              <p>
-                {t('Preferred name')}:{' '}
-                {snapshot.settings.shareName
-                  ? snapshot.settings.preferredName || t('Not configured')
-                  : t('Not shared')}
-              </p>
-              <small>
-                {t('Change your name and sharing preference in Settings → Your profile.')}
-              </small>
-            </section>
-          </details>
-        </div>
-        <div className="agent-profile-column">
+          </section>
           <section className="agent-config-card">
             <h2>{t('Default model')}</h2>
             <label className="setting-switch">
@@ -379,6 +379,10 @@ export default function AgentScreen({
               onUpdate={async ({ model }) => setDraft({ ...draft, model, inheritModel: false })}
               onError={onError}
             />
+          </section>
+        </div>
+        <div className="agent-profile-column">
+          <section className="agent-config-card">
             <h2>{t('Tools and connections')}</h2>
             <small>{t('Profile choices can only restrict the access granted in the app.')}</small>
             <label>
@@ -391,20 +395,22 @@ export default function AgentScreen({
                 <option value="projects">{t('Authorized project folders only')}</option>
               </select>
             </label>
-            <details className="agent-tool-choices">
+            <details className="agent-tool-choices" open>
               <summary>{t('Tool categories')}</summary>
-              {groups.map((g) => (
-                <label className="setting-switch" key={g}>
-                  <span>{t(groupLabels[g] || g)}</span>
-                  <Switch
-                    data-tooltip={t(
-                      'Allow this agent to use this tool category within the access you granted in the app.',
-                    )}
-                    checked={!draft.toolGroups || draft.toolGroups.includes(g)}
-                    onChange={(e) => scope('toolGroups', groups, g, e.target.checked)}
-                  />
-                </label>
-              ))}
+              <div className="agent-category-grid">
+                {groups.map((g) => (
+                  <label className="setting-switch" key={g}>
+                    <span>{t(groupLabels[g] || g)}</span>
+                    <Switch
+                      data-tooltip={t(
+                        'Allow this agent to use this tool category within the access you granted in the app.',
+                      )}
+                      checked={!draft.toolGroups || draft.toolGroups.includes(g)}
+                      onChange={(e) => scope('toolGroups', groups, g, e.target.checked)}
+                    />
+                  </label>
+                ))}
+              </div>
             </details>
             <label className="setting-switch">
               <span>{t('Create reusable skills')}</span>
@@ -417,45 +423,47 @@ export default function AgentScreen({
               const choices = snapshot.entities.filter((e) => e.kind === kind),
                 key = kind === 'skill' ? 'skillIds' : 'connectionIds';
               return (
-                <details key={kind}>
+                <details key={kind} open>
                   <summary>{t(kind === 'skill' ? 'Skills' : 'MCP servers')}</summary>
-                  {choices.map((e) => (
-                    <label className="setting-switch" key={e.id}>
-                      <span>{e.title}</span>
-                      <Switch
-                        data-tooltip={t(
-                          kind === 'skill'
-                            ? 'Make these saved instructions available to this agent.'
-                            : 'Allow this agent to use this connected tool server, subject to app permissions.',
-                        )}
-                        checked={
-                          kind === 'skill' &&
-                          e.data.creatorProfile &&
-                          e.data.creatorProfile !== profile.id
-                            ? !!draft[key]?.includes(e.id)
-                            : !draft[key] || draft[key].includes(e.id)
-                        }
-                        onChange={(event) =>
-                          scope(
-                            key,
-                            choices
-                              .filter(
-                                (c) =>
-                                  kind !== 'skill' ||
-                                  !c.data.creatorProfile ||
-                                  c.data.creatorProfile === profile.id ||
-                                  draft[key]?.includes(c.id) ||
-                                  c.id === e.id,
-                              )
-                              .map((c) => c.id),
-                            e.id,
-                            event.target.checked,
-                          )
-                        }
-                      />
-                    </label>
-                  ))}
-                  {!choices.length ? <p>{t('No items yet.')}</p> : null}
+                  <div className="agent-choice-list">
+                    {choices.map((e) => (
+                      <label className="setting-switch" key={e.id}>
+                        <span>{e.title}</span>
+                        <Switch
+                          data-tooltip={t(
+                            kind === 'skill'
+                              ? 'Make these saved instructions available to this agent.'
+                              : 'Allow this agent to use this connected tool server, subject to app permissions.',
+                          )}
+                          checked={
+                            kind === 'skill' &&
+                            e.data.creatorProfile &&
+                            e.data.creatorProfile !== profile.id
+                              ? !!draft[key]?.includes(e.id)
+                              : !draft[key] || draft[key].includes(e.id)
+                          }
+                          onChange={(event) =>
+                            scope(
+                              key,
+                              choices
+                                .filter(
+                                  (c) =>
+                                    kind !== 'skill' ||
+                                    !c.data.creatorProfile ||
+                                    c.data.creatorProfile === profile.id ||
+                                    draft[key]?.includes(c.id) ||
+                                    c.id === e.id,
+                                )
+                                .map((c) => c.id),
+                              e.id,
+                              event.target.checked,
+                            )
+                          }
+                        />
+                      </label>
+                    ))}
+                    {!choices.length ? <p>{t('No items yet.')}</p> : null}
+                  </div>
                 </details>
               );
             })}

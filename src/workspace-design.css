@@ -262,6 +262,114 @@
 .agent-ratings-card[open] > summary {
   margin-bottom: 12px;
 }
+.agent-editor {
+  max-width: 1800px;
+  padding: 26px 30px;
+}
+.agent-editor .agent-screen-heading {
+  margin-bottom: 18px;
+}
+.agent-editor .agent-profile-layout,
+.agent-editor .agent-profile-column {
+  gap: 16px;
+}
+@container (min-width: 1350px) {
+  .agent-editor .agent-profile-layout {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+.agent-editor .agent-identity-card,
+.agent-editor .agent-config-card,
+.agent-editor .agent-ratings-card,
+.agent-editor .agent-grants {
+  padding: 18px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.agent-editor .agent-identity-card {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  column-gap: 14px;
+  align-items: center;
+}
+.agent-editor .agent-identity-card > img {
+  width: 64px;
+  height: 64px;
+  margin: 0;
+  border-radius: 16px;
+}
+.agent-editor .agent-identity-card > label,
+.agent-editor .agent-identity-card > small {
+  grid-column: 1 / -1;
+}
+.agent-editor label,
+.agent-editor .agent-config-card .setting-switch {
+  margin: 10px 0;
+}
+.agent-editor label > input:not(.toggle-switch),
+.agent-editor label textarea,
+.agent-editor label select {
+  margin-top: 5px;
+}
+.agent-editor .internal-guidance {
+  margin-top: 0;
+}
+.agent-editor .agent-ratings-card h2 {
+  font-size: 17px;
+  margin: 0 0 8px;
+}
+.agent-editor .agent-ratings-card .star-rating {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  flex-wrap: wrap;
+}
+.agent-editor .star-rating > div {
+  flex-shrink: 0;
+  gap: 2px;
+}
+.agent-editor .star-rating button {
+  min-width: 26px;
+  min-height: 28px;
+  padding: 2px;
+}
+.agent-editor .agent-performance {
+  padding: 12px;
+  margin: 12px 0;
+}
+.agent-editor .agent-user-context {
+  padding-top: 10px;
+  margin-top: 12px;
+}
+.agent-editor .agent-user-context h3,
+.agent-editor .agent-user-context p {
+  margin: 4px 0;
+}
+.agent-editor .agent-category-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 14px;
+}
+.agent-editor .agent-category-grid .setting-switch {
+  margin: 0;
+  padding: 6px 0;
+  gap: 6px;
+}
+.agent-editor .agent-choice-list,
+.agent-editor .agent-grant-list {
+  max-height: 180px;
+  overflow: auto;
+  scrollbar-gutter: stable;
+}
+.agent-editor .agent-grant-list {
+  max-height: 300px;
+}
+@container (max-width: 760px) {
+  .agent-editor .agent-category-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
 .agent-identity-card,
 .agent-config-card,
 .agent-profile-grid article {

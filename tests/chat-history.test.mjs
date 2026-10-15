@@ -98,6 +98,35 @@ test('historical tool results respect revoked access to nested source entities',
   assert.equal(history[2].tool_call_id, 'read');
 });
 
+test('turn skill metadata obeys live exclusions and old ungranted selections lose their names', (t) => {
+  const { store, conversation } = fixture(t);
+  const skill = store.mutate({
+    kind: 'skill',
+    title: 'Procedure metadata',
+    data: { access: true, content: 'Load only on demand' },
+  });
+  const note = store.all().find((e) => e.kind === 'note');
+  store.mutate({ id: note.id, data: { access: false } });
+  const first = store.message(conversation.id, 'user', 'Inspect selection', {
+    promptContext: {
+      ...snapshotContext([], []),
+      permissionSelections: [{ id: note.id, title: note.title, kind: note.kind }],
+      skills: [{ id: skill.id, title: skill.title, revision: skill.revision }],
+    },
+  });
+  const initial = modelHistory(store, conversation.id)[0].content;
+  assert.ok(initial.includes(note.title));
+  assert.ok(initial.includes(skill.title));
+  assert.ok(!initial.includes('Load only on demand'));
+  store.message(conversation.id, 'user', 'Continue', { promptContext: snapshotContext([], []) });
+  assert.ok(!modelHistory(store, conversation.id)[0].content.includes(note.title));
+  store.mutate({ id: skill.id, data: { access: false } });
+  assert.ok(!modelHistory(store, conversation.id)[0].content.includes(skill.title));
+  assert.ok(
+    store.messages(conversation.id).find((m) => m.id === first.id).data.promptContext.skills.length,
+  );
+});
+
 test('screen focus stays with its user turn, changes across navigation and loses revoked titles on replay', (t) => {
   const { store, conversation } = fixture(t);
   const note = store.all().find((e) => e.kind === 'note' && store.access(e.id));
