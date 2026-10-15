@@ -74,12 +74,16 @@ try {
         workspace: rect(workspace),
         overflow: workspace.scrollWidth - workspace.clientWidth,
         pageScroll: workspace.scrollHeight - workspace.clientHeight,
-        toolsOpen: editor.querySelector('.agent-tools-card').open,
-        cards: [...editor.querySelectorAll('.agent-profile-layout > section')].map((e) => ({
+        userContext: !!editor.querySelector('.agent-user-context'),
+        cards: [...editor.querySelectorAll('.agent-profile-layout section')].map((e) => ({
           name: e.className,
           ...rect(e),
           overflow: e.scrollWidth - e.clientWidth,
+          verticalOverflow: e.scrollHeight - e.clientHeight,
         })),
+        controls: [...editor.querySelectorAll('button,input,select,textarea')]
+          .filter((e) => e.getClientRects().length)
+          .map(rect),
         ratings: [...editor.querySelectorAll('.star-rating button')].map(rect),
         categories: [...editor.querySelectorAll('[data-tool-category]')].map(rect),
       };
@@ -105,17 +109,30 @@ try {
     fs.writeFileSync(path.join(directory, name + '.png'), Buffer.from(png, 'base64'));
     assert.ok(layout.overflow <= 2, name + ': workspace overflow');
     assert.ok(
-      layout.cards.every((c) => c.overflow <= 2),
+      layout.cards.every((c) => c.overflow <= 2 && c.verticalOverflow <= 1),
       name + ': card overflow',
     );
     assert.equal(layout.ratings.length, 24);
-    assert.equal(layout.categories.length, 10);
+    assert.equal(layout.categories.length, 4);
+    assert.equal(layout.userContext, false);
     if (fit) {
       assert.ok(layout.pageScroll <= 1, name + ': page must not scroll ' + layout.pageScroll);
-      assert.equal(layout.toolsOpen, false, name + ': tools start collapsed');
+
       assert.ok(
         layout.cards.every((c) => c.bottom <= layout.workspace.bottom + 1),
         name + ': profile should fit without page scrolling ' + JSON.stringify(layout.cards),
+      );
+      assert.ok(
+        layout.controls.every(
+          (c) =>
+            c.y >= layout.workspace.y &&
+            c.bottom <= layout.workspace.bottom + 1 &&
+            c.x >= layout.workspace.x &&
+            c.right <= layout.workspace.right + 1,
+        ),
+        name +
+          ': all controls visible ' +
+          JSON.stringify(layout.controls.filter((c) => c.bottom > layout.workspace.bottom + 1)),
       );
       assert.ok(
         layout.ratings.every((c) => c.bottom <= layout.workspace.bottom),
@@ -236,31 +253,180 @@ try {
     }
   });
   await capture('profile-long-catalog', true);
-  const menu = page.locator('.agent-tools-card');
-  await menu.locator(':scope > summary').focus();
-  await page.keyboard.press('Enter');
-  assert.equal(await menu.getAttribute('open'), '');
-  await menu.locator('.agent-tool-choices > summary').click();
-  await menu.getByRole('switch', { name: 'Terminal', exact: true }).uncheck();
-  await page.getByRole('switch', { name: 'Create reusable skills', exact: true }).uncheck();
-  const popup = await page.locator('.agent-tools-body').boundingBox();
-  const viewport = page.viewportSize() || { height: 1080, width: 1920 };
-  assert.ok(
-    popup.y >= 32 && popup.y + popup.height <= viewport.height,
-    'Tools popup within viewport',
-  );
-  await capture('profile-tools-open');
+  const checkChoices = async (title, name) => {
+    const opener = page
+      .locator('.agent-tool-actions')
+      .getByRole('button', { name: title, exact: true });
+    await opener.click();
+    const dialog = page.getByRole('dialog', { name: title, exact: true });
+    await dialog.waitFor();
+    await page.waitForTimeout(160);
+    const measured = await dialog.evaluate((e) => {
+      const r = e.getBoundingClientRect();
+      return {
+        x: r.x,
+        y: r.y,
+        right: r.right,
+        bottom: r.bottom,
+        viewport: { width: innerWidth, height: innerHeight },
+        overflow: [
+          e,
+          ...e.querySelectorAll('.agent-choices-body,.agent-choice-pages,.agent-choice-row'),
+        ].map((n) => ({ x: n.scrollWidth - n.clientWidth, y: n.scrollHeight - n.clientHeight })),
+        rows: [...e.querySelectorAll('.agent-choice-row')].map((n) => {
+          const b = n.getBoundingClientRect();
+          return { top: b.top, bottom: b.bottom };
+        }),
+        list: e.querySelector('.agent-choice-pages').getBoundingClientRect().toJSON(),
+      };
+    });
+    assert.ok(
+      measured.x >= 0 &&
+        measured.y >= 0 &&
+        measured.right <= measured.viewport.width &&
+        measured.bottom <= measured.viewport.height,
+      name + ': modal fits',
+    );
+    assert.ok(
+      measured.overflow.every((n) => n.x <= 1 && n.y <= 1),
+      name + ': no dialog or list scrolling ' + JSON.stringify(measured),
+    );
+    assert.ok(
+      measured.rows.every(
+        (r) => r.top >= measured.list.top && r.bottom <= measured.list.bottom + 1,
+      ),
+      name + ': all rows visible',
+    );
+    assert.equal(await page.locator('.main-canvas').evaluate((e) => e.scrollTop), 0);
+    await page.keyboard.press('Shift+Tab');
+    assert.ok(
+      await dialog.evaluate((e) => e.contains(document.activeElement)),
+      name + ': focus contained',
+    );
+    await page.keyboard.press('Tab');
+    assert.ok(
+      await dialog.evaluate((e) => e.contains(document.activeElement)),
+      name + ': forward focus contained',
+    );
+    await app.evaluate(async ({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].capturePage());
+    await page.waitForTimeout(100);
+    const png = await app.evaluate(async ({ BrowserWindow }) =>
+      (await BrowserWindow.getAllWindows()[0].capturePage()).toPNG().toString('base64'),
+    );
+    fs.writeFileSync(path.join(directory, name + '.png'), Buffer.from(png, 'base64'));
+    results.captures.push({ name, measured });
+    return { dialog, opener };
+  };
+  let opened = await checkChoices('More tool categories', 'profile-more-categories');
+  await opened.dialog.getByRole('switch', { name: 'Terminal', exact: true }).uncheck();
   await page.keyboard.press('Escape');
-  assert.equal(await menu.getAttribute('open'), null);
-  assert.ok(await menu.locator(':scope > summary').evaluate((e) => e === document.activeElement));
+  await opened.dialog.waitFor({ state: 'detached' });
+  assert.ok(await opened.opener.evaluate((e) => e === document.activeElement));
+  await page.getByRole('switch', { name: 'Create reusable skills', exact: true }).uncheck();
+  for (const title of ['Skills', 'MCP servers']) {
+    opened = await checkChoices(title, title === 'Skills' ? 'profile-skills' : 'profile-mcp');
+    const next = opened.dialog.getByRole('button', { name: 'Next page', exact: true });
+    assert.equal(await next.isDisabled(), false, 'Long catalogs are paged');
+    const firstTitle = await opened.dialog.getByRole('switch').first().getAttribute('aria-label');
+    await next.click();
+    assert.notEqual(
+      await opened.dialog.getByRole('switch').first().getAttribute('aria-label'),
+      firstTitle,
+    );
+    const search = opened.dialog.getByRole('textbox', { name: 'Search choices', exact: true });
+    await search.fill(
+      'Long ' + (title === 'Skills' ? 'saved procedure' : 'MCP server name') + ' 19',
+    );
+    assert.equal(await opened.dialog.getByRole('switch').count(), 1);
+    await opened.dialog.getByRole('switch').uncheck();
+    await search.fill('no such catalog entry');
+    assert.equal(await opened.dialog.getByRole('switch').count(), 0);
+    await search.fill('');
+    await page.keyboard.press('Escape');
+    await opened.dialog.waitFor({ state: 'detached' });
+    assert.ok(await opened.opener.evaluate((e) => e === document.activeElement));
+  }
+  for (const [w, h, zoom, language] of [
+    [1920, 1080, 1.25, 'ro'],
+    [1366, 768, 1, 'ro'],
+    [1280, 800, 1, 'en'],
+  ]) {
+    await resize(w, h);
+    await app.evaluate(
+      ({ BrowserWindow }, factor) =>
+        BrowserWindow.getAllWindows()[0].webContents.setZoomFactor(factor),
+      zoom,
+    );
+    await configure({ language });
+    for (const [index, title] of ['categories', 'skills', 'mcp'].entries()) {
+      const actual = await page
+        .locator('.agent-tool-actions > button')
+        .nth(index)
+        .locator('span')
+        .first()
+        .innerText();
+      opened = await checkChoices(
+        actual,
+        'choices-' + w + '-' + zoom + '-' + language + '-' + title.replaceAll(' ', '-'),
+      );
+      await page.keyboard.press('Escape');
+      await opened.dialog.waitFor({ state: 'detached' });
+    }
+  }
+  await resize(1920, 1080);
+  await app.evaluate(({ BrowserWindow }) =>
+    BrowserWindow.getAllWindows()[0].webContents.setZoomFactor(1),
+  );
+  await configure({ language: 'en' });
+  await page
+    .getByRole('textbox', { name: 'Agent name', exact: true })
+    .fill('Intelligence — Profile A');
   await page.getByRole('button', { name: 'Save profile', exact: true }).click();
   await page.waitForFunction(async () => {
     const s = await window.intelligence.bootstrap();
+    const saved = s.entities.find((e) => e.id === s.settings.activeAgent);
+    const skill = s.entities.find(
+      (e) => e.kind === 'skill' && e.title.startsWith('Long saved procedure 19 '),
+    );
+    const connection = s.entities.find(
+      (e) => e.kind === 'connection' && e.title.startsWith('Long MCP server name 19 '),
+    );
     return (
-      s.entities.find((e) => e.id === s.settings.activeAgent).data.allowSkillCreation === false &&
-      !s.entities.find((e) => e.id === s.settings.activeAgent).data.toolGroups.includes('terminal')
+      saved.title === 'Intelligence — Profile A' &&
+      saved.data.allowSkillCreation === false &&
+      !saved.data.toolGroups.includes('terminal') &&
+      !saved.data.skillIds.includes(skill.id) &&
+      !saved.data.connectionIds.includes(connection.id) &&
+      saved.data.ratings.knowledge === 2 &&
+      saved.data.personality === 'Keep all this user-authored text. '.repeat(100)
     );
   });
+  await page.reload();
+  await page.locator('.agent-profile').click();
+  await page.getByRole('button', { name: 'Edit profile', exact: true }).first().click();
+  assert.equal(
+    await page.getByRole('textbox', { name: 'Agent name', exact: true }).inputValue(),
+    'Intelligence — Profile A',
+  );
+  assert.equal(
+    await page.getByLabel('Personality & preferences', { exact: true }).inputValue(),
+    'Keep all this user-authored text. '.repeat(100),
+  );
+  for (const [title, query] of [
+    ['Skills', 'Long saved procedure 19'],
+    ['MCP servers', 'Long MCP server name 19'],
+  ]) {
+    await page
+      .locator('.agent-tool-actions')
+      .getByRole('button', { name: title, exact: true })
+      .click();
+    const dialog = page.getByRole('dialog', { name: title, exact: true });
+    await dialog.getByRole('textbox', { name: 'Search choices', exact: true }).fill(query);
+    assert.equal(await dialog.getByRole('switch').count(), 1);
+    assert.equal(await dialog.getByRole('switch').isChecked(), false);
+    await page.keyboard.press('Escape');
+    await dialog.waitFor({ state: 'detached' });
+  }
   await capture('profile-tools-saved', true);
   for (const [w, h, language] of [
     [1920, 1080, 'en'],

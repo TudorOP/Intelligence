@@ -9,12 +9,14 @@ export default function ModelPicker({
   onUpdate,
   onError,
   matrix = false,
+  manualEntry = true,
 }: {
   settings: Settings;
   models?: string[];
   onUpdate: (input: Partial<Settings>) => Promise<any>;
   onError: (error: any) => void;
   matrix?: boolean;
+  manualEntry?: boolean;
 }) {
   const [models, setModels] = useState<string[]>(provided ?? []),
     [manual, setManual] = useState(false),
@@ -62,10 +64,12 @@ export default function ModelPicker({
       >
         ↻
       </button>
-      <button type="button" aria-expanded={manual} onClick={() => setManual((v) => !v)}>
-        {t('Model ID')}
-      </button>
-      {manual ? (
+      {manualEntry && (
+        <button type="button" aria-expanded={manual} onClick={() => setManual((v) => !v)}>
+          {t('Model ID')}
+        </button>
+      )}
+      {manualEntry && manual ? (
         <input
           className="manual-model"
           key={settings.provider + settings.model}

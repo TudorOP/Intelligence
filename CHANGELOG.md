@@ -1,5 +1,12 @@
 # Releases
 
+## 1.06 — balanced agent profile on dev
+
+- Implement the selected concept A: image/name and default model in the left column, a large system-prompt editor in the center, and visible ratings and Tools and connections on the right. Remove the User context block from this screen.
+- Open More tool categories, Skills and MCP servers in keyboard-accessible dialogs with search and adaptive pages. Long catalogs do not require page or dialog scrolling; choices remain profile drafts until Save profile.
+- Retain native access enforcement, mandatory instructions, existing artwork and English/Romanian content. Remove the profile's duplicate Model ID toggle while retaining its explicit editable field and model picker.
+- Verify profile controls and dialog contents stay visible across the tested desktop sizes, themes and real 125% zoom, with long prompts/catalogs and an open assistant. Prepare 1.06/package 1.0.6 locally; no push, merge or publication.
+
 ## 1.05 — classic agent profile and resource-access modal on dev
 
 - Restore the 1.0 profile arrangement: identity/personality, model/tools, and ratings/user context in three columns. Keep a larger personality field, modern searchable models and current profile save behavior.

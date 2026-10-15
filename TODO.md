@@ -1,6 +1,13 @@
-# Intelligence 1.05 — release acceptance
+# Intelligence 1.06 — release acceptance
 
 The current workspace features are described in README.md. The 1.0 baseline passed 223 enabled backend checks. Current verification is recorded in docs/VERIFICATION.md. Source publication is separate from the remaining binary-release gates. Verification procedures and limitations are documented in docs/VERIFICATION.md.
+
+## Balanced profile — 1.06, 15 October 2026
+
+- [x] Implement the selected concept A: identity/default model on the left, large central system-prompt editor, ratings/open tools on the right; omit User context.
+- [x] Open More tool categories, Skills and MCP servers in focused dialogs, with search and adaptive pages instead of expanding/scrolling the profile or catalog.
+- [x] Check every visible profile control, actual page/card overflow, dialogs, localization, themes, real zoom and short/larger windows with varied content. Verify profile drafts and tool/skill/server choices save correctly.
+- [x] Update release docs, ignored source ZIP and local commit; no push or publication.
 
 ## Classic profile and resource modal — 1.05, 15 October 2026
 

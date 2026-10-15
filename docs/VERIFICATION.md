@@ -1,4 +1,14 @@
-# Intelligence 1.05 — verification
+# Intelligence 1.06 — verification
+
+## 1.06 balanced agent profile — 15 October 2026
+
+The selected [concept A](design/agent-profile-alternatives-2026-10-15/README.md) is implemented with separate identity/model, prompt and ratings/tools columns. User context is removed. Common tool controls remain visible; More tool categories, Skills and MCP servers use the shared keyboard-safe modal with search and adaptive pages. The existing resource-access grant modal remains separate. The editable prompt still stores the user's personality/preferences and does not replace mandatory guidance.
+
+TypeScript and the production renderer build pass. Three targeted backend profile checks pass (migration/ratings/intersected scopes, approval revocation and excluded skills), plus the release-version check. The focused production Electron fixture passes **38 captures** in `.test-data/profile-layout-1792100071318` with no renderer errors. Coverage includes all ten themes, English/Romanian, 1920×1080, 2560×1440, 3440×1440, 1366×768, 1280×800, real 125% app zoom in EN/RO, an open assistant, a long user-authored prompt and twenty additional skills and MCP servers. Representative Day/Night/RO/zoom/assistant/dialog captures were inspected. Actual main-canvas scroll range is **zero** in every captured profile state; each profile card has no vertical/horizontal content overflow, and every visible profile control fits inside the pane. All captured tool-dialog containers/list rows also have zero scroll range and fit the viewport, including short RO and 125% RO cases.
+
+Behavior checks cover rating save/reload, category/skill-creation/skill/MCP selection saves, name and exact prompt-text persistence, searching and paging long catalogs, empty results, and selection state after reload. Resource grant add/revoke preserves a dirty prompt and rating. All tool dialogs retain keyboard containment, Escape and focus restoration; the existing grant-dialog checks pass. Initial runs exposed short-window overflow and a bottom control outside its card; compact styling and stronger card/control assertions corrected these. An ambiguous Skills test locator was scoped to the profile's tools section. The final run above passes all checks. The broader UI-repair fixture's obsolete dropdown selectors were updated and syntax-checked; that unrelated full fixture was not rerun. No full suite or deferred benchmarks were run.
+
+The production build retains the known Tiptap module-directive and large-chunk warnings. Source/native policy, user data and shipped artwork remain unchanged; only the profile presentation, dialog interaction and optional duplicate ModelPicker manual entry are changed. The source audit and ignored source ZIP are refreshed before the local commit for **1.06/package 1.0.6**. Windows source/UI verification does not close the target-Linux runtime/scaling or binary-release gates. Nothing is pushed, merged or published.
 
 ## Profile design alternatives — 15 October 2026
 
