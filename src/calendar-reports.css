@@ -368,10 +368,6 @@
   margin-top: 16px;
   color: var(--muted);
 }
-.agent-profile-layout {
-  grid-template-columns: minmax(240px, 1fr) minmax(280px, 1fr) minmax(280px, 1fr);
-  align-items: start;
-}
 .agent-ratings-card {
   padding: 24px;
   background: var(--surface);

@@ -1,5 +1,15 @@
 # Releases
 
+## 1.02 — UI repairs and theme consistency on dev
+
+- Space the Icons & identity disclosure and sharing buttons; remove repeated disclosure headings.
+- Consolidate workspace/memory switches and selected-agent resource policy, with expandable grant details and computer controls. Keep native permission, revision and approval behavior intact.
+- Arrange agent identity/ratings in one independent column, model/tools in another and resource access in a third, adapting to the available workspace width. Show each tool category once and persist the skill-creation switch with the profile.
+- Give model choices their own bounded scroll area; keep status and the providers action clear, focused options visible and ordinary Home/End text editing available in search.
+- Normalize Chat artwork bounds across all ten themes, correcting the larger Autumn override without changing assets. Improve secondary/small-label text contrast within the existing palettes.
+- Add a production Electron fixture for the reported defects and the full screen/theme review, with long catalogs, grant controls, keyboard checks, short/larger windows, text scaling, Romanian, setup/help and dialogs. Preserve the six original references and feedback.
+- Prepare public 1.02/package 1.0.2 locally. Target-Linux/live-provider/binary-release checks remain open; no push, merge or publication.
+
 ## 1.01 — local workspace and automation update on dev
 
 - Documentation follow-up: add a harness-independent agent handoff, update architecture/Linux/release guidance, and document local commits, source-ZIP regeneration and separate remote authorization. Application/package versions stay 1.01/1.0.1.

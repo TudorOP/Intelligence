@@ -352,7 +352,7 @@ try {
   );
   await page.getByRole('button', { name: 'Settings', exact: true }).click();
   await page.getByRole('button', { name: 'Agent access', exact: true }).click();
-  await page.getByText('Access for each agent', { exact: true }).first().click();
+  await page.locator('.resource-grants > summary').click();
   await page
     .locator('.grant-row')
     .filter({ hasText: 'Selected private notebook' })

@@ -298,6 +298,7 @@ try {
   await shot('task-agent-assignment');
   await page.getByRole('button', { name: 'Settings', exact: true }).click();
   await settingsSection(page, 'Agent access');
+  await page.locator('.computer-disclosure > summary').click();
   await page.getByLabel('File access scope', { exact: true }).selectOption('folders');
   await selectNative([path.join(directory, 'Downloads')]);
   await page.getByRole('button', { name: 'Add folder', exact: true }).click();

@@ -1,4 +1,4 @@
-# Intelligence 1.01
+# Intelligence 1.02
 
 Intelligence is a personal AI harness for people who do not want to manage a complicated toolchain. It brings conversations, notes, tasks and an assistant into one understandable Linux desktop workspace. The goal is to make working with AI easy to use and easy to understand, with clear controls over what the assistant can access and do.
 
@@ -48,6 +48,8 @@ No chat model or optional speech/archive engine is bundled. Downloads happen in 
 
 ## Workspace and ongoing work
 
+The 1.02 interface update spaces appearance/sharing controls, consolidates Agent access, and keeps profile ratings beside identity. Model choices scroll within their picker without covering its status or Settings action. Chat artwork uses the same bounds across all ten themes, with clearer secondary text colors. See the [UI repair review](docs/design/ui-repairs-2026-10-15/README.md) for visual references and verification coverage.
+
 The last project selection and desktop window bounds are restored. First launch uses a smaller 1280×800 window, fitted to the display. Model pickers support search; chat uses a symbolic model button. Matrix lists and Tasks assignments select an agent profile, carrying its model, style, skills and restrictions. Switching the active chat agent does not reassign existing work.
 
 Add sources attaches files/images or bounded folder snapshots, or identifies existing resources in notebook/task trees. Choose conversation-only copies or project retention. Originals are preserved; retained project copies survive chat deletion. Conversation-only files follow recoverable Trash, then are collected on permanent deletion when no branch still uses them. Automatic memory/skill learning stays off for these chats unless explicitly enabled. Existing exported backups remain independent copies.
@@ -64,8 +66,8 @@ Install Docker Engine and Compose, then run from this source directory:
 
 ```bash
 docker compose run --build --rm appimage
-chmod +x release/Intelligence-1.0.1-x86_64.AppImage
-./release/Intelligence-1.0.1-x86_64.AppImage
+chmod +x release/Intelligence-1.0.2-x86_64.AppImage
+./release/Intelligence-1.0.2-x86_64.AppImage
 ```
 
 Release/AppImage packaging runs only inside Linux Docker. Docker is needed to build, not to run. See [the Linux handoff](docs/LINUX_HANDOFF.md) for runtime dependencies, sandbox/desktop checks and the source-distribution checklist.
@@ -88,11 +90,11 @@ Data normally lives in `~/.config/Intelligence/`, follows `XDG_CONFIG_HOME`, and
 
 Continuing with another coding harness or agent? Start with the [development handoff](docs/AGENT_HANDOFF.md). It covers the current checkpoint, required reading, native boundaries, verification, versioning, local commits and the separate authorization required for remote actions.
 
-The [1.0 plan](docs/ONBOARDING_1_0_PLAN.md), [implementation notes](docs/ONBOARDING_1_0_IMPLEMENTATION.md) and retained ImageGen concepts document this development milestone. Main still holds the reviewed 0.94 release; 1.01 is prepared locally on dev and is not published. The [workspace and automation plan](docs/WORKSPACE_1_01_PLAN.md) records this update.
+The [1.0 plan](docs/ONBOARDING_1_0_PLAN.md), [implementation notes](docs/ONBOARDING_1_0_IMPLEMENTATION.md) and retained ImageGen concepts document that development milestone. Main still holds the reviewed 0.94 release; 1.02 is prepared locally on dev and is not published. The [workspace and automation plan](docs/WORKSPACE_1_01_PLAN.md) records the prior 1.01 update.
 
 Use `npm ci`, `npm run dev`, `npm run build` and `npm test`. Run `node scripts/verify-source.mjs` before sharing source. Desktop fixtures use isolated data under `.test-data/`. See [verification](docs/VERIFICATION.md), [architecture and development](docs/DEVELOPMENT.md), [appearance](docs/APPEARANCE.md) and [release acceptance](docs/RELEASE_CHECKLIST.md).
 
-The public release label is 1.01 (package 1.0.1). Normal updates continue to add 0.01: 1.02, 1.03 and so on. `node scripts/bump-version.mjs` advances the label and its semantic package version together.
+The public release label is 1.02 (package 1.0.2). Normal updates continue to add 0.01: 1.03, 1.04 and so on. `node scripts/bump-version.mjs` advances the label and its semantic package version together.
 
 After verified changes, refresh the relevant docs and local `Intelligence-source.zip`, then create the local commit with `scripts/commit-version.mjs`. Documentation-only follow-ups retain the app version. The ZIP is rebuilt from audited tracked source by `scripts/archive-source.ps1`; `*.zip` intentionally keeps it out of Git. It does not contain Git history, installed dependencies or user data, and is not uploaded by a Git push. Stage intended new files before archiving; inspect the entire tree before the commit helper, which runs `git add .`.
 

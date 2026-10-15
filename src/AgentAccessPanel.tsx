@@ -38,6 +38,7 @@ export default function AgentAccessPanel({
   if (!profile) return null;
   const grants: { id: string; permission: string; fingerprint?: string }[] =
     profile.data.resourceGrants || [];
+  const temporaryGrants = snapshot.temporaryAccess?.filter((g) => g.profile === profile.id) || [];
   const save = async (data: Record<string, unknown>) => {
     setBusy(true);
     try {
@@ -73,30 +74,36 @@ export default function AgentAccessPanel({
     .slice(0, 100);
   return (
     <section className="settings-card agent-grants">
-      <h3>{t('Access for each agent')}</h3>
-      {!profileId && (
+      <h3>{t(profileId ? 'Resource access' : 'Access for each agent')}</h3>
+      <div className="grant-policy-fields">
+        {!profileId && (
+          <label>
+            {t('Agent')}
+            <select
+              value={profile.id}
+              onChange={(e) => setSelected(e.target.value)}
+              disabled={busy}
+            >
+              {profiles.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.title}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
         <label>
-          {t('Agent')}
-          <select value={profile.id} onChange={(e) => setSelected(e.target.value)} disabled={busy}>
-            {profiles.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.title}
-              </option>
-            ))}
+          {t('Resource policy')}
+          <select
+            disabled={busy}
+            value={profile.data.resourcePolicy || 'shared'}
+            onChange={(e) => void save({ resourcePolicy: e.target.value })}
+          >
+            <option value="shared">{t('Use resources already shared with agents')}</option>
+            <option value="ask">{t('Selected resources only; ask when needed')}</option>
           </select>
         </label>
-      )}
-      <label>
-        {t('Resource policy')}
-        <select
-          disabled={busy}
-          value={profile.data.resourcePolicy || 'shared'}
-          onChange={(e) => void save({ resourcePolicy: e.target.value })}
-        >
-          <option value="shared">{t('Use resources already shared with agents')}</option>
-          <option value="ask">{t('Selected resources only; ask when needed')}</option>
-        </select>
-      </label>
+      </div>
       <label className="setting-switch">
         <span>
           {t('Allow setup and access requests')}
@@ -126,55 +133,57 @@ export default function AgentAccessPanel({
         ))}
         <small>{t('Shows up to 100 matching collections. Child exceptions still apply.')}</small>
       </details>
-      {grants.map((g) => (
-        <div className="grant-row" key={g.id}>
-          <span>
-            {snapshot.entities.find((e) => e.id === g.id)?.title || t('Unavailable resource')}
-            <small>{t(g.permission === 'edit' ? 'Read & edit' : 'Read')}</small>
-          </span>
-          <button
+      <details className="resource-grants">
+        <summary>
+          {t('Resource grants')} <small>{grants.length + temporaryGrants.length}</small>
+        </summary>
+        {grants.map((g) => (
+          <div className="grant-row" key={g.id}>
+            <span>
+              {snapshot.entities.find((e) => e.id === g.id)?.title || t('Unavailable resource')}
+              <small>{t(g.permission === 'edit' ? 'Read & edit' : 'Read')}</small>
+            </span>
+            <button
+              disabled={busy}
+              onClick={() => void save({ resourceGrants: grants.filter((p) => p.id !== g.id) })}
+            >
+              {t('Revoke')}
+            </button>
+          </div>
+        ))}
+        {!grants.length && <p>{t('No permanent resource grants for this agent.')}</p>}
+        <label>
+          {t('Grant read access to a selected resource')}
+          <input
+            aria-label={t('Find a resource')}
+            placeholder={t('Find a resource')}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+          <select
+            value=""
             disabled={busy}
-            onClick={() => void save({ resourceGrants: grants.filter((p) => p.id !== g.id) })}
+            onChange={(e) => {
+              if (e.target.value)
+                void save({
+                  resourceGrants: [...grants, { id: e.target.value, permission: 'read' }],
+                });
+            }}
           >
-            {t('Revoke')}
-          </button>
-        </div>
-      ))}
-      {!grants.length && <p>{t('No permanent resource grants for this agent.')}</p>}
-      <label>
-        {t('Grant read access to a selected resource')}
-        <input
-          aria-label={t('Find a resource')}
-          placeholder={t('Find a resource')}
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
-        <select
-          value=""
-          disabled={busy}
-          onChange={(e) => {
-            if (e.target.value)
-              void save({
-                resourceGrants: [...grants, { id: e.target.value, permission: 'read' }],
-              });
-          }}
-        >
-          <option value="">{t('Choose a resource')}</option>
-          {choices.map((e) => (
-            <option key={e.id} value={e.id}>
-              {e.title} · {t(resourceLabel(e.kind))}
-            </option>
-          ))}
-        </select>
-      </label>
-      <small>
-        {t(
-          'To change read access to editing, approve an exact agent request or remove and reselect the grant during setup.',
-        )}
-      </small>
-      {snapshot.temporaryAccess
-        ?.filter((g) => g.profile === profile.id)
-        .map((g) => (
+            <option value="">{t('Choose a resource')}</option>
+            {choices.map((e) => (
+              <option key={e.id} value={e.id}>
+                {e.title} · {t(resourceLabel(e.kind))}
+              </option>
+            ))}
+          </select>
+        </label>
+        <small>
+          {t(
+            'To change read access to editing, approve an exact agent request or remove and reselect the grant during setup.',
+          )}
+        </small>
+        {temporaryGrants.map((g) => (
           <div className="grant-row" key={g.conversation + g.resource}>
             <span>
               {snapshot.entities.find((e) => e.id === g.resource)?.title ||
@@ -193,6 +202,7 @@ export default function AgentAccessPanel({
             </button>
           </div>
         ))}
+      </details>
     </section>
   );
 }

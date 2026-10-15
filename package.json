@@ -1,6 +1,6 @@
 {
   "name": "intelligence",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "private": true,
   "description": "A thoughtful local-first AI companion for your Linux desktop.",
   "desktopName": "app.intelligence.desktop.desktop",

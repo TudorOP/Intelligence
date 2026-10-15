@@ -1,18 +1,18 @@
-# Intelligence 1.01 — release acceptance
+# Intelligence 1.02 — release acceptance
 
-The current workspace features are described in README.md. The 1.0 baseline passed 223 enabled backend checks. Current 1.01 verification is recorded in docs/VERIFICATION.md. Source publication is separate from the remaining binary-release gates. Verification procedures and limitations are documented in docs/VERIFICATION.md.
+The current workspace features are described in README.md. The 1.0 baseline passed 223 enabled backend checks. Current verification is recorded in docs/VERIFICATION.md. Source publication is separate from the remaining binary-release gates. Verification procedures and limitations are documented in docs/VERIFICATION.md.
 
-## Queued UI repairs — screenshot review, 15 October 2026
+## Completed UI repairs — 1.02, 15 October 2026
 
-The [repair checklist and six original screenshots](docs/design/ui-repairs-2026-10-15/README.md) preserve the reported defects and acceptance criteria. This follow-up records future work; implementation is still pending.
+The [repair checklist and six original screenshots](docs/design/ui-repairs-2026-10-15/README.md) preserve the reported defects and acceptance criteria. Local source repairs and the full Windows UI/theme review are complete. See the linked review evidence and VERIFICATION.md; target-Linux acceptance remains open below.
 
-- [ ] Fix spacing and the repeated heading around Icons & identity (image 1).
-- [ ] Add consistent spacing and narrow-window wrapping between Notebook sharing and Task sharing (image 2).
-- [ ] Streamline Agent access and Access for each agent into a coherent flow, remove duplicated controls and preserve every native permission boundary (image 3).
-- [ ] Repair the agent profile layout so ratings and access sections do not leave large empty grid areas (image 4).
-- [ ] Fix shared model-picker scrolling so choices cannot overlap status text or the footer in either chat surface (images 5–6).
-- [ ] Complete a full UI pass across every screen and all ten themes: check consistent spacing, typography, controls, imagery, contrast and interaction states. Investigate the reported larger Chat image in Autumn against the same view in other themes; details and acceptance criteria are in the repair checklist.
-- [ ] Complete the checklist's visual, keyboard, localization and permission checks before marking these repairs complete; then follow the normal version/docs/archive/local-commit workflow.
+- [x] Fix spacing and the repeated heading around Icons & identity (image 1).
+- [x] Add consistent spacing and narrow-window wrapping between Notebook sharing and Task sharing (image 2).
+- [x] Streamline Agent access and Access for each agent into a coherent flow, remove duplicated controls and preserve every native permission boundary (image 3).
+- [x] Repair the agent profile layout so ratings and access sections do not leave large empty grid areas (image 4).
+- [x] Fix shared model-picker scrolling so choices cannot overlap status text or the footer in either chat surface (images 5–6).
+- [x] Complete a full UI pass across every screen and all ten themes: check consistent spacing, typography, controls, imagery, contrast and interaction states. Investigate the reported larger Chat image in Autumn against the same view in other themes; details and acceptance criteria are in the repair checklist.
+- [x] Complete the checklist's visual, keyboard, localization and permission checks before marking these repairs complete; then follow the normal version/docs/archive/local-commit workflow.
 
 ## Required on the target Linux host
 

@@ -7,15 +7,17 @@ export default function ComputerAccessPanel({
   settings,
   onUpdate,
   onError,
+  embedded = false,
 }: {
   settings: Settings;
   onUpdate: (s: Partial<Settings>) => Promise<any>;
   onError: (e: any) => void;
+  embedded?: boolean;
 }) {
   const update = (s: Partial<Settings>) => void onUpdate(s).catch(onError);
   return (
-    <section className="settings-card computer-access">
-      <h3>{t('Computer access')}</h3>
+    <section className={'computer-access' + (embedded ? '' : ' settings-card')}>
+      {!embedded && <h3>{t('Computer access')}</h3>}
       <label>
         {t('File access scope')}
         <select

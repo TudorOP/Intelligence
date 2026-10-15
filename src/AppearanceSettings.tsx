@@ -10,10 +10,12 @@ export default function AppearanceSettings({
   settings,
   onUpdate,
   identity = false,
+  embedded = false,
 }: {
   settings: Settings;
   onUpdate: (s: Partial<Settings>) => Promise<any>;
   identity?: boolean;
+  embedded?: boolean;
 }) {
   const [backgroundError, setBackgroundError] = useState('');
   const [importingBackground, setImportingBackground] = useState(false);
@@ -38,8 +40,8 @@ export default function AppearanceSettings({
   if (identity)
     return (
       <section className="settings-section">
-        <span className="eyebrow">{t('IDENTITY')}</span>
-        <h2>{t('Icons & identity')}</h2>
+        {!embedded && <span className="eyebrow">{t('IDENTITY')}</span>}
+        {!embedded && <h2>{t('Icons & identity')}</h2>}
         <div className="settings-grid settings-icon-cards">
           {(
             [

@@ -55,7 +55,7 @@ export default function SearchPicker({
       const r = trigger.current!.getBoundingClientRect(),
         width = Math.min(380, innerWidth - 16);
       const above = innerHeight - r.bottom < 320 && r.top > innerHeight - r.bottom;
-      const maxHeight = Math.min(440, Math.max(120, (above ? r.top : innerHeight - r.bottom) - 16));
+      const maxHeight = Math.min(440, Math.max(0, (above ? r.top : innerHeight - r.bottom) - 16));
       const height = Math.min(panel.current?.scrollHeight || 400, maxHeight);
       setPosition({
         left: Math.max(8, Math.min(r.left, innerWidth - width - 8)),
@@ -134,7 +134,11 @@ export default function SearchPicker({
                 e.stopPropagation();
                 close();
               }
-              if (['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(e.key)) {
+              if (
+                ['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(e.key) &&
+                (!(e.target instanceof HTMLInputElement) ||
+                  ['ArrowDown', 'ArrowUp'].includes(e.key))
+              ) {
                 const buttons = Array.from(
                   panel.current!.querySelectorAll<HTMLButtonElement>(
                     '.picker-option:not(:disabled)',
@@ -143,13 +147,21 @@ export default function SearchPicker({
                 if (!buttons.length) return;
                 e.preventDefault();
                 const index = buttons.indexOf(document.activeElement as HTMLButtonElement);
-                buttons[
-                  e.key === 'Home'
-                    ? 0
-                    : e.key === 'End'
-                      ? buttons.length - 1
-                      : (index + (e.key === 'ArrowUp' ? -1 : 1) + buttons.length) % buttons.length
-                ]?.focus();
+                const next =
+                  buttons[
+                    e.key === 'Home'
+                      ? 0
+                      : e.key === 'End'
+                        ? buttons.length - 1
+                        : index < 0
+                          ? e.key === 'ArrowUp'
+                            ? buttons.length - 1
+                            : 0
+                          : (index + (e.key === 'ArrowUp' ? -1 : 1) + buttons.length) %
+                            buttons.length
+                  ];
+                next?.focus({ preventScroll: true });
+                next?.scrollIntoView({ block: 'nearest' });
               }
             }}
           >

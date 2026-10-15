@@ -1,6 +1,22 @@
-# Intelligence 1.01 — verification
+# Intelligence 1.02 — verification
 
-The 1.01 update adds saved workspace/window state, shared searchable pickers, retained conversation attachments, named task agents, computer scope and command policy, managed commands and durable inbox monitoring. The update is verified locally on dev. No push/publication or Linux binary build is authorized.
+The 1.02 update repairs appearance/sharing spacing, consolidates access controls, balances agent profiles, contains model-picker scrolling and normalizes Chat artwork across themes. It includes a full UI review and clearer secondary text colors. This is local source verification on `dev`; no push/publication or Linux binary build was performed.
+
+## 1.02 results — 15 October 2026
+
+All **232 enabled backend checks** passed during implementation, retaining the package script's deferred context/compaction exclusions. TypeScript and the final production renderer build pass. The four appearance/release-version checks also passed after the 1.02 bump. Build diagnostics retain the large-chunk and upstream Tiptap module-directive warnings.
+
+The final production Electron UI fixture passed **502 captures** with `node scripts/verify-ui-repairs.mjs --states`, plus **132 captures** with `--supplemental`. Both used the same fixed 1.02 renderer and isolated data, with no renderer errors or horizontal overflow in the measured surfaces. These counts include repeated focused/responsive checks, not 634 unique screens. The [review evidence](design/ui-repairs-2026-10-15/REVIEW.md) maps the coverage across all ten themes. Full-size defect/responsive captures and comparison sheets were inspected for layout, spacing, typography, readable controls, artwork proportions and theme consistency.
+
+The fixture verifies matching 520×248.39 CSS-pixel Chat artwork bounds in all themes at 1920×1080; Autumn previously used 660×314.55. It checks a 360-plus-model catalog in both chats, clipped/scrolled choices, keyboard focus visibility/Escape restoration, empty search, long model names and unavailable-provider status. It exercises grant add/revoke, confirms global suspension preserves permanent grants, checks ten unique tool categories and saves the skill-creation preference. Primary/secondary/small-label text tokens meet a measured 4.5:1 contrast against base, surface, sidebar and hover colors in every theme. This token check does not establish accessibility for every custom accent, artwork or device.
+
+The final theme/background fixture passes 20 captures (`node scripts/verify-themes.mjs`), including independent artwork/blur, imported-image persistence, Pause AI, larger/shorter windows and Romanian. Settings (27 captures), profiles, onboarding (17 captures, including real native approvals/revocation) and workspace/automation (11 captures) fixtures passed during implementation. Fixture selectors were updated to open the new resource/computer disclosures before checking their existing behavior. No native permission service was changed.
+
+Successful local artifacts are retained under `.test-data/`: `ui-repairs-after-1792081516478` (502), `ui-repairs-after-1792081814009` (132), `ui-polish-1792081516524` (20), `settings-1792080891999`, `profiles-1792080892017`, `onboarding-1792081123748` and `workspace-automation-1792080973300`. The pre-repair comparison is `ui-repairs-before-1792080669048` (18). Generated screenshots/results/comparison sheets stay ignored; the six original references remain tracked. The audited local source ZIP is refreshed after staging the new fixture/review document.
+
+During verification, the theme fixture detected a 7 px collapsed Look & feel overrun; reducing the disclosure's internal padding fixed it while keeping its 24 px outer gap. Early captures could catch a lazy section before loading; the fixture now waits for the section fallback to disappear and deliberately opens shelf/board views. A run interrupted by rebuilding `dist` lost a lazy chunk; it was discarded and repeated against the fixed build. Earlier fixture development failures are not acceptance evidence.
+
+These checks run on Windows. Linux compositor/font/scaling/sandbox/tray checks, actual providers/models and optional device/engine workflows remain open target-host acceptance. The full Linux binary/license/corresponding-source audit is still required before distribution. No context-length benchmark, token-overhead work, AppImage build, push, merge or publication was performed.
 
 ## 1.01 results
 
@@ -12,13 +28,13 @@ The implementation source audit passed with 930 files and 442 complete indexed n
 
 These checks ran on Windows with isolated fixture data. Actual Linux shell execution/process-group cancellation, desktop/window restoration across Wayland/X11, live providers and real download workflows remain target-host acceptance checks. Inbox readiness is a size/mtime stability heuristic, not a guarantee that another program has closed a file. Monitoring requires the application to run, including in its tray; startup/resume reconciles missed files. Command jobs end with their response/run; persistent shell state and a standalone monitoring service remain deferred. Context-length benchmarking and token-overhead work remain excluded. No binary was built, pushed or published.
 
-## UI repair planning follow-up — 15 October 2026
+## UI repair planning history — 15 October 2026
 
 The [queued repair checklist](design/ui-repairs-2026-10-15/README.md) records the six user-supplied defect screenshots, original feedback, affected components and acceptance checks. All six screenshots were copied unchanged and compared against their originals with SHA-256. The feedback text is preserved with its extra trailing blank line removed for the whitespace check. Local Markdown links, all six embedded PNG references, pending status and unchanged package version 1.0.1 were checked. The tracked-source and archive audits were repeated after staging the new references; the ignored local source ZIP includes them.
 
-This is documentation and visual context only. Spacing, access consolidation, agent layout and picker overflow remain unfixed. Application tests were not rerun; the earlier results above do not establish acceptance for these reported defects. No push or publication occurred.
+At that planning checkpoint, this was documentation and visual context only: spacing, access consolidation, agent layout and picker overflow remained unfixed. Application tests were not rerun for that documentation-only work. The subsequent authorized implementation and fresh evidence are recorded in the 1.02 results above.
 
-The checklist was subsequently extended to require a full UI pass across every screen and all ten themes, including reproduction of the reported larger Chat image in Autumn under matched viewport/scale conditions. This follow-up checks the documentation, local links and source/archive contents only; no theme comparison, UI repair or application test is claimed as completed. Version remains 1.01/package 1.0.1.
+The checklist was then extended to require a full UI pass across every screen and all ten themes, including reproduction of the reported larger Chat image in Autumn under matched viewport/scale conditions. That documentation follow-up checked local links and source/archive contents only, retaining version 1.01/package 1.0.1 until application implementation began.
 
 ## 1.0 baseline
 

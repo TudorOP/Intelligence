@@ -2230,5 +2230,9 @@
   "Require native review for destructive computer-file operations and shell commands that cannot be classified safely.": "Solicită verificare nativă pentru operațiile distructive asupra fișierelor calculatorului și comenzile shell care nu pot fi clasificate în siguranță.",
   "Conversation-only copies follow chat deletion. Project copies remain after the chat is deleted.": "Copiile păstrate doar în conversație urmează ștergerea acesteia. Copiile din proiect rămân după ștergerea conversației.",
   "Choose where retained file copies are stored. Original external files are preserved.": "Alege unde sunt păstrate copiile fișierelor. Fișierele externe originale sunt păstrate.",
-  "Wait for running command sessions before recording the task outcome": "Așteaptă încheierea comenzilor în curs înainte de înregistrarea rezultatului sarcinii"
+  "Wait for running command sessions before recording the task outcome": "Așteaptă încheierea comenzilor în curs înainte de înregistrarea rezultatului sarcinii",
+  "Set app-wide access, then choose what each agent can use.": "Stabilește accesul general al aplicației, apoi alege ce poate folosi fiecare agent.",
+  "Resource access": "Acces la resurse",
+  "Resource grants": "Permisiuni pentru resurse",
+  "Tool categories": "Categorii de instrumente"
 }

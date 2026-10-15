@@ -21,13 +21,13 @@ If starting from `Intelligence-source.zip`, remember that it contains source, no
 
 ## Current checkpoint
 
-As of 15 October 2026, the app is **1.01**, package **1.0.1**. The feature implementation is commit `d7a380b` on `dev`; later documentation commits may follow it. The last observed `main` was reviewed 0.94 at `12a56d2`. These are a dated checkpoint, not a substitute for checking current refs. Remote-tracking refs can be stale.
+As of 15 October 2026, the app is **1.02**, package **1.0.2**, prepared locally on `dev`. The UI repair update follows the planning commit `d84f340`; read `git log` for its final local commit. The prior 1.01 feature implementation is `d7a380b`. The last observed `main` was reviewed 0.94 at `12a56d2`. These are a dated checkpoint, not a substitute for checking current refs. Remote-tracking refs can be stale.
 
 The 1.01 implementation includes saved project/window state, shared searchable model/agent pickers, Add sources with retention, Matrix/Tasks agent assignments, computer scopes, managed commands and durable inbox monitoring. The completed checklist is [WORKSPACE_1_01_PLAN.md](WORKSPACE_1_01_PLAN.md). The implementation passed 232 enabled backend checks, TypeScript, the production build and the desktop fixtures recorded in VERIFICATION.md. This is source verification on Windows, not a verified Linux binary release.
 
 Monitoring needs the application open or in the tray. It reconciles missed files after startup/resume; file readiness is a stability heuristic. Command jobs are bounded to their response/run. True persistent shell state and a standalone background monitoring service remain deferred. Do not silently promise either capability.
 
-The 15 October screenshot review is queued in [the UI repair checklist](design/ui-repairs-2026-10-15/README.md), with six original visual references and the user's feedback retained alongside it. This documentation follow-up records spacing, access consolidation, profile layout and model-picker overflow work, plus a full UI consistency pass across every screen and all ten themes. The user also reports that the large Chat image seems bigger in Autumn; reproduce and compare its sizing across themes. No application fixes have landed from that review. Read the checklist and current user request before implementation.
+The 1.02 [UI repair checklist](design/ui-repairs-2026-10-15/README.md) retains the six original visual references and feedback. It covers spacing, consolidated access controls, independent profile columns, bounded model-picker scrolling, normalized Autumn Chat artwork and a full UI review across all ten themes. Secondary text contrast is improved within the existing palettes. See VERIFICATION.md for the actual Windows fixture results, capture coverage and remaining target-Linux/live-provider limits. Permission and revision enforcement remains native; no artwork assets or user data were replaced.
 
 The next work comes from the user's request or the still-open target-Linux acceptance checklist in TODO.md. Do not automatically resume context-length benchmarks, token-overhead testing/estimation or animated backgrounds; those are explicitly deferred or excluded.
 
@@ -101,7 +101,7 @@ Normal application updates advance the public label by 0.01 using:
 node scripts/bump-version.mjs
 ```
 
-The script updates package.json and both lockfile versions. Public 1.01 maps to package 1.0.1; the next normal app update is public 1.02/package 1.0.2. Do not manually assume the public label is a semantic version. Documentation-only follow-ups retain the current application version unless the user requests a new release. Internal schema versions are independent.
+The script updates package.json and both lockfile versions. Public 1.02 maps to package 1.0.2; the next normal app update is public 1.03/package 1.0.3. Do not manually assume the public label is a semantic version. Documentation-only follow-ups retain the current application version unless the user requests a new release. Internal schema versions are independent.
 
 After verification, update README, CHANGELOG, TODO, UI_UX and related docs as applicable. Distinguish completed source work from open Linux/live-provider/binary gates. Review `git diff` and `git diff --cached`, then stage only the intended source/doc paths, including new files. Stage new files **before** the audit/archive: both use `git ls-files` and would otherwise omit them.
 

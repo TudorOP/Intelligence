@@ -276,68 +276,69 @@ export default function SettingsDialog({
                 identity={section === 'icons'}
               />
               {section === 'appearance' && (
-                <details>
+                <details className="settings-disclosure identity-disclosure">
                   <summary>{t('Icons & identity')}</summary>
-                  <AppearanceSettings settings={settings} onUpdate={changeSettings} identity />
+                  <AppearanceSettings
+                    settings={settings}
+                    onUpdate={changeSettings}
+                    identity
+                    embedded
+                  />
                 </details>
               )}
             </>
           )}
           {section === 'access' && (
-            <section className="settings-section">
+            <section className="settings-section access-settings">
               <span className="eyebrow">{t('IN YOUR HANDS')}</span>
               <h2>{t('Agent access')}</h2>
-              <div className="settings-grid">
+              <p>{t('Set app-wide access, then choose what each agent can use.')}</p>
+              <div className="access-settings-stack">
                 <section className="settings-card">
                   <h3>{t('Workspace resources')}</h3>
-                  <button onClick={() => onResources('notebooks')}>{t('Notebook sharing')}</button>
-                  <button onClick={() => onResources('tasks')}>{t('Task sharing')}</button>
-                  {(
-                    [
-                      ['notebookAccess', 'Notebook access'],
-                      ['vaultAccess', 'Vault access'],
-                      ['kanbanAccess', 'Task board access'],
-                      ['calendarAccess', 'Calendar access'],
-                      ['reportsAccess', 'Reports access'],
-                    ] as const
-                  ).map(([key, label]) => (
-                    <label className="setting-switch" key={key}>
-                      <span>{t(label)}</span>
-                      <Switch
-                        checked={settings[key]}
-                        onChange={(e) => void changeSettings({ [key]: e.target.checked })}
-                      />
-                    </label>
-                  ))}
-                </section>
-                <section className="settings-card">
-                  <h3>{t('Memory & host tools')}</h3>
-                  {([['memoryAccess', 'Memory recall']] as const).map(([key, label]) => (
-                    <label className="setting-switch" key={key}>
-                      <span>{t(label)}</span>
-                      <Switch
-                        checked={settings[key]}
-                        onChange={(e) => void changeSettings({ [key]: e.target.checked })}
-                      />
-                    </label>
-                  ))}
+                  <div className="settings-action-row">
+                    <button onClick={() => onResources('notebooks')}>
+                      {t('Notebook sharing')}
+                    </button>
+                    <button onClick={() => onResources('tasks')}>{t('Task sharing')}</button>
+                  </div>
+                  <div className="resource-switches">
+                    {(
+                      [
+                        ['notebookAccess', 'Notebook access'],
+                        ['vaultAccess', 'Vault access'],
+                        ['kanbanAccess', 'Task board access'],
+                        ['calendarAccess', 'Calendar access'],
+                        ['reportsAccess', 'Reports access'],
+                        ['memoryAccess', 'Memory recall'],
+                      ] as const
+                    ).map(([key, label]) => (
+                      <label className="setting-switch" key={key}>
+                        <span>{t(label)}</span>
+                        <Switch
+                          checked={settings[key]}
+                          onChange={(e) => void changeSettings({ [key]: e.target.checked })}
+                        />
+                      </label>
+                    ))}
+                  </div>
                   <p className="settings-note">
                     {t(
                       'Resource switches suspend existing grants. Individual items and agent profiles still control what can be used.',
                     )}
                   </p>
-                  <p className="settings-note">
-                    {t(
-                      'Host commands have broader file access and follow your chosen approval mode.',
-                    )}
-                  </p>
                 </section>
-              </div>
-              <ComputerAccessPanel settings={settings} onUpdate={changeSettings} onError={fail} />
-              <details className="agent-grants-menu">
-                <summary>{t('Access for each agent')}</summary>
                 <AgentAccessPanel snapshot={snapshot} onChanged={boot} onError={fail} />
-              </details>
+                <details className="settings-disclosure computer-disclosure">
+                  <summary>{t('Computer access')}</summary>
+                  <ComputerAccessPanel
+                    settings={settings}
+                    onUpdate={changeSettings}
+                    onError={fail}
+                    embedded
+                  />
+                </details>
+              </div>
             </section>
           )}
           {section === 'automation' && (

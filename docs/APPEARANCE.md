@@ -2,6 +2,10 @@
 
 Ten themes are available: Ink, Day, Night, Summer, Autumn, Winter Wonderland, Festive, Tech, Astral and Marble & gold. Follow the system remains an option. The Night toggle remembers the chosen return theme.
 
+The 1.02 UI pass uses the same Chat welcome-artwork bounds across all ten themes. Autumn's complete panorama uses contain sizing inside that shared frame; original assets and provenance are unchanged. The standard 1920×1080 frame measures 520×248.39 CSS px. Secondary/small-label colors are checked at 4.5:1 or better against the base, surface, sidebar and hover colors in every theme; this token check does not replace visual inspection of artwork, custom accents or target-Linux rendering.
+
+Icons & identity is a spaced, initially collapsed disclosure with a single title. The expanded app/tray/logo cards retain independent settings. Sharing actions wrap with a consistent gap; permission and computer details use the same theme surfaces as other Settings controls.
+
 Festive uses deep burgundy and evergreen with restrained champagne gold; Tech uses charcoal/emerald technical geometry; Astral uses navy/brass constellation imagery; Marble uses ivory/gray stone and brushed gold. Each has category artwork and a detailed welcome panorama. Text/controls use solid theme surfaces. Gold is an accent, not a low-contrast body-text color.
 
 In Settings → Look & feel, Still artwork can follow the theme, use another built-in theme's background or use Your image. Choose background image accepts PNG/JPEG/WebP up to 20 MiB; the native importer checks decoding/pixel limits, removes metadata, bounds output to 2560×1440 and stores a managed WebP. Remove image clears the selected reference. Backup includes managed images; shared images remain protected from unrelated Trash deletion.
