@@ -12,7 +12,7 @@ Develop new work on `dev`; `main` holds reviewed releases and remains the GitHub
 
 Run only tests and fixtures relevant to the change; broaden testing only when a failure or issue needs debugging. Collection UI changes use `node scripts/verify-collection-layout.mjs` against a built renderer with varied content and visual inspection. A single representative item is insufficient to check consistent sizes or optional metadata states.
 
-Release labels advance by hundredths using `scripts/bump-version.mjs`; public 1.04 is package 1.0.4, with 1.05/package 1.0.5 next. Verify, update docs, stage intended new source files, audit and rebuild `Intelligence-source.zip`, then use `scripts/commit-version.mjs`. Documentation-only follow-ups keep the app version. The commit helper stages the whole tree, so inspect for unrelated work first. The source ZIP is deliberately ignored by `*.zip`; do not force-add it or assume a push uploads it. Build Linux release artifacts only in Docker.
+Release labels advance by hundredths using `scripts/bump-version.mjs`; public 1.05 is package 1.0.5, with 1.06/package 1.0.6 next. Verify, update docs, stage intended new source files, audit and rebuild `Intelligence-source.zip`, then use `scripts/commit-version.mjs`. Documentation-only follow-ups keep the app version. The commit helper stages the whole tree, so inspect for unrelated work first. The source ZIP is deliberately ignored by `*.zip`; do not force-add it or assume a push uploads it. Build Linux release artifacts only in Docker.
 
 Internal database/backup/module schema versions are independent of public product numbering; preserve their compatibility checks. Do not renumber schemas as part of a product release.
 

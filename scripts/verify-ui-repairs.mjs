@@ -372,8 +372,14 @@ try {
   if (baseline) await page.locator('.agent-ratings-card > summary').click();
   else await page.locator('.agent-ratings-card h2').waitFor();
   if (!baseline) {
+    const toolsDropdown = page.locator('.agent-tools-card > summary');
+    if (await toolsDropdown.count()) await toolsDropdown.click();
     await page.locator('.agent-tool-choices').evaluate((e) => (e.open = true));
-    assert.equal(await page.locator('.agent-tool-choices .setting-switch').count(), 10);
+    const categoryCount = await page.locator('[data-tool-category]').count();
+    assert.equal(
+      categoryCount || (await page.locator('.agent-tool-choices .setting-switch').count()),
+      10,
+    );
     await shot('agent-tools-expanded');
     await page.locator('.agent-tool-choices > summary').click();
     await page.getByRole('switch', { name: 'Create reusable skills', exact: true }).uncheck();
@@ -385,8 +391,14 @@ try {
         false
       );
     });
+    if (
+      (await toolsDropdown.count()) &&
+      !(await toolsDropdown.locator('..').evaluate((e) => e.open))
+    )
+      await toolsDropdown.click();
     await page.getByRole('switch', { name: 'Create reusable skills', exact: true }).check();
     await page.getByRole('button', { name: 'Save profile', exact: true }).click();
+    if (await toolsDropdown.count()) await page.keyboard.press('Escape');
     results.checks.push('Ten unique tool categories and persisted skill-creation control');
   }
   await shot('agent-expanded');

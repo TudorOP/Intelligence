@@ -1,4 +1,16 @@
-# Intelligence 1.04 — verification
+# Intelligence 1.05 — verification
+
+## 1.05 classic profile and resource-access modal — 15 October 2026
+
+The user preferred the original 1.0 profile arrangement after reviewing the 1.04 captures and generated design studies. The implementation restores the layout from `830d401` while preserving current model selection, native fields and live draft merging. Resource access moves into the shared Modal component. See the [final layout review and retained concepts](design/agent-profile-2026-10-15/README.md).
+
+TypeScript, the production renderer build and the single release-version test pass. The focused production Electron fixture passes **27 captures** in `.test-data/profile-layout-1792088623758`. It checks profiles across all ten themes, English/Romanian, 1920×1080, 2560×1440, 3440×1440, 1366×768 and 1280×800, real 125% app zoom in EN/RO, an open assistant, long personality text and twenty additional skills/servers. Tested default desktop cases have no horizontal overflow and at most one pixel of vertical scroll-range rounding in `.main-canvas`; every profile card and all ratings remain inside the visible pane. Ratings remain open, tools start closed, and renderer errors are empty. Representative full-size captures were inspected.
+
+Behavior checks cover rating save/reload, tool-category and skill-creation persistence, a bounded tool menu and Escape/focus return. Resource access opens from the profile button, identifies the agent and reuses the current native grant editor. Modal tests cover live grant add/revoke, retained dirty personality and rating values across profile revisions, root inertness, Tab/Shift+Tab containment, Escape/focus restoration and bounded EN/RO dialogs at 1080p and 1366×768. Longer optional catalogs and the modal body may scroll internally. The profile's narrow single-column fallback remains available.
+
+The fixture now measures the actual scrolling `.main-canvas`; the earlier 1.04 card-bound checks were insufficient evidence for a zero-scroll claim. Electron zoom replaces CSS body zoom. The unpublished two-pane attempt revealed 125% overflow and was superseded by the final 1.0-style request; its intermediate runs are not acceptance evidence. A modal screenshot initially raced compositor painting; the final fixture flushes and waits before capture. No full suite or unrelated desktop catalog was run. Legacy profile/UI fixture selectors were updated for permanently visible ratings and the tool dropdown, but those broader fixtures are not claimed as freshly rerun.
+
+The build retains its existing Tiptap module-directive and large-chunk warnings. Native services, translations, user-authored content, data and shipped artwork are unchanged. Local links and staged/unstaged whitespace checks pass. The source audit passes with 952 files, 442 complete notices and no optional artifacts; the ignored source ZIP is refreshed for package 1.0.5. This is Windows source/UI verification; target-Linux fonts/scaling and binary release gates remain open. Nothing is pushed, merged or published.
 
 ## 1.04 profile, computer files and prompt follow-up — 15 October 2026
 

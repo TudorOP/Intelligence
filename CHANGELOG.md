@@ -1,5 +1,13 @@
 # Releases
 
+## 1.05 — classic agent profile and resource-access modal on dev
+
+- Restore the 1.0 profile arrangement: identity/personality, model/tools, and ratings/user context in three columns. Keep a larger personality field, modern searchable models and current profile save behavior.
+- Replace the in-page resource-access column with a profile button opening the shared grant editor in the native-style modal. Preserve unsaved preferences and ratings across live grant edits, Escape/focus restoration and keyboard containment.
+- Keep Tools and connections collapsed in a viewport-bounded menu. Retain original category grouping without duplicates, newer computer scope and skill restrictions, English/Romanian labels and saved values.
+- Strengthen the focused fixture to measure the actual main-canvas scroll range and use real Electron zoom rather than CSS body zoom. Retain generated design studies separately from the final 1.0-style implementation.
+- Prepare 1.05/package 1.0.5 locally. No push, merge or publication.
+
 ## 1.04 — visible profile ratings, computer files and stable prompts on dev
 
 - Use four compact profile columns at 1080p with ratings first, expanded tool/access sections and independent scrolling for long catalogs. Preserve rating saves, unsaved preferences and live grants.

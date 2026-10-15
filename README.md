@@ -1,4 +1,4 @@
-# Intelligence 1.04
+# Intelligence 1.05
 
 Intelligence is a personal AI harness for people who do not want to manage a complicated toolchain. It brings conversations, notes, tasks and an assistant into one understandable Linux desktop workspace. The goal is to make working with AI easy to use and easy to understand, with clear controls over what the assistant can access and do.
 
@@ -48,7 +48,7 @@ No chat model or optional speech/archive engine is bundled. Downloads happen in 
 
 ## Workspace and ongoing work
 
-The 1.04 update puts always-visible ratings at the top of a compact profile layout. At 1920×1080 the standard profile fits without page scrolling; long catalogs use their own scroll areas and shorter/narrower panes adapt. Computer access → Any file on the computer permits native file work outside projects within OS permissions, with separate action approvals and per-agent restrictions. The agent receives its effective scope/home/working directory and can inspect live file access. Home paths such as `~/Downloads` resolve correctly. Relevant skill bodies load on demand; skill names and selected-resource metadata stay with their user turn so they do not rewrite the system prefix. See [verification and inference notes](docs/PROFILE_FILES_AND_PROMPT.md).
+The 1.05 profile restores the familiar 1.0 arrangement: identity and personality on the left, model and collapsed tools in the middle, and always-visible ratings/user context on the right. Resource access opens from a profile button in a focused modal. The larger personality field and standard profile fit without page scrolling at 1080p. See the [profile layout review](docs/design/agent-profile-2026-10-15/README.md). The 1.04 native file and prompt changes remain: Computer access → Any file on the computer permits native file work outside projects within OS permissions, with separate action approvals and per-agent restrictions. The agent receives its effective scope/home/working directory and can inspect live file access. Home paths such as `~/Downloads` resolve correctly. Relevant skill bodies load on demand; skill names and selected-resource metadata stay with their user turn so they do not rewrite the system prefix. See [verification and inference notes](docs/PROFILE_FILES_AND_PROMPT.md).
 
 The 1.03 follow-up gives Skills, Projects and Connections equal-size cards within each collection. Skills availability and instruction actions align at the bottom; list mode keeps learned-skill metadata in a dedicated area so it cannot squeeze the instruction button. Rows adapt to the available pane width. See the [collection repair review](docs/design/collection-layout-2026-10-15/README.md).
 
@@ -70,8 +70,8 @@ Install Docker Engine and Compose, then run from this source directory:
 
 ```bash
 docker compose run --build --rm appimage
-chmod +x release/Intelligence-1.0.4-x86_64.AppImage
-./release/Intelligence-1.0.4-x86_64.AppImage
+chmod +x release/Intelligence-1.0.5-x86_64.AppImage
+./release/Intelligence-1.0.5-x86_64.AppImage
 ```
 
 Release/AppImage packaging runs only inside Linux Docker. Docker is needed to build, not to run. See [the Linux handoff](docs/LINUX_HANDOFF.md) for runtime dependencies, sandbox/desktop checks and the source-distribution checklist.
@@ -94,11 +94,11 @@ Data normally lives in `~/.config/Intelligence/`, follows `XDG_CONFIG_HOME`, and
 
 Continuing with another coding harness or agent? Start with the [development handoff](docs/AGENT_HANDOFF.md). It covers the current checkpoint, required reading, native boundaries, verification, versioning, local commits and the separate authorization required for remote actions.
 
-The [1.0 plan](docs/ONBOARDING_1_0_PLAN.md), [implementation notes](docs/ONBOARDING_1_0_IMPLEMENTATION.md) and retained ImageGen concepts document that development milestone. Main still holds the reviewed 0.94 release; 1.04 is prepared locally on dev and is not published. The [workspace and automation plan](docs/WORKSPACE_1_01_PLAN.md) records the prior 1.01 update.
+The [1.0 plan](docs/ONBOARDING_1_0_PLAN.md), [implementation notes](docs/ONBOARDING_1_0_IMPLEMENTATION.md) and retained ImageGen concepts document that development milestone. Main still holds the reviewed 0.94 release; 1.05 is prepared locally on dev and is not published. The [workspace and automation plan](docs/WORKSPACE_1_01_PLAN.md) records the prior 1.01 update.
 
 Use `npm ci`, `npm run dev`, `npm run build` and `npm test`. Run `node scripts/verify-source.mjs` before sharing source. Desktop fixtures use isolated data under `.test-data/`. See [verification](docs/VERIFICATION.md), [architecture and development](docs/DEVELOPMENT.md), [appearance](docs/APPEARANCE.md) and [release acceptance](docs/RELEASE_CHECKLIST.md).
 
-The public release label is 1.04 (package 1.0.4). Normal updates continue to add 0.01: 1.05, 1.06 and so on. `node scripts/bump-version.mjs` advances the label and its semantic package version together. Run only tests relevant to the change; broaden testing when an issue needs debugging.
+The public release label is 1.05 (package 1.0.5). Normal updates continue to add 0.01: 1.06, 1.07 and so on. `node scripts/bump-version.mjs` advances the label and its semantic package version together. Run only tests relevant to the change; broaden testing when an issue needs debugging.
 
 After verified changes, refresh the relevant docs and local `Intelligence-source.zip`, then create the local commit with `scripts/commit-version.mjs`. Documentation-only follow-ups retain the app version. The ZIP is rebuilt from audited tracked source by `scripts/archive-source.ps1`; `*.zip` intentionally keeps it out of Git. It does not contain Git history, installed dependencies or user data, and is not uploaded by a Git push. Stage intended new files before archiving; inspect the entire tree before the commit helper, which runs `git add .`.
 

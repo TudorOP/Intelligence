@@ -1,6 +1,13 @@
-# Intelligence 1.04 — release acceptance
+# Intelligence 1.05 — release acceptance
 
 The current workspace features are described in README.md. The 1.0 baseline passed 223 enabled backend checks. Current verification is recorded in docs/VERIFICATION.md. Source publication is separate from the remaining binary-release gates. Verification procedures and limitations are documented in docs/VERIFICATION.md.
+
+## Classic profile and resource modal — 1.05, 15 October 2026
+
+- [x] Restore the 1.0 three-column profile arrangement from commit 830d401 while retaining current model selection, profile fields and native protections.
+- [x] Keep ratings visible, a larger personality field and collapsed Tools and connections; open Resource access in a modal through a profile button.
+- [x] Verify actual page scrolling, modal focus/Escape/grants and draft preservation in the affected profile fixture. Retain the [design references and final review](docs/design/agent-profile-2026-10-15/README.md).
+- [x] Update release documentation and the ignored source ZIP, audit and commit locally; no push or publication.
 
 ## Profile, computer files and prompt follow-up — 1.04, 15 October 2026
 

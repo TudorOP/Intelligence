@@ -21,7 +21,7 @@ If starting from `Intelligence-source.zip`, remember that it contains source, no
 
 ## Current checkpoint
 
-As of 15 October 2026, the app is **1.04**, package **1.0.4**, prepared locally on `dev`. This update repairs profile density/ratings, home paths, computer-wide file discoverability and prompt-prefix stability; see [implementation and inference notes](PROFILE_FILES_AND_PROMPT.md) and [verification](VERIFICATION.md). The prior local 1.03 commit is `0dec533`. The 1.02 commit `7abc941` and four preceding commits were pushed to `origin/dev` at the user's request; this new work has no push authorization. Read `git log` for its local commit. The prior 1.01 feature implementation is `d7a380b`. The last observed `main` was reviewed 0.94 at `12a56d2`. These are a dated checkpoint, not a substitute for checking current refs. Remote-tracking refs can be stale.
+As of 15 October 2026, the app is **1.05**, package **1.0.5**, prepared locally on `dev`. The profile restores the three-column 1.0 arrangement from `830d401`, with a Resource access modal and collapsed tools; see [the final layout review](design/agent-profile-2026-10-15/README.md) and [verification](VERIFICATION.md). The prior 1.04 local commit is `626303d`; its native file/prompt changes remain. The prior 1.03 commit is `0dec533`. The 1.02 commit `7abc941` and four preceding commits were pushed to `origin/dev` at the user's request; no push of 1.03–1.05 is authorized. Read `git log` for the latest local commit. The last observed `main` was reviewed 0.94 at `12a56d2`. This dated checkpoint does not replace checking current refs; remote-tracking refs can be stale.
 
 The 1.01 implementation includes saved project/window state, shared searchable model/agent pickers, Add sources with retention, Matrix/Tasks agent assignments, computer scopes, managed commands and durable inbox monitoring. The completed checklist is [WORKSPACE_1_01_PLAN.md](WORKSPACE_1_01_PLAN.md). The implementation passed 232 enabled backend checks, TypeScript, the production build and the desktop fixtures recorded in VERIFICATION.md. This is source verification on Windows, not a verified Linux binary release.
 
@@ -101,7 +101,7 @@ Normal application updates advance the public label by 0.01 using:
 node scripts/bump-version.mjs
 ```
 
-The script updates package.json and both lockfile versions. Public 1.04 maps to package 1.0.4; the next normal app update is public 1.05/package 1.0.5. Do not manually assume the public label is a semantic version. Documentation-only follow-ups retain the current application version unless the user requests a new release. Internal schema versions are independent.
+The script updates package.json and both lockfile versions. Public 1.05 maps to package 1.0.5; the next normal app update is public 1.06/package 1.0.6. Do not manually assume the public label is a semantic version. Documentation-only follow-ups retain the current application version unless the user requests a new release. Internal schema versions are independent.
 
 After verification, update README, CHANGELOG, TODO, UI_UX and related docs as applicable. Distinguish completed source work from open Linux/live-provider/binary gates. Review `git diff` and `git diff --cached`, then stage only the intended source/doc paths, including new files. Stage new files **before** the audit/archive: both use `git ls-files` and would otherwise omit them.
 

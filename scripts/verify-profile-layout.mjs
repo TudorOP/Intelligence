@@ -5,7 +5,6 @@ import { ensureProfiles } from '../electron/profiles.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import assert from 'node:assert/strict';
-import { settingsSection } from './ui-pickers.mjs';
 const directory = path.resolve('.test-data/profile-layout-' + Date.now());
 fs.mkdirSync(directory, { recursive: true });
 console.log(directory);
@@ -54,7 +53,7 @@ try {
   await page.getByRole('button', { name: 'Edit profile', exact: true }).first().click();
   await page.locator('.agent-ratings-card h2').waitFor();
   const capture = async (name, fit = false) => {
-    await page.locator('.workspace').evaluate((e) => (e.scrollTop = 0));
+    await page.locator('.main-canvas').evaluate((e) => (e.scrollTop = 0));
     await page.mouse.move(250, 110);
     await page.evaluate(() => document.fonts.ready);
     const layout = await page.locator('.agent-editor').evaluate((editor) => {
@@ -69,18 +68,20 @@ try {
           height: r.height,
         };
       };
-      const workspace = document.querySelector('.workspace');
+      const workspace = document.querySelector('.main-canvas');
       return {
         editor: rect(editor),
         workspace: rect(workspace),
         overflow: workspace.scrollWidth - workspace.clientWidth,
-        cards: [...editor.querySelectorAll('.agent-profile-column > section')].map((e) => ({
+        pageScroll: workspace.scrollHeight - workspace.clientHeight,
+        toolsOpen: editor.querySelector('.agent-tools-card').open,
+        cards: [...editor.querySelectorAll('.agent-profile-layout > section')].map((e) => ({
           name: e.className,
           ...rect(e),
           overflow: e.scrollWidth - e.clientWidth,
         })),
         ratings: [...editor.querySelectorAll('.star-rating button')].map(rect),
-        categories: [...editor.querySelectorAll('.agent-category-grid .setting-switch')].map(rect),
+        categories: [...editor.querySelectorAll('[data-tool-category]')].map(rect),
       };
     });
     results.captures.push({ name, layout });
@@ -110,6 +111,8 @@ try {
     assert.equal(layout.ratings.length, 24);
     assert.equal(layout.categories.length, 10);
     if (fit) {
+      assert.ok(layout.pageScroll <= 1, name + ': page must not scroll ' + layout.pageScroll);
+      assert.equal(layout.toolsOpen, false, name + ': tools start collapsed');
       assert.ok(
         layout.cards.every((c) => c.bottom <= layout.workspace.bottom + 1),
         name + ': profile should fit without page scrolling ' + JSON.stringify(layout.cards),
@@ -157,25 +160,37 @@ try {
     [3440, 1440, '1', 'ro'],
     [1920, 1080, '1', 'ro'],
     [1920, 1080, '1.25', 'en'],
+    [1920, 1080, '1.25', 'ro'],
     [1366, 768, '1', 'ro'],
     [1280, 800, '1', 'en'],
   ]) {
     await resize(w, h);
-    await page.evaluate((zoom) => (document.body.style.zoom = zoom), zoom);
+    await app.evaluate(
+      ({ BrowserWindow }, factor) =>
+        BrowserWindow.getAllWindows()[0].webContents.setZoomFactor(factor),
+      Number(zoom),
+    );
     await configure({ language });
-    await capture(`profile-${w}-${h}-${zoom}-${language}`, zoom === '1' && w >= 1920);
+    await capture(`profile-${w}-${h}-${zoom}-${language}`, w >= 1280);
   }
   await resize(1920, 1080);
-  await page.evaluate(() => (document.body.style.zoom = '1'));
+  await app.evaluate(({ BrowserWindow }) =>
+    BrowserWindow.getAllWindows()[0].webContents.setZoomFactor(1),
+  );
   await configure({ language: 'en' });
   await page
     .getByLabel('Personality & preferences', { exact: true })
     .fill('Keep all this user-authored text. '.repeat(100));
   await capture('profile-long-preferences', true);
   await page.locator('.assistant-toggle').click();
-  await capture('profile-with-assistant');
+  await capture('profile-with-assistant', true);
   await page.locator('.assistant-toggle').click();
   // Native grants remain live while the profile form has unsaved changes.
+  await page.getByRole('button', { name: 'Knowledge 2', exact: true }).click();
+  await page.getByRole('button', { name: 'Resource access', exact: true }).click();
+  const accessDialog = page.getByRole('dialog', { name: 'Resource access', exact: true });
+  await accessDialog.waitFor();
+  assert.equal(await page.locator('#root').getAttribute('inert'), '');
   await page.getByRole('textbox', { name: 'Find a resource', exact: true }).fill('');
   const grantSelect = page.locator('.resource-grants select');
   const option = await grantSelect.locator('option').nth(1).getAttribute('value');
@@ -191,6 +206,19 @@ try {
     (await page.getByLabel('Personality & preferences', { exact: true }).inputValue()).startsWith(
       'Keep all this',
     ),
+  );
+  assert.equal(
+    await page
+      .getByRole('button', { name: 'Knowledge 2', exact: true })
+      .getAttribute('aria-pressed'),
+    'true',
+  );
+  await page.keyboard.press('Escape');
+  await accessDialog.waitFor({ state: 'detached' });
+  assert.ok(
+    await page
+      .getByRole('button', { name: 'Resource access', exact: true })
+      .evaluate((e) => e === document.activeElement),
   );
   await capture('profile-grants', true);
   await page.evaluate(async () => {
@@ -208,18 +236,71 @@ try {
     }
   });
   await capture('profile-long-catalog', true);
-  await page.getByRole('button', { name: 'Settings', exact: true }).click();
-  await settingsSection(page, 'Agent access');
-  await page.locator('.computer-disclosure > summary').click();
-  await page.getByLabel('File access scope', { exact: true }).selectOption('system');
-  assert.equal(
-    await page.locator('.computer-access option[value="system"]').textContent(),
-    'Any file on the computer',
+  const menu = page.locator('.agent-tools-card');
+  await menu.locator(':scope > summary').focus();
+  await page.keyboard.press('Enter');
+  assert.equal(await menu.getAttribute('open'), '');
+  await menu.locator('.agent-tool-choices > summary').click();
+  await menu.getByRole('switch', { name: 'Terminal', exact: true }).uncheck();
+  await page.getByRole('switch', { name: 'Create reusable skills', exact: true }).uncheck();
+  const popup = await page.locator('.agent-tools-body').boundingBox();
+  const viewport = page.viewportSize() || { height: 1080, width: 1920 };
+  assert.ok(
+    popup.y >= 32 && popup.y + popup.height <= viewport.height,
+    'Tools popup within viewport',
   );
-  for (const language of ['en', 'ro']) {
+  await capture('profile-tools-open');
+  await page.keyboard.press('Escape');
+  assert.equal(await menu.getAttribute('open'), null);
+  assert.ok(await menu.locator(':scope > summary').evaluate((e) => e === document.activeElement));
+  await page.getByRole('button', { name: 'Save profile', exact: true }).click();
+  await page.waitForFunction(async () => {
+    const s = await window.intelligence.bootstrap();
+    return (
+      s.entities.find((e) => e.id === s.settings.activeAgent).data.allowSkillCreation === false &&
+      !s.entities.find((e) => e.id === s.settings.activeAgent).data.toolGroups.includes('terminal')
+    );
+  });
+  await capture('profile-tools-saved', true);
+  for (const [w, h, language] of [
+    [1920, 1080, 'en'],
+    [1366, 768, 'ro'],
+    [1920, 1080, 'ro'],
+  ]) {
+    await resize(w, h);
     await configure({ language });
-    await page.locator('.computer-access').scrollIntoViewIfNeeded();
-    await page.mouse.move(250, 110);
+    await page.locator('.agent-screen-heading button[aria-haspopup="dialog"]').click();
+    const dialog = page.getByRole('dialog');
+    await dialog.waitFor();
+    const bounds = await dialog.boundingBox();
+    assert.ok(
+      bounds.y >= 0 &&
+        bounds.y + bounds.height <= h &&
+        bounds.x >= 0 &&
+        bounds.x + bounds.width <= w,
+      'Access modal within window',
+    );
+    await page.keyboard.press('Shift+Tab');
+    assert.ok(
+      await dialog.evaluate((e) => e.contains(document.activeElement)),
+      'Modal traps backward Tab',
+    );
+    await page.keyboard.press('Tab');
+    assert.ok(
+      await dialog.evaluate((e) => e.contains(document.activeElement)),
+      'Modal traps forward Tab',
+    );
+    await app.evaluate(async ({ BrowserWindow }) =>
+      BrowserWindow.getAllWindows()[0].capturePage(undefined, {
+        stayHidden: true,
+        stayAwake: true,
+      }),
+    );
+    await page.waitForTimeout(150);
+    assert.ok(
+      await dialog.evaluate((e) => e.scrollWidth <= e.clientWidth + 1),
+      'No modal horizontal overflow',
+    );
     const png = await app.evaluate(async ({ BrowserWindow }) =>
       (
         await BrowserWindow.getAllWindows()[0].capturePage(undefined, {
@@ -230,21 +311,12 @@ try {
         .toPNG()
         .toString('base64'),
     );
-    fs.writeFileSync(
-      path.join(directory, 'computer-any-file-' + language + '.png'),
-      Buffer.from(png, 'base64'),
-    );
-    if (language === 'ro')
-      assert.equal(
-        await page.locator('.computer-access option[value="system"]').textContent(),
-        'Orice fișier de pe calculator',
-      );
-    results.captures.push({ name: 'computer-any-file-' + language });
+    const name = 'resource-access-' + w + '-' + language;
+    fs.writeFileSync(path.join(directory, name + '.png'), Buffer.from(png, 'base64'));
+    results.captures.push({ name, bounds });
+    await page.keyboard.press('Escape');
+    await dialog.waitFor({ state: 'detached' });
   }
-  assert.equal(
-    (await page.evaluate(() => window.intelligence.bootstrap())).settings.computerScope,
-    'system',
-  );
   assert.deepEqual(results.errors, []);
 } finally {
   fs.writeFileSync(path.join(directory, 'results.json'), JSON.stringify(results, null, 2));

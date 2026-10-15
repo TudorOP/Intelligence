@@ -2,7 +2,9 @@
 
 This implements the user's 15 October 2026 requests: visible ratings without page scrolling at 1080p, a leaner/stabler prompt, correction of `~/Downloads` resolving under a project, and understandable computer-wide file access. It is local work on dev; no remote action is authorized.
 
-## Profile
+## Historical 1.04 profile
+
+The user subsequently requested the 1.0 arrangement with a resource-access modal. That 1.05 implementation replaces the layout below; see [the final profile review](design/agent-profile-2026-10-15/README.md). Native file/prompt behavior in the rest of this document remains current.
 
 Four columns use the available 1080p width: identity/user context, ratings/model, tools/connections, and resource access. Ratings start at the top and cannot be collapsed. Tool categories and profile access start open; long skills/server/resource lists scroll independently. Existing controls, texts, rating persistence and draft preservation remain. Shorter/narrower windows can require page scrolling for later sections; arbitrary long text/catalogs cannot all occupy a fixed viewport at once. Content remains reachable.
 
