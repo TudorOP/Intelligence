@@ -10,6 +10,8 @@ Documentation-only follow-ups keep the current application version unless the us
 
 Keep commits reviewable. Do not discard unrelated work or rewrite established public history without explicit user authorization. Preserve artwork and provenance. Release/AppImage builds belong in Docker on Linux; weights and optional engines are provisioned in user data, not bundled.
 
+Run only tests and fixtures relevant to the change. Do not run the full suite by default; broaden testing only when a failure or issue needs debugging. For UI repairs, exercise the affected layouts with varied content, themes and relevant responsive/localized states, and inspect the screenshots.
+
 Core is the fixed Cognition Matrix list name. Secondary and Tertiary are freely renameable. Mandatory harness instructions remain present when editable personality/prompt preferences change. Native resource, revision, approval and live profile checks must remain enforced.
 
 Still backgrounds are independent from theme and background AI. Keep them pointer-transparent, offer persisted blur/strength controls, and preserve bounded imported images in backups. Animated backgrounds are withdrawn and explicitly deferred; do not reintegrate without a new user request. Pause AI controls automatic tasks/memory, not decorative imagery or foreground chat.

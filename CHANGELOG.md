@@ -1,5 +1,12 @@
 # Releases
 
+## 1.03 — collection card and Skills list repairs on dev
+
+- Give Skills, Projects and Connections matching card dimensions within each collection, including across rows. Wrap long titles/paths/descriptions and align card actions.
+- Align Skills availability/instruction actions, reserve provenance space and use explicit list areas so optional learned-skill metadata cannot displace the instruction button. Adapt to available pane width, including the assistant.
+- Preserve the two new visual references and add a focused production Electron collection fixture with varied content, themes, responsive/localized states and real Skills controls.
+- Record relevant-tests-only as the standing development rule; expand coverage only to debug an issue. Prepare 1.03/package 1.0.3 locally; no new push or publication.
+
 ## 1.02 — UI repairs and theme consistency on dev
 
 - Space the Icons & identity disclosure and sharing buttons; remove repeated disclosure headings.

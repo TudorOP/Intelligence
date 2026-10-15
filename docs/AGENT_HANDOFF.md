@@ -21,7 +21,7 @@ If starting from `Intelligence-source.zip`, remember that it contains source, no
 
 ## Current checkpoint
 
-As of 15 October 2026, the app is **1.02**, package **1.0.2**, prepared locally on `dev`. The UI repair update follows the planning commit `d84f340`; read `git log` for its final local commit. The prior 1.01 feature implementation is `d7a380b`. The last observed `main` was reviewed 0.94 at `12a56d2`. These are a dated checkpoint, not a substitute for checking current refs. Remote-tracking refs can be stale.
+As of 15 October 2026, the app is **1.03**, package **1.0.3**, prepared locally on `dev`. This follow-up repairs mixed-content collection cards and learned-skill list rows missed in the 1.02 UI review; see the [collection review](design/collection-layout-2026-10-15/README.md). The prior 1.02 commit `7abc941` and four preceding commits were pushed to `origin/dev` at the user's request. No push of this new 1.03 work is authorized. Read `git log` for its local commit. The prior 1.01 feature implementation is `d7a380b`. The last observed `main` was reviewed 0.94 at `12a56d2`. These are a dated checkpoint, not a substitute for checking current refs. Remote-tracking refs can be stale.
 
 The 1.01 implementation includes saved project/window state, shared searchable model/agent pickers, Add sources with retention, Matrix/Tasks agent assignments, computer scopes, managed commands and durable inbox monitoring. The completed checklist is [WORKSPACE_1_01_PLAN.md](WORKSPACE_1_01_PLAN.md). The implementation passed 232 enabled backend checks, TypeScript, the production build and the desktop fixtures recorded in VERIFICATION.md. This is source verification on Windows, not a verified Linux binary release.
 
@@ -91,7 +91,7 @@ node scripts/verify-matrix.mjs
 node scripts/verify-onboarding.mjs
 ```
 
-Choose fixtures appropriate to the change; do not run the entire fixture catalog indiscriminately. Inspect representative screenshots, renderer errors, overflow and localized labels for UI changes. Keep exact checks and any failures/limitations in VERIFICATION.md. Documentation-only follow-ups need link/content checks and the source/archive audit; unchanged application tests need not be rerun. Never present old tests as freshly rerun. Windows fixtures do not establish Linux shell/process-group, Wayland/X11, live provider, download or device behavior.
+Run only tests and fixtures relevant to the change; do not run the full suite or fixture catalog by default. Broaden testing only when a failure or issue needs debugging. For collection layout changes, use `node scripts/verify-collection-layout.mjs` after building the renderer. Inspect representative screenshots with varied content and optional states, renderer errors, overflow and localized labels. Keep exact checks and any failures/limitations in VERIFICATION.md. Documentation-only follow-ups need link/content checks and the source/archive audit; unchanged application tests need not be rerun. Never present old tests as freshly rerun. Windows fixtures do not establish Linux shell/process-group, Wayland/X11, live provider, download or device behavior.
 
 ## Version, source ZIP and local commit
 
@@ -101,7 +101,7 @@ Normal application updates advance the public label by 0.01 using:
 node scripts/bump-version.mjs
 ```
 
-The script updates package.json and both lockfile versions. Public 1.02 maps to package 1.0.2; the next normal app update is public 1.03/package 1.0.3. Do not manually assume the public label is a semantic version. Documentation-only follow-ups retain the current application version unless the user requests a new release. Internal schema versions are independent.
+The script updates package.json and both lockfile versions. Public 1.03 maps to package 1.0.3; the next normal app update is public 1.04/package 1.0.4. Do not manually assume the public label is a semantic version. Documentation-only follow-ups retain the current application version unless the user requests a new release. Internal schema versions are independent.
 
 After verification, update README, CHANGELOG, TODO, UI_UX and related docs as applicable. Distinguish completed source work from open Linux/live-provider/binary gates. Review `git diff` and `git diff --cached`, then stage only the intended source/doc paths, including new files. Stage new files **before** the audit/archive: both use `git ls-files` and would otherwise omit them.
 

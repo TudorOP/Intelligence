@@ -1,4 +1,16 @@
-# Intelligence 1.02 — verification
+# Intelligence 1.03 — verification
+
+## 1.03 collection layout follow-up — 15 October 2026
+
+The user reported unequal Skills card heights and a squeezed learned-skill list instruction button after the 1.02 review. The prior broad pass missed this mixed-content/optional-provenance state. The [two original references and repair details](design/collection-layout-2026-10-15/README.md) are retained unchanged.
+
+Only affected checks were run: TypeScript, the production renderer build, the single release-version test (for the 1.03/package 1.0.3 bump), and `node scripts/verify-collection-layout.mjs`. The final collection run passes **36 captures**, with equal dimensions across rows, aligned Skills actions, no measured collection/card overflow or control overlap, readable instruction-button width and no renderer errors. It checks Skills cards/list across all ten themes, shorter/larger windows, 125% scale, Romanian and narrowed panes with an assistant, plus the shared Projects/Connections cards. Opening the Skills instruction editor, availability persistence and menus pass. Representative full-size captures were inspected. No full backend suite or unrelated fixture catalog was run; the standing relevant-tests-only rule is recorded in AGENTS.md and the handoff.
+
+Final local artifacts: `.test-data/collection-layout-after-1792083556611`. The old 1.02 renderer reproduced unequal heights in `.test-data/collection-layout-before-1792083391853`; that exploratory run stopped at a pointer checkbox interaction and is not a passing acceptance run. The final fixture uses keyboard availability interaction with native persistence checks. During fixture development, a button-width assertion was narrowed to Skills rather than applying its English instruction-button threshold to Browse files; navigation waits and compositor flushing were added so captures show the intended screen. Only the affected fixture was repeated after these corrections and shared card styling changes.
+
+The production build retains existing large-chunk and upstream Tiptap module-directive warnings. No native permission service, translations, user data or artwork changed. Local source/archive checks follow the normal commit workflow. This is Windows source/UI verification; target-Linux gates remain open. No new push, merge, binary build or publication was performed for 1.03.
+
+## Historical 1.02 verification
 
 The 1.02 update repairs appearance/sharing spacing, consolidates access controls, balances agent profiles, contains model-picker scrolling and normalizes Chat artwork across themes. It includes a full UI review and clearer secondary text colors. This is local source verification on `dev`; no push/publication or Linux binary build was performed.
 

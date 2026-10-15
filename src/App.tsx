@@ -2836,12 +2836,14 @@ export default function App() {
                             {menu(s)}
                             <h2>{s.title}</h2>
                             <p>{s.data.description || t('A reusable bit of know-how.')}</p>
-                            {s.data.generated && (
-                              <small>
-                                {t('Learned by')} {s.data.creatorName} ·{' '}
-                                {t(s.data.learningState || 'active')}
-                              </small>
-                            )}
+                            <small className="skill-provenance" aria-hidden={!s.data.generated}>
+                              {s.data.generated ? (
+                                <>
+                                  {t('Learned by')} {s.data.creatorName} ·{' '}
+                                  {t(s.data.learningState || 'active')}
+                                </>
+                              ) : null}
+                            </small>
                             <label className="check-label">
                               <Check
                                 checked={s.data.access === true}
@@ -2857,6 +2859,7 @@ export default function App() {
                               {t('Available to agent')}
                             </label>
                             <button
+                              className="skill-open"
                               onClick={() =>
                                 setForm({
                                   title: t('Edit skill'),

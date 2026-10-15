@@ -1,10 +1,17 @@
-# Intelligence 1.02 — release acceptance
+# Intelligence 1.03 — release acceptance
 
 The current workspace features are described in README.md. The 1.0 baseline passed 223 enabled backend checks. Current verification is recorded in docs/VERIFICATION.md. Source publication is separate from the remaining binary-release gates. Verification procedures and limitations are documented in docs/VERIFICATION.md.
 
+## Collection layout follow-up — 1.03, 15 October 2026
+
+- [x] Fix unequal collection card heights, including different rows, and align Skills availability/instruction actions.
+- [x] Keep learned-skill provenance in its own list area; prevent cramped buttons, overlap and horizontal overflow.
+- [x] Check affected Skills card/list themes, narrow/large panes, 125% scale, Romanian and the shared Projects/Connections layouts with varied content. Preserve the [two reported screenshots and review](docs/design/collection-layout-2026-10-15/README.md).
+- [x] Record the standing preference to run relevant checks only, broadening only to debug an issue.
+
 ## Completed UI repairs — 1.02, 15 October 2026
 
-The [repair checklist and six original screenshots](docs/design/ui-repairs-2026-10-15/README.md) preserve the reported defects and acceptance criteria. Local source repairs and the full Windows UI/theme review are complete. See the linked review evidence and VERIFICATION.md; target-Linux acceptance remains open below.
+The [repair checklist and six original screenshots](docs/design/ui-repairs-2026-10-15/README.md) preserve the reported defects and acceptance criteria. That Windows UI/theme review missed mixed-content Skills card/list defects subsequently reported by the user; the 1.03 follow-up above corrects them. See the linked review evidence and VERIFICATION.md; target-Linux acceptance remains open below.
 
 - [x] Fix spacing and the repeated heading around Icons & identity (image 1).
 - [x] Add consistent spacing and narrow-window wrapping between Notebook sharing and Task sharing (image 2).
