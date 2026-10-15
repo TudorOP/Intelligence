@@ -12,6 +12,12 @@ The implementation source audit passed with 930 files and 442 complete indexed n
 
 These checks ran on Windows with isolated fixture data. Actual Linux shell execution/process-group cancellation, desktop/window restoration across Wayland/X11, live providers and real download workflows remain target-host acceptance checks. Inbox readiness is a size/mtime stability heuristic, not a guarantee that another program has closed a file. Monitoring requires the application to run, including in its tray; startup/resume reconciles missed files. Command jobs end with their response/run; persistent shell state and a standalone monitoring service remain deferred. Context-length benchmarking and token-overhead work remain excluded. No binary was built, pushed or published.
 
+## UI repair planning follow-up — 15 October 2026
+
+The [queued repair checklist](design/ui-repairs-2026-10-15/README.md) records the six user-supplied defect screenshots, original feedback, affected components and acceptance checks. All six screenshots were copied unchanged and compared against their originals with SHA-256. The feedback text is preserved with its extra trailing blank line removed for the whitespace check. Local Markdown links, all six embedded PNG references, pending status and unchanged package version 1.0.1 were checked. The tracked-source and archive audits were repeated after staging the new references; the ignored local source ZIP includes them.
+
+This is documentation and visual context only. Spacing, access consolidation, agent layout and picker overflow remain unfixed. Application tests were not rerun; the earlier results above do not establish acceptance for these reported defects. No push or publication occurred.
+
 ## 1.0 baseline
 
 The authorized 1.0 implementation follows a separately verified cleanup commit on dev. The six-stage setup, offline guide/lessons, inline provider help and reviewed agent access/configuration flows are implemented; this is local source preparation, not a published binary release.
