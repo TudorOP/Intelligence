@@ -1,4 +1,4 @@
-# Intelligence 1.0
+# Intelligence 1.01
 
 Intelligence is a personal AI harness for people who do not want to manage a complicated toolchain. It brings conversations, notes, tasks and an assistant into one understandable Linux desktop workspace. The goal is to make working with AI easy to use and easy to understand, with clear controls over what the assistant can access and do.
 
@@ -10,11 +10,11 @@ Intelligence is a personal AI harness for people who do not want to manage a com
 
 Ten themes include Ink, Day, Night, Summer, Autumn, Winter Wonderland, Festive, Tech, Astral and Marble & gold. Each has original artwork and readable controls. Still backgrounds are independent: combine any theme with built-in artwork or your own image, adjust strength, and choose 0–24 px blur. The Festive, Tech, Astral and Marble & gold themes include detailed landscape backgrounds. Still artwork stays separate from automatic AI work.
 
-| Festive | Tech |
-| --- | --- |
-| ![Festive theme](docs/images/festive.png) | ![Tech theme](docs/images/tech.png) |
-| Astral | Marble & gold |
-| ![Astral theme](docs/images/astral.png) | ![Marble and gold theme](docs/images/marble.png) |
+| Festive                                   | Tech                                             |
+| ----------------------------------------- | ------------------------------------------------ |
+| ![Festive theme](docs/images/festive.png) | ![Tech theme](docs/images/tech.png)              |
+| Astral                                    | Marble & gold                                    |
+| ![Astral theme](docs/images/astral.png)   | ![Marble and gold theme](docs/images/marble.png) |
 
 ## What you can do
 
@@ -33,7 +33,7 @@ Your workspace is stored locally. Messages sent to a cloud provider, remote tool
 - Steer a running conversation with corrections delivered between model/tool steps. General responses have a persisted 1–256 round limit (default 12); Matrix and reports keep their own budgets.
 - Keep local and API providers connected together, choose provider/model per conversation or agent, and disconnect individual providers with saved-key removal. LM Studio, Ollama, llama.cpp, OpenAI, OpenRouter, Mistral, Qwen and compatible APIs are supported.
 - Agent task controls and reports appear only on cards with effective agent access; board/list inheritance and card exceptions apply.
-- Persistent streaming chat, returned Thinking, grouped tool activity and conversation branches. Main Chat and the assistant share compact model/image/Thinking/TTS/microphone/approval controls.
+- Persistent streaming chat, returned Thinking, grouped tool activity and conversation branches. Main Chat and the assistant share compact model/Add sources/Thinking/TTS/microphone/approval controls, with searchable model selection.
 - Agent profiles with their own model, personality, skills and tool scopes. Mandatory application guidance and native permissions remain enforced.
 - Notebooks, chapters, Markdown notes and a real-file Markdown Vault, with recoverable Trash and revision history.
 - Kanban boards with draggable list ordering and a three-list Cognition Matrix. Core stays fixed; Secondary and Tertiary can be renamed.
@@ -46,14 +46,26 @@ Your workspace is stored locally. Messages sent to a cloud provider, remote tool
 
 No chat model or optional speech/archive engine is bundled. Downloads happen in user data after the relevant setup action. Intelligence does not silently switch to a cloud provider.
 
+## Workspace and ongoing work
+
+The last project selection and desktop window bounds are restored. First launch uses a smaller 1280×800 window, fitted to the display. Model pickers support search; chat uses a symbolic model button. Matrix lists and Tasks assignments select an agent profile, carrying its model, style, skills and restrictions. Switching the active chat agent does not reassign existing work.
+
+Add sources attaches files/images or bounded folder snapshots, or identifies existing resources in notebook/task trees. Choose conversation-only copies or project retention. Originals are preserved; retained project copies survive chat deletion. Conversation-only files follow recoverable Trash, then are collected on permanent deletion when no branch still uses them. Automatic memory/skill learning stays off for these chats unless explicitly enabled. Existing exported backups remain independent copies.
+
+Backups include conversation files and inbox queue state. Restoring a backup resets computer-wide and additional-folder grants for review, restores destructive-action protection, and marks interrupted file work for attention.
+
+Agent access combines app gates, per-agent grants and computer controls. File tools can use authorized projects, additional read/edit folders or system-wide account access; native app storage, project permissions and profile restrictions remain enforced. Destructive computer-file actions and unclassified shell commands can require separate review. Approved shell commands are not isolated by file-tool scopes. Managed command jobs expose incremental output, input, cancellation and bounded lifetimes; they end with the response/run.
+
+For continuous inbox work, configure Matrix → Schedule & triggers → File monitoring → New completed files continuously. Authorize the watched folder, choose whether to include existing files, and integrate the list. A lightweight native watcher and persistent queue wait for stable files, skip partial-download names, retain arrivals while busy and catch up after startup/resume. The assigned agent runs only for queued work. Failures and interrupted runs require review; native file outputs are tracked to avoid repeat processing. Monitoring requires the app to remain open or in the tray; Pause AI suspends it. A separate system service and persistent shell state are not included.
+
 ## Build on Linux
 
 Install Docker Engine and Compose, then run from this source directory:
 
 ```bash
 docker compose run --build --rm appimage
-chmod +x release/Intelligence-1.0.0-x86_64.AppImage
-./release/Intelligence-1.0.0-x86_64.AppImage
+chmod +x release/Intelligence-1.0.1-x86_64.AppImage
+./release/Intelligence-1.0.1-x86_64.AppImage
 ```
 
 Release/AppImage packaging runs only inside Linux Docker. Docker is needed to build, not to run. See [the Linux handoff](docs/LINUX_HANDOFF.md) for runtime dependencies, sandbox/desktop checks and the source-distribution checklist.
@@ -64,7 +76,7 @@ Getting started offers six optional stages: welcome, your profile and companion,
 
 Settings → Help & setup contains the searchable offline English/Romanian written guide, optional feature lessons and an explicit setup entry. Opening ordinary Settings never starts or resumes setup. Returning from a setup-origin Settings detour resumes that setup session; completed setup stays completed when reviewed.
 
-Fresh users start with selected resources only and optional sharing, automatic memory processing and model preparation off. Existing preferences stay intact. Both chats let you choose resource names as context and review exact access requests: Allow for this request expires with the current response; Always allow for this agent saves a grant for that profile until revoked. Agent access shows saved grants and active temporary access. Global gates, child exceptions, task assignment and native command approvals remain enforced.
+Fresh users start with selected resources only and optional sharing, automatic memory processing and model preparation off. Existing preferences stay intact. Both chats offer optional resource selection under Add sources and review exact access requests: Allow for this request expires with the current response; Always allow for this agent saves a grant for that profile until revoked. Agent access shows saved grants and active temporary access. Global gates, child exceptions, task assignment and native command approvals remain enforced.
 
 Settings → Look & feel owns themes, static artwork, imported images, strength and blur. The compact Pause AI control in the workspace header pauses automatic tasks and memory processing; foreground chat remains available.
 
@@ -74,11 +86,11 @@ Data normally lives in `~/.config/Intelligence/`, follows `XDG_CONFIG_HOME`, and
 
 `main` holds reviewed releases and remains the default branch. New work is developed on `dev` and pushed there first when authorized. Merging to `main` and publishing a release are separate, explicit actions.
 
-The [1.0 plan](docs/ONBOARDING_1_0_PLAN.md), [implementation notes](docs/ONBOARDING_1_0_IMPLEMENTATION.md) and retained ImageGen concepts document this development milestone. Main still holds the reviewed 0.94 release; 1.0 is prepared locally on dev and is not published.
+The [1.0 plan](docs/ONBOARDING_1_0_PLAN.md), [implementation notes](docs/ONBOARDING_1_0_IMPLEMENTATION.md) and retained ImageGen concepts document this development milestone. Main still holds the reviewed 0.94 release; 1.01 is prepared locally on dev and is not published. The [workspace and automation plan](docs/WORKSPACE_1_01_PLAN.md) records this update.
 
 Use `npm ci`, `npm run dev`, `npm run build` and `npm test`. Run `node scripts/verify-source.mjs` before sharing source. Desktop fixtures use isolated data under `.test-data/`. See [verification](docs/VERIFICATION.md), [architecture and development](docs/DEVELOPMENT.md), [appearance](docs/APPEARANCE.md) and [release acceptance](docs/RELEASE_CHECKLIST.md).
 
-The public release label is 1.0 (package 1.0.0). This requested milestone follows 0.94; normal updates continue to add 0.01: 1.01, 1.02 and so on. `node scripts/bump-version.mjs` advances the label and its semantic package version together.
+The public release label is 1.01 (package 1.0.1). Normal updates continue to add 0.01: 1.02, 1.03 and so on. `node scripts/bump-version.mjs` advances the label and its semantic package version together.
 
 ## License
 

@@ -1,6 +1,6 @@
-# Intelligence 1.0 — release acceptance
+# Intelligence 1.01 — release acceptance
 
-The current workspace features are described in README.md. Source checks, all 223 enabled backend checks, the production build and the isolated desktop smoke pass. Source publication is separate from the remaining binary-release gates. Verification procedures and limitations are documented in docs/VERIFICATION.md.
+The current workspace features are described in README.md. The 1.0 baseline passed 223 enabled backend checks. Current 1.01 verification is recorded in docs/VERIFICATION.md. Source publication is separate from the remaining binary-release gates. Verification procedures and limitations are documented in docs/VERIFICATION.md.
 
 ## Required on the target Linux host
 
@@ -42,3 +42,7 @@ Develop on `dev`; `main` holds reviewed releases. The reviewed plan is implement
 - [x] Record the current performance baseline and compare startup, idle resources, bundle size and Settings/Chat responsiveness as the 1.0 phases land; keep closed setup/help features free of recurring work. The isolated 0.94/1.0 comparison and measurement limits are recorded in docs/VERIFICATION.md.
 
 - [x] Refresh release docs and Intelligence-source.zip after the final build/test/screenshot/performance pass; create the local 1.0 commit with scripts/commit-version.mjs. This completion record is included in the source archive prepared immediately before that commit; no push or publication is authorized.
+
+## 1.01 workspace and automation
+
+The authorized implementation and acceptance checklist are recorded in [WORKSPACE_1_01_PLAN.md](docs/WORKSPACE_1_01_PLAN.md). This update includes project/window state, shared model/agent selection, retained conversation sources, native computer scopes, managed command jobs and continuous inbox queues. Packaging/publication still require the target-Linux and exact binary/source/license gates above.

@@ -1,3 +1,4 @@
+import { settingsSection } from './ui-pickers.mjs';
 import { _electron as electron } from 'playwright';
 import electronPath from 'electron';
 import { Store } from '../electron/store.mjs';
@@ -284,10 +285,7 @@ try {
     'Search providers',
   ]) {
     console.log('Checking Settings help: ' + name);
-    await page
-      .locator('.settings-dialog > aside')
-      .getByRole('button', { name, exact: true })
-      .click();
+    await settingsSection(page, name);
     await page.waitForTimeout(100);
     const controls = page.locator(
       '.settings-content input:visible,.settings-content select:visible,.settings-content textarea:visible',

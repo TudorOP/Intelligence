@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { api } from './api';
 import { t } from './i18n';
 import type { Settings } from './types';
+import SearchPicker from './SearchPicker';
 export default function ModelPicker({
   settings,
   models: provided,
@@ -38,19 +39,14 @@ export default function ModelPicker({
   const values = [...new Set([settings.model, ...models].filter(Boolean))];
   return (
     <div className="model-picker">
-      <select
-        aria-label={t('Selected model')}
+      <SearchPicker
+        label={t('Selected model')}
         value={settings.model}
         disabled={busy}
-        onChange={(e) => void onUpdate({ model: e.target.value }).catch(onError)}
-      >
-        <option value="">{t('Choose a model')}</option>
-        {values.map((model) => (
-          <option key={model} value={model}>
-            {model}
-          </option>
-        ))}
-      </select>
+        options={values.map((model) => ({ value: model, label: model }))}
+        placeholder={t('Choose a model')}
+        onChange={(model) => void onUpdate({ model }).catch(onError)}
+      />
       <button
         type="button"
         disabled={busy}

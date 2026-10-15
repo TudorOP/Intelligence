@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { api, art } from './api';
 import { t } from './i18n';
 import type { Entity, Snapshot } from './types';
 import { logoPath } from './branding';
 import Switch from './Switch';
+import ModelPicker from './ModelPicker';
+import AgentAccessPanel from './AgentAccessPanel';
 import { providers } from './providers';
 const ratings = [
   ['intelligence', 'Intelligence'],
@@ -68,9 +70,25 @@ export default function AgentScreen({
     [busy, setBusy] = useState(false),
     [catalog, setCatalog] = useState<string[]>([]);
   const profile = profiles.find((p) => p.id === id) ?? profiles[0];
+  const draftBase = useRef<{ id: string; data: any } | null>(null);
   useEffect(() => {
-    if (profile)
-      setDraft({ title: profile.title, ...profile.data, ratings: { ...profile.data.ratings } });
+    if (profile) {
+      const next = { title: profile.title, ...profile.data, ratings: { ...profile.data.ratings } };
+      const old = draftBase.current;
+      setDraft((current: any) =>
+        old?.id === profile.id && current
+          ? {
+              ...next,
+              ...Object.fromEntries(
+                Object.entries(current).filter(
+                  ([key, value]) => JSON.stringify(value) !== JSON.stringify(old.data[key]),
+                ),
+              ),
+            }
+          : next,
+      );
+      draftBase.current = { id: profile.id, data: next };
+    }
   }, [profile?.id, profile?.revision]);
   const act = async (input: any) => {
     setBusy(true);
@@ -193,7 +211,22 @@ export default function AgentScreen({
               id: profile.id,
               revision: profile.revision,
               title: draft.title,
-              data: draft,
+              data: Object.fromEntries(
+                [
+                  'avatar',
+                  'personality',
+                  'inheritModel',
+                  'provider',
+                  'model',
+                  'toolGroups',
+                  'skillIds',
+                  'connectionIds',
+                  'ratings',
+                  'computerAccess',
+                ]
+                  .map((key) => [key, draft[key]])
+                  .filter(([, value]) => value !== undefined),
+              ),
             })
           }
         >
@@ -270,46 +303,29 @@ export default function AgentScreen({
             />
           </label>
           <small>{t('Provider addresses and credentials are managed in Settings.')}</small>
-          <div className="profile-model-picker">
-            <select
-              aria-label={t('Profile model')}
-              value={draft.model ?? ''}
-              onChange={(e) => setDraft({ ...draft, model: e.target.value, inheritModel: false })}
-            >
-              <option value="">{t('Choose a model')}</option>
-              {[...new Set([draft.model, ...catalog].filter(Boolean))].map((model) => (
-                <option key={model} value={model}>
-                  {model}
-                </option>
-              ))}
-            </select>
-            <button
-              onClick={() =>
-                void api
-                  .models({ provider: draft.provider ?? snapshot.settings.provider })
-                  .then(setCatalog)
-                  .catch(onError)
-              }
-            >
-              {t('Find models')}
-            </button>
-          </div>
+          <ModelPicker
+            settings={{
+              ...snapshot.settings,
+              provider: draft.provider ?? snapshot.settings.provider,
+              model: draft.model ?? '',
+            }}
+            onUpdate={async ({ model }) => setDraft({ ...draft, model, inheritModel: false })}
+            onError={onError}
+          />
           <h2>{t('Tools and connections')}</h2>
           <small>{t('Profile choices can only restrict the access granted in the app.')}</small>
-          <label className="setting-switch">
-            <span>
-              {t('Allow setup and access requests')}
-              <small>
-                {t('Native review is required before any proposed change or access grant.')}
-              </small>
-            </span>
-            <Switch
-              checked={draft.allowConfigurationRequests !== false}
-              onChange={(e) => setDraft({ ...draft, allowConfigurationRequests: e.target.checked })}
-            />
+          <label>
+            {t('Computer access')}
+            <select
+              value={draft.computerAccess || 'inherit'}
+              onChange={(e) => setDraft({ ...draft, computerAccess: e.target.value })}
+            >
+              <option value="inherit">{t('Use global computer access')}</option>
+              <option value="projects">{t('Authorized project folders only')}</option>
+            </select>
           </label>
           {groups
-            .filter((g) => ['calendar', 'reports', 'search', 'projects'].includes(g))
+            .filter(() => true)
             .map((g) => (
               <label className="setting-switch" key={g}>
                 <span>{t(groupLabels[g] || g)}</span>
@@ -393,7 +409,14 @@ export default function AgentScreen({
             );
           })}
         </section>
-        <section className="agent-ratings-card">
+        <AgentAccessPanel
+          profileId={profile.id}
+          snapshot={snapshot}
+          onChanged={onChanged}
+          onError={onError}
+        />
+        <details className="agent-ratings-card">
+          <summary>{t('Your ratings')}</summary>
           <h2>{t('Your ratings')}</h2>
           <p className="muted">{t('Your assessment, from 0 to 5 stars.')}</p>
           {ratings.map(([key, label]) => (
@@ -452,7 +475,7 @@ export default function AgentScreen({
               {t('Change your name and sharing preference in Settings → Your profile.')}
             </small>
           </section>
-        </section>
+        </details>
       </div>
     </div>
   );

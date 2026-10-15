@@ -88,7 +88,8 @@
     "paragraphs": [
       "Un profil de agent are nume, imagine, stil, model implicit și domenii pentru instrumente. Stilul nu înlocuiește instrucțiunile obligatorii. Evaluările sunt ale tale, nu garanții măsurate ale calității.",
       "Abilitățile sunt instrucțiuni reutilizabile. Le poți inspecta și alege modul de învățare sau revizuire. Notele, memoria și rezultatele instrumentelor nu autorizează extinderea permisiunilor agentului.",
-      "Conexiunile oferă instrumente externe. Configurarea unui server MCP primește întotdeauna revizuire nativă, inclusiv cu Acces complet, afișând executabilul și argumentele sau adresa HTTP. Configurarea, conectarea, descoperirea și verificarea capacității sunt rezultate separate. Autentificarea, cheile și instalarea dependențelor folosesc fluxuri dedicate utilizatorului."
+      "Conexiunile oferă instrumente externe. Configurarea unui server MCP primește întotdeauna revizuire nativă, inclusiv cu Acces complet, afișând executabilul și argumentele sau adresa HTTP. Configurarea, conectarea, descoperirea și verificarea capacității sunt rezultate separate. Autentificarea, cheile și instalarea dependențelor folosesc fluxuri dedicate utilizatorului.",
+      "Listele Matrix și Sarcinile aleg profiluri de agent, cu modelele, abilitățile și restricțiile lor. Sarcinile pot moșteni opțiunile panoului/listei sau pot rămâne manuale. Schimbarea agentului conversației nu reatribuie lucrul salvat. Profilurile atribuite indisponibile necesită intervenția ta."
     ],
     "setting": "models"
   },
@@ -99,7 +100,8 @@
       "Comutatoarele globale pot suspenda accesul. Elementele, moștenirea, excepțiile și profilurile decid în continuare ce poate fi folosit. Citirea nu înseamnă editare; atribuirea sarcinilor și aprobările comenzilor rămân separate.",
       "Doar resurse selectate limitează acest agent la resursele acordate. Agentul poate cere acces la o resursă selectată explicit sau deja descoperibilă; nu poate inventaria resurse private pentru a cere acces mai larg. Aprobarea exactă nu schimbă accesul tuturor agenților.",
       "Permite pentru această cerere expiră când execuția cererii se termină, este oprită, corectată sau anulată. Alt mesaj, ramură, agent sau sarcină programată nu o moștenește. Permite mereu pentru acest agent păstrează resursa și nivelul exact până la revocare. Excepțiile copiilor și limitele globale rămân active.",
-      "Refuzul nu acordă acces. Cardurile de configurare arată exact înainte și după și explică persistența. Accesul permanent nu ocolește aprobările comenzilor sau configurarea MCP. Verifică și revocă acordările salvate în Accesul agentului."
+      "Refuzul nu acordă acces. Cardurile de configurare arată exact înainte și după și explică persistența. Accesul permanent nu ocolește aprobările comenzilor sau configurarea MCP. Verifică și revocă acordările salvate în Accesul agentului.",
+      "Accesul la calculator selectează proiecte, dosare suplimentare cu citire/editare sau toate fișierele contului. Profilurile pot restrânge accesul suplimentar. Limitele fișierelor nu izolează comenzile shell; comenzile aprobate pot folosi accesul contului tău. Protecția separată a acțiunilor distructive/neclasificate se aplică și în Acces complet, iar configurarea MCP necesită întotdeauna verificare."
     ],
     "setting": "access"
   },
@@ -155,5 +157,25 @@
       "Pentru probleme de conectare verifică separat serverul, adresa, cheia, modelul și cota. Include versiunea aplicației, sistemul și pași fără date private într-un raport de eroare. Nu distribui chei, conversații private sau întreaga bază. Licențele locale complete și notificările terților sunt în Setări → Licențe."
     ],
     "setting": "data"
+  },
+  {
+    "id": "sources",
+    "title": "Adaugă surse și păstrează fișiere",
+    "page": "chat",
+    "paragraphs": [
+      "Folosește butonul + din oricare conversație pentru fișiere/imagini, copii limitate ale dosarelor sau selectarea opțională a resurselor interne. Caietele afișează capitole și note; Sarcinile afișează panouri, liste și carduri. Întrebările obișnuite pot căuta în resursele deja permise agentului. Selectarea identifică exact un element privat pentru o cerere de acces, fără a-i partaja conținutul.",
+      "Aplicația întreabă dacă fișierele copiate aparțin doar conversației sau trebuie păstrate într-un proiect. Originalele rămân intacte. Copiile conversației urmează conversația în Coș și sunt eliminate la ștergerea definitivă când nu le mai folosește nicio ramură. Copiile din proiect rămân. Copiile de siguranță exportate anterior sunt independente.",
+      "Fișierele text/PDF/DOCX permit extragere limitată. Imaginile necesită un model cu intrare vizuală și trebuie să respecte limita acestuia; PDF-urile scanate necesită imagini ale paginilor sau un export text. Copiile dosarelor omit fișiere ascunse/legături simbolice și sunt limitate la 200 de fișiere și 100 MB, cu 25 MB pe fișier. Învățarea automată a memoriei/abilităților rămâne oprită pentru sursele conversației până la activarea explicită."
+    ]
+  },
+  {
+    "id": "ongoing-files",
+    "title": "Monitorizarea continuă a fișierelor",
+    "page": "matrix",
+    "paragraphs": [
+      "Alege agentul unei liste Matrix. În Programare și declanșatoare ale unei sarcini, alege Monitorizare fișiere și Fișiere noi finalizate, în mod continuu, selectează un dosar și decide dacă procesezi și fișierele deja prezente. Autorizează dosarul în Accesul agentului și integrează lista. Atribuirea nu acordă acces la fișiere.",
+      "Aplicația monitorizează nativ, fără terminal deschis sau apeluri către model în repaus. Pune în coadă fișierele noi stabilizate, omite numele descărcărilor parțiale, procesează loturi limitate cu agentul atribuit, înregistrează rezultatele și revine la monitorizare. Sosirile noi așteaptă când se lucrează la altceva. Stabilitatea dimensiunii/timpului este o estimare; unele programe de descărcare pot necesita așteptare suplimentară sau verificare manuală.",
+      "Monitorizarea funcționează cât timp aplicația este deschisă sau în zona de notificare. Pauză AI o suspendă; închiderea completă/suspendarea calculatorului oprește observarea. Pornirea/reluarea verifică fișierele omise. Execuțiile întrerupte sau eșuate necesită verificare înaintea reîncercării. Ieșirile native cunoscute sunt urmărite pentru evitarea buclelor. Declanșatoarele clasice de modificare rămân separate; un serviciu de sistem independent și starea shell persistentă nu sunt incluse."
+    ]
   }
 ]

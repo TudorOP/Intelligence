@@ -46,12 +46,15 @@ import { WebSearch } from './web-search.mjs';
 import { SearchCredentials } from './search-credentials.mjs';
 import { Workspace } from './workspace.mjs';
 import { ensureProfiles, profileSettings } from './profiles.mjs';
+import { requireAssignedAgent } from './assignments.mjs';
+import { resourceKinds, resourceGate, resourceGroup } from './resource-catalog.mjs';
 import { exportBackup, inspectBackup, restoreBackup } from './backup.mjs';
 import { ExternalEvents, wakeCapability, updateWake } from './automation.mjs';
 import { Planning } from './planning.mjs';
 import { projectPath } from './projects.mjs';
 import { deleteTrashBatch } from './trash-bulk.mjs';
 import { OptionalModules } from './optional-modules.mjs';
+import { restoreWindow } from './window-state.mjs';
 import { importBackgroundImage } from './appearance-settings.mjs';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const setupFixture =
@@ -351,6 +354,125 @@ function setup() {
       !['activity', 'history', 'receipt', 'read-activity'].includes(input.action)
     )
       throw Error('A backup operation is in progress');
+    if (input.action.startsWith('chat-attachment-')) {
+      const conversation = agent.chatFiles.conversation(input.conversation);
+      if (input.action === 'chat-attachment-list') return agent.chatFiles.list(conversation.id);
+      if (agent.active.has(conversation.id))
+        throw Error('Wait for the response to finish before changing attachments');
+      if (input.action === 'chat-attachment-remove') {
+        await agent.chatFiles.remove(conversation.id, input.id);
+        change();
+        return agent.chatFiles.list(conversation.id);
+      }
+      if (input.action === 'chat-attachment-keep') {
+        const item = agent.chatFiles.list(conversation.id).find((f) => f.id === input.id);
+        if (!item) throw Error('Attachment not found');
+        const destination = 'Sources/' + item.name.replaceAll('\\', '/');
+        try {
+          await agent.chatFiles.keep(conversation.id, item.id, input.project, destination, {
+            user: true,
+          });
+        } catch (e) {
+          if (e.code !== 'EEXIST') throw e;
+          await agent.chatFiles.keep(
+            conversation.id,
+            item.id,
+            input.project,
+            'Sources/' + item.id.slice(0, 8) + '-' + path.basename(item.name),
+            { user: true },
+          );
+        }
+        change();
+        return agent.chatFiles.list(conversation.id);
+      }
+      if (input.action !== 'chat-attachment-add') throw Error('Unsupported attachment action');
+      if (input.retention === 'project' && store.get(input.project)?.kind !== 'project')
+        throw Error('Choose a project for retained files');
+      const selection = await dialog.showOpenDialog(window, {
+        title: localized(
+          input.folder ? 'Attach folder snapshot' : 'Attach files and images',
+          store.settings().language,
+        ),
+        properties: input.folder ? ['openDirectory'] : ['openFile', 'multiSelections'],
+      });
+      if (selection.canceled) return { files: agent.chatFiles.list(conversation.id), skipped: [] };
+      const result = await agent.chatFiles.import(conversation.id, selection.filePaths, {
+        folder: input.folder === true,
+      });
+      const warnings = [];
+      if (input.retention === 'project')
+        for (const id of result.added) {
+          const item = result.files.find((f) => f.id === id);
+          try {
+            await agent.chatFiles.keep(
+              conversation.id,
+              id,
+              input.project,
+              'Sources/' + item.name.replaceAll('\\', '/'),
+              { user: true },
+            );
+          } catch (e) {
+            if (e.code === 'EEXIST') {
+              try {
+                await agent.chatFiles.keep(
+                  conversation.id,
+                  id,
+                  input.project,
+                  'Sources/' + id.slice(0, 8) + '-' + path.basename(item.name),
+                  { user: true },
+                );
+              } catch (error) {
+                warnings.push(item.name + ': ' + error.message);
+              }
+            } else warnings.push(item.name + ': ' + e.message);
+          }
+        }
+      change();
+      return { ...result, files: agent.chatFiles.list(conversation.id), warnings };
+    }
+    if (input.action === 'matrix-file-queue') {
+      if (store.get(input.id)?.kind !== 'matrix-task') throw Error('Matrix task not found');
+      return matrix.triggers.inbox.history(input.id);
+    }
+    if (input.action === 'access-overview') {
+      if (store.get(input.profile)?.kind !== 'agent-profile')
+        throw Error('Agent profile not found');
+      const settings = profileSettings(store, { data: { agentProfile: input.profile } }),
+        scope = agent.accessRequests.scope(settings, 'access-overview');
+      return store.withAgentScope(scope, () =>
+        store
+          .all(false, true)
+          .filter(
+            (e) =>
+              !e.parent &&
+              resourceKinds.has(e.kind) &&
+              e.title.toLocaleLowerCase().includes(String(input.query || '').toLocaleLowerCase()),
+          )
+          .slice(0, 100)
+          .map((e) => {
+            const gate = resourceGate(e),
+              blocked = gate && !store.settings()[gate],
+              toolBlocked =
+                settings.profileScope?.toolGroups &&
+                !settings.profileScope.toolGroups.includes(resourceGroup(e));
+            const read = !toolBlocked && store.access(e.id),
+              edit = read && store.access(e.id, true);
+            return {
+              id: e.id,
+              title: e.title,
+              reason: blocked
+                ? 'Blocked globally'
+                : toolBlocked
+                  ? 'Blocked by profile tools'
+                  : edit
+                    ? 'Read & edit'
+                    : read
+                      ? 'Read only'
+                      : 'Not granted to this agent',
+            };
+          }),
+      );
+    }
     if (input.action.startsWith('module-')) {
       const action = input.action.slice(7),
         id = input.id;
@@ -521,25 +643,37 @@ function setup() {
   });
   handle('bootstrap', async () => {
     const actorScope = agent.accessRequests.scope(profileSettings(store), 'bootstrap');
+    const cardAccess = (e) => {
+      try {
+        const settings = profileSettings(store, {
+          data: { agentProfile: requireAssignedAgent(store, e) },
+        });
+        return store.withAgentScope(agent.accessRequests.scope(settings, 'bootstrap'), () => ({
+          ...e,
+          agentAccess: store.access(e.id),
+          agentEditable: store.access(e.id, true),
+          agentAssigned: store.assigned(e.id),
+        }));
+      } catch {
+        return { ...e, agentAccess: false, agentEditable: false, agentAssigned: false };
+      }
+    };
     return {
       ...store.snapshot(false),
       entities: store.withAgentScope(actorScope, () =>
-        store.all(false, true).map((e) =>
-          e.kind === 'card'
-            ? {
-                ...e,
-                agentAccess: store.access(e.id),
-                agentEditable: store.access(e.id, true),
-                agentAssigned: store.assigned(e.id),
-              }
-            : e.kind === 'report'
-              ? { ...e, data: { ...e.data, content: undefined, sections: undefined } }
-              : e.kind === 'vault-file'
-                ? { ...e, data: { ...e.data, content: undefined } }
-                : e.kind === 'connection'
-                  ? { ...e, data: { ...e.data, enabled: connections.clients.has(e.id) } }
-                  : e,
-        ),
+        store
+          .all(false, true)
+          .map((e) =>
+            e.kind === 'card'
+              ? cardAccess(e)
+              : e.kind === 'report'
+                ? { ...e, data: { ...e.data, content: undefined, sections: undefined } }
+                : e.kind === 'vault-file'
+                  ? { ...e, data: { ...e.data, content: undefined } }
+                  : e.kind === 'connection'
+                    ? { ...e, data: { ...e.data, enabled: connections.clients.has(e.id) } }
+                    : e,
+          ),
       ),
       desktop: true,
       showOnboarding:
@@ -634,7 +768,9 @@ function setup() {
       void externalEvents.refresh().catch((e) => emit({ type: 'notice', error: e.message }));
     if (input.language !== undefined) rebuildTray();
     if (input.appIcon !== undefined || input.trayIcon !== undefined) updateIcons(s);
-    if (input.approvalMode !== undefined) agent.applyApprovalMode();
+    if (input.approvalMode !== undefined || input.askDestructive !== undefined)
+      agent.applyApprovalMode();
+    agent.commandListener();
     if (input.semanticSearch === false)
       void memory.release().catch((error) => console.error('Memory cleanup:', error));
     if (!s.autoConsolidation || !s.memoryAccess) consolidator.pause();
@@ -1068,7 +1204,7 @@ function setup() {
     await fs.copyFile(source, result.filePath);
     return result.filePath;
   });
-  const deleteOneTrash = (id) => {
+  const deleteOneTrash = async (id) => {
     const item = store.get(id, true);
     const subtree = item ? [item, ...store.children(id, true, true)] : [];
     const ids = new Set(subtree.map((e) => e.id));
@@ -1083,6 +1219,7 @@ function setup() {
     consolidator.pause();
     const vaultAssets = store.get(id, true)?.kind.startsWith('vault-') ? vault.destroy(id) : null;
     const result = store.deleteTrash(id);
+    await agent.chatFiles.collect();
     result.retainedAssets += vault.collectAssets(vaultAssets);
     change();
     return result;
@@ -1092,8 +1229,12 @@ function setup() {
   );
 }
 async function runTask(id, manual = false) {
+  const profile = requireAssignedAgent(store, store.get(id));
   return store.withAgentScope(
-    agent.accessRequests.scope(profileSettings(store), 'task-start'),
+    agent.accessRequests.scope(
+      profileSettings(store, { data: { agentProfile: profile } }),
+      'task-start',
+    ),
     () => runTaskScoped(id, manual),
   );
 }
@@ -1105,7 +1246,10 @@ async function runTaskScoped(id, manual = false) {
   if (card.data.status === 'running') return;
   if (agent.active.size)
     throw new Error('Finish or stop the active response before starting another task.');
-  if (!profileSettings(store).model) throw new Error('Choose a model before starting this task.');
+  const assignedProfile = requireAssignedAgent(store, card);
+  const taskSettings = profileSettings(store, { data: { agentProfile: assignedProfile } });
+  if (!taskSettings.model)
+    throw new Error('Choose a model for the assigned agent before starting this task.');
   if (manual && !store.assigned(id)) store.mutate({ id, data: { assigned: true } });
   const conversation = store.mutate({
     kind: 'conversation',
@@ -1114,16 +1258,26 @@ async function runTaskScoped(id, manual = false) {
     data: {
       context: [id, ...(card.data.links ?? [])],
       task: id,
-      agentProfile: store.settings().activeAgent,
+      agentProfile: assignedProfile,
     },
   });
   const runId = randomUUID();
   store.db
     .prepare('INSERT INTO runs VALUES(?,?,?,?,?,?,?)')
     .run(runId, id, 'running', new Date().toISOString(), null, null, conversation.id);
+  store.db
+    .prepare('INSERT INTO run_profiles VALUES(?,?,?,?,?)')
+    .run(runId, assignedProfile, taskSettings.agentName, taskSettings.provider, taskSettings.model);
   store.mutate({
     id,
-    data: { status: 'running', conversation: conversation.id, lastRun: new Date().toISOString() },
+    data: {
+      status: 'running',
+      conversation: conversation.id,
+      lastRun: new Date().toISOString(),
+      lastAgent: assignedProfile,
+      lastModel: taskSettings.model,
+      lastProvider: taskSettings.provider,
+    },
   });
   change();
   const maxMinutes = Math.max(1, Math.min(Number(card.data.schedule?.maxMinutes ?? 30), 480));
@@ -1167,9 +1321,21 @@ async function tick() {
       return;
     }
     for (const c of store.all(false, true).filter((e) => e.kind === 'card')) {
+      if (!store.assigned(c.id)) continue;
+      let chosen;
+      try {
+        chosen = requireAssignedAgent(store, c);
+      } catch (error) {
+        if (c.data.status !== 'needs_input')
+          store.mutate({ id: c.id, data: { status: 'needs_input', result: error.message } });
+        continue;
+      }
       if (
         !store.withAgentScope(
-          agent.accessRequests.scope(profileSettings(store), 'task-start'),
+          agent.accessRequests.scope(
+            profileSettings(store, { data: { agentProfile: chosen } }),
+            'task-start',
+          ),
           () => store.assigned(c.id),
         ) ||
         ['running', 'review', 'needs_input', 'paused', 'done'].includes(c.data.status)
@@ -1177,7 +1343,7 @@ async function tick() {
         continue;
       const start = c.data.schedule?.start;
       if (!start || Date.parse(start) > Date.now()) continue;
-      if (!profileSettings(store).model) {
+      if (!profileSettings(store, { data: { agentProfile: chosen } }).model) {
         store.mutate({
           id: c.id,
           data: {
@@ -1252,6 +1418,7 @@ workspace = new Workspace(store, vault);
 memory = new Memory(store, emit);
 connections = new Connections(store);
 agent = new Agent(store, memory, connections, emit);
+await agent.chatFiles.collect();
 planning = new Planning(store, agent, emit);
 workspace.planning = planning;
 agent.planning = planning;
@@ -1342,12 +1509,20 @@ protocol.handle('intelligence-media', async (request) => {
     return new Response('Not found', { status: 404 });
   }
 });
-const workArea = screen.getPrimaryDisplay().workAreaSize;
+const savedWindow = restoreWindow(
+  store.settings().windowBounds,
+  [
+    screen.getPrimaryDisplay(),
+    ...screen.getAllDisplays().filter((d) => d.id !== screen.getPrimaryDisplay().id),
+  ].map((d) => d.workArea),
+);
 window = new BrowserWindow({
-  width: Math.min(1920, workArea.width),
-  height: Math.min(1080, workArea.height),
-  minWidth: 820,
-  minHeight: 600,
+  width: Math.round(savedWindow.width),
+  height: Math.round(savedWindow.height),
+  x: Math.round(savedWindow.x),
+  y: Math.round(savedWindow.y),
+  minWidth: Math.min(820, savedWindow.width),
+  minHeight: Math.min(600, savedWindow.height),
   show: process.env.INTELLIGENCE_TEST !== '1',
   frame: false,
   backgroundColor: '#111614',
@@ -1361,6 +1536,21 @@ window = new BrowserWindow({
     webSecurity: true,
   },
 });
+if (savedWindow.maximized) window.maximize();
+let windowSaveTimer;
+const saveWindow = () => {
+  clearTimeout(windowSaveTimer);
+  if (!window.isDestroyed())
+    store.setSettings({
+      windowBounds: { ...window.getNormalBounds(), maximized: window.isMaximized() },
+    });
+};
+for (const event of ['resize', 'move', 'maximize', 'unmaximize'])
+  window.on(event, () => {
+    clearTimeout(windowSaveTimer);
+    windowSaveTimer = setTimeout(saveWindow, 250);
+  });
+window.on('close', saveWindow);
 window.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
 window.webContents.on('context-menu', (_event, params) => {
   const items = params.isEditable
@@ -1453,6 +1643,7 @@ powerMonitor.on('suspend', () => {
     matrix.stop('Sleep interrupted this task. Review progress before retrying.', 'needs_input');
 });
 app.on('before-quit', () => {
+  saveWindow();
   quitting = true;
   workspace.close();
   planning.close();
@@ -1463,6 +1654,7 @@ app.on('before-quit', () => {
   void memory.close().catch(() => {});
   matrix.close();
   for (const id of agent.active.keys()) agent.stop(id);
+  agent.commands.close();
   void connections.close();
 });
 app.on('window-all-closed', () => app.quit());

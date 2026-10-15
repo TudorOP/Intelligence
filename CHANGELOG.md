@@ -1,5 +1,17 @@
 # Releases
 
+## 1.01 — local workspace and automation update on dev
+
+- Restore the selected project and normal/maximized window bounds; first launch fits a smaller 1280×800 window.
+- Share searchable model/agent pickers, symbolic chat model buttons and a unified Add sources dialog with resource trees.
+- Support text/PDF/DOCX/image attachments, bounded folder snapshots, explicit project retention, branch-aware cleanup and backup inclusion.
+- Assign agent profiles to Matrix lists and Tasks, preserve prior Matrix model choices as migrated profiles, and retain the assigned model when preparation is disabled.
+- Centralize computer scope, additional read/edit folders, command approvals and destructive-action protection; expose effective per-agent access and the same grants editor in profiles.
+- Add managed command jobs with incremental output, ownership, polling/input, cancellation, bounded execution and outcome guards.
+- Add continuous Matrix inbox monitoring with readiness checks, durable per-file queues, busy/startup/resume catch-up, output deduplication and execution history.
+- Consolidate Icons under Look & feel and command policy under Agent access; retain EN/RO help, mandatory native permission/revision checks, artwork and licenses.
+- Prepare public label 1.01/package 1.0.1 locally. No push, main merge, binary build or publication. Target-Linux/live-provider acceptance remains open.
+
 ## 1.0 — local development milestone on dev
 
 - Completed the prerequisite provider catalog/profile-form deduplication and verified cleanup as a separate commit.

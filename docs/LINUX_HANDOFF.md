@@ -4,8 +4,8 @@ Use the matching Intelligence-source.zip or this source checkout. Dev holds new 
 
 ```bash
 docker compose run --build --rm appimage
-chmod +x release/Intelligence-1.0.0-x86_64.AppImage
-./release/Intelligence-1.0.0-x86_64.AppImage
+chmod +x release/Intelligence-1.0.1-x86_64.AppImage
+./release/Intelligence-1.0.1-x86_64.AppImage
 ```
 
 The script rejects release packaging outside Linux Docker. Docker is not a runtime dependency. Run the AppImage as a regular user with the Electron sandbox enabled. Validate Wayland/X11, tray, desktop icon, single-instance reopening and mixed-DPI/font/scaling behavior.

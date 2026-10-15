@@ -1,3 +1,4 @@
+import { pickChoice } from './ui-pickers.mjs';
 import { _electron as electron } from 'playwright';
 import electronPath from 'electron';
 import fs from 'node:fs';
@@ -216,7 +217,7 @@ try {
   await setup
     .getByText('Server reached · Models found. Choose a model below.', { exact: true })
     .waitFor();
-  await setup.getByLabel('Selected model', { exact: true }).selectOption('setup-fixture-model');
+  await pickChoice(page, 'Selected model', 'setup-fixture-model', setup);
   await setup.getByRole('button', { name: 'Test a reply', exact: true }).click();
   await setup
     .getByText('Reply tested. This model can chat. Agent tools remain untested.', { exact: true })
@@ -287,13 +288,18 @@ try {
   assert.equal(state.settings.onboardingComplete, true);
   assert.equal(state.settings.onboarding.lessons.notes, 1);
   await page.getByRole('button', { name: 'Chat', exact: true }).first().click();
-  await page.getByRole('button', { name: 'Choose context', exact: true }).click();
-  await page.getByLabel('Find a resource', { exact: true }).fill('Selected private notebook');
-  await page.getByLabel('Selected private notebook · Notebook', { exact: true }).check();
+  await page.getByRole('button', { name: 'Add sources', exact: true }).click();
   await page
-    .locator('.chat-context-picker')
-    .getByRole('button', { name: 'Done', exact: true })
+    .locator('.sources-dialog')
+    .getByRole('button', { name: 'Notebooks', exact: true })
     .click();
+  await page.getByLabel('Find a resource', { exact: true }).fill('Selected private notebook');
+  await page
+    .locator('.sources-dialog .source-resource')
+    .filter({ hasText: 'Selected private notebook' })
+    .getByRole('checkbox')
+    .check();
+  await page.locator('.sources-dialog').getByRole('button', { name: 'Done', exact: true }).click();
   await page
     .getByRole('textbox', { name: 'Message Intelligence', exact: true })
     .fill('Ask for temporary access to my selected notebook.');
@@ -370,13 +376,18 @@ try {
   );
   await page.getByRole('button', { name: /Ask Guide companion/ }).click();
   const sidebar = page.locator('.assistant-pane');
-  await sidebar.getByRole('button', { name: 'Choose context', exact: true }).click();
-  await sidebar.getByLabel('Find a resource', { exact: true }).fill('Selected private notebook');
-  await sidebar.getByLabel('Selected private notebook · Notebook', { exact: true }).check();
-  await sidebar
-    .locator('.chat-context-picker')
-    .getByRole('button', { name: 'Done', exact: true })
+  await sidebar.getByRole('button', { name: 'Add sources', exact: true }).click();
+  await page
+    .locator('.sources-dialog')
+    .getByRole('button', { name: 'Notebooks', exact: true })
     .click();
+  await page.getByLabel('Find a resource', { exact: true }).fill('Selected private notebook');
+  await page
+    .locator('.sources-dialog .source-resource')
+    .filter({ hasText: 'Selected private notebook' })
+    .getByRole('checkbox')
+    .check();
+  await page.locator('.sources-dialog').getByRole('button', { name: 'Done', exact: true }).click();
   await sidebar
     .getByRole('textbox', { name: 'Message contextual assistant', exact: true })
     .fill('Ask for access in the sidebar.');

@@ -9,7 +9,7 @@ import type { Entity, Settings, Snapshot } from './types';
 import './matrix.css';
 import ThemeArt from './ThemeArt';
 import Switch from './Switch';
-import { MatrixModel, MatrixTaskSchedule } from './MatrixControls';
+import { MatrixModel, MatrixTaskSchedule, FileQueueHistory } from './MatrixControls';
 
 const stateName: Record<string, string> = {
   queued: 'Queued',
@@ -81,6 +81,11 @@ function MatrixPreview({
               }
             >
               {t(run.status)} · {new Date(run.start).toLocaleString()}
+              {run.agentName && (
+                <small>
+                  {run.agentName} · {run.provider} · {run.model}
+                </small>
+              )}
             </button>
           ))}
         </>
@@ -260,6 +265,9 @@ export default function CognitionMatrix({
     </form>
   );
   const renderTask = (task: Entity, depth = 0): React.ReactNode => {
+    let owner = task;
+    while (owner.parent && owner.kind !== 'matrix-list')
+      owner = snapshot.entities.find((e) => e.id === owner.parent) || { ...owner, parent: null };
     const isOpen = expanded.has(task.id),
       state = task.data.status ?? 'queued';
     const subtasks = children(task.id).filter((e) => e.kind === 'matrix-task');
@@ -306,7 +314,17 @@ export default function CognitionMatrix({
           <button className="matrix-task-title" onClick={toggle} aria-expanded={isOpen}>
             <span>{task.title}</span>
             <small>
-              {state === 'paused' && !task.data.startedAt ? t('Draft') : stateName[state]}
+              {task.data.trigger?.mode === 'inbox' && ['done', 'queued'].includes(state)
+                ? t(
+                    owner.data.integrated &&
+                      task.data.enabled !== false &&
+                      !settings.backgroundPaused
+                      ? 'Monitoring'
+                      : 'Paused',
+                  )
+                : state === 'paused' && !task.data.startedAt
+                  ? t('Draft')
+                  : t(stateName[state])}
               {subtasks.length
                 ? ` · ${subtasks.filter((e) => e.data.status === 'done').length}/${subtasks.length} subtasks`
                 : ''}
@@ -374,6 +392,7 @@ export default function CognitionMatrix({
               </select>
             </label>
             <MatrixPreview task={task} onConversation={onConversation} />
+            {task.data.trigger?.mode === 'inbox' && <FileQueueHistory task={task} />}
             <MatrixTaskSchedule
               task={task}
               snapshot={snapshot}
@@ -396,7 +415,8 @@ export default function CognitionMatrix({
               >
                 {t('Conversation ↗')}
               </button>
-              {snapshot.matrixActive?.task === task.id ? (
+              {snapshot.matrixActive?.task === task.id ||
+              (task.data.trigger?.mode === 'inbox' && ['queued', 'done'].includes(state)) ? (
                 <button onClick={() => void action(task.id, 'pause')}>{t('Pause')}</button>
               ) : ['failed', 'needs_input', 'paused'].includes(state) ? (
                 <button onClick={() => void action(task.id, 'retry')}>

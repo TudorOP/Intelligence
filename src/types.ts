@@ -40,6 +40,11 @@ export type Entity = {
   updated: string;
 };
 export type Settings = {
+  lastProject: string;
+  computerScope: 'projects' | 'folders' | 'system';
+  computerFolders: { directory: string; permission: 'read' | 'edit' }[];
+  askDestructive: boolean;
+  windowBounds: { x?: number; y?: number; width?: number; height?: number; maximized?: boolean };
   skillLearning: 'automatic' | 'review' | 'off';
   preferredName: string;
   profileDescription: string;

@@ -17,6 +17,8 @@ import {
 } from './inference-providers.mjs';
 import { validateEvent, validateReportTemplate } from './planning-schema.mjs';
 import { redactLog } from './workloads.mjs';
+import { validateComputerSettings } from './computer-access.mjs';
+import { workspaceSchema } from './workspace-storage.mjs';
 
 export const kinds = [
   'machine',
@@ -44,6 +46,12 @@ export const kinds = [
   'vault-file',
 ];
 export const defaults = {
+  lastProject: '',
+  assignmentVersion: 0,
+  computerScope: 'projects',
+  computerFolders: [],
+  askDestructive: true,
+  windowBounds: {},
   theme: 'night',
   returnTheme: 'day',
   chatWidth: 'comfortable',
@@ -183,6 +191,7 @@ export class Store extends EventEmitter {
       CREATE TABLE IF NOT EXISTS search_credentials (provider TEXT PRIMARY KEY,value BLOB NOT NULL);
       CREATE VIRTUAL TABLE IF NOT EXISTS message_search USING fts5(id UNINDEXED,conversation UNINDEXED,content);
     `);
+    this.db.exec(workspaceSchema);
     this.db.exec(`INSERT INTO message_search SELECT id,conversation,content FROM messages
       WHERE role IN ('user','assistant') AND coalesce(json_extract(data,'$.tool'),0)=0
       AND coalesce(json_extract(data,'$.error'),0)=0 AND id NOT IN (SELECT id FROM message_search)`);
@@ -252,6 +261,24 @@ export class Store extends EventEmitter {
       };
     }
     validateAppearanceSettings(value);
+    validateComputerSettings(value);
+    if (value.assignmentVersion !== undefined && ![0, 1].includes(value.assignmentVersion))
+      throw Error('Invalid assignment migration version');
+    if (
+      value.windowBounds !== undefined &&
+      (!value.windowBounds ||
+        Array.isArray(value.windowBounds) ||
+        Object.entries(value.windowBounds).some(([k, v]) =>
+          k === 'maximized'
+            ? typeof v !== 'boolean'
+            : !['x', 'y', 'width', 'height'].includes(k) ||
+              !Number.isFinite(v) ||
+              (['width', 'height'].includes(k) && (v < 100 || v > 30000)),
+        ))
+    )
+      throw Error('Invalid window bounds');
+    if (value.lastProject && this.get(value.lastProject)?.kind !== 'project')
+      throw Error('Project no longer exists');
     if (value.autoReadAloud !== undefined && typeof value.autoReadAloud !== 'boolean')
       throw Error('Invalid automatic reading preference');
     validateOptionalModules(value.optionalModules);
@@ -770,6 +797,23 @@ export class Store extends EventEmitter {
       if (!p || !parentKinds[kind].includes(p.kind)) throw new Error('Choose a valid parent');
     } else if (parent) throw new Error('This item cannot have a parent');
     const data = { ...previous?.data, ...input.data };
+    if (input.data?.assignedAgent !== undefined) {
+      if (
+        !['board', 'list', 'card', 'matrix-list'].includes(kind) ||
+        (data.assignedAgent !== null &&
+          (typeof data.assignedAgent !== 'string' ||
+            this.get(data.assignedAgent)?.kind !== 'agent-profile'))
+      )
+        throw Error('Choose an available agent');
+      if (agent) throw Error('Only the user can change access and assignment');
+    }
+    if (
+      input.data?.assigned === true &&
+      !data.assignedAgent &&
+      !parent &&
+      this.settings().activeAgent
+    )
+      data.assignedAgent = this.settings().activeAgent;
     if (kind === 'calendar-event') Object.assign(data, validateEvent(data));
     if (kind === 'report-template') Object.assign(data, validateReportTemplate(data));
     if (agent && kind === 'report') throw Error('Reports are created by the native report runner');
@@ -998,6 +1042,7 @@ export class Store extends EventEmitter {
         this.db
           .prepare('DELETE FROM runs WHERE card=? OR conversation=?')
           .run(deletedId, deletedId);
+        this.db.exec('DELETE FROM run_profiles WHERE run NOT IN (SELECT id FROM runs)');
         for (const table of ['versions', 'vectors', 'search', 'entities'])
           this.db.prepare(`DELETE FROM ${table} WHERE id=?`).run(deletedId);
       }

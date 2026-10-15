@@ -1,3 +1,4 @@
+import ChatSources, { type ChatAttachment } from './ChatSources';
 import { resourceKinds, resourceLabel } from '../electron/resource-catalog.mjs';
 import ApprovalCard from './ApprovalCard';
 import { t } from './i18n';
@@ -227,6 +228,7 @@ export default function Chat({
     [activity, setActivity] = useState(''),
     [approvals, setApprovals] = useState<AgentEvent[]>([]);
   const [images, setImages] = useState<string[]>([]);
+  const [attachedFiles, setAttachedFiles] = useState<ChatAttachment[]>([]);
   const [branching, setBranching] = useState(false);
   const [spokenMessage, setSpokenMessage] = useState(''),
     [speechState, setSpeechState] = useState('');
@@ -452,7 +454,8 @@ export default function Chat({
       }
       return;
     }
-    if (!text.trim() && !images.length) return;
+    if (!text.trim() && !images.length && !attachedFiles.length) return;
+    if (!text.trim() && attachedFiles.length) text = t('Please review the attached sources.');
     if (!settings.model && !conversation?.data.matrixTask) {
       onSettings();
       return;
@@ -770,14 +773,28 @@ export default function Chat({
           <label className="chat-memory-control">
             <input
               type="checkbox"
-              checked={conversation.data.memoryExcluded !== true}
+              checked={
+                conversation.data.memoryExcluded !== true && !conversation.data.attachmentPrivate
+              }
               onChange={(e) =>
                 void api
-                  .mutate({ id: conversation.id, data: { memoryExcluded: !e.target.checked } })
+                  .mutate({
+                    id: conversation.id,
+                    data: {
+                      memoryExcluded: !e.target.checked,
+                      attachmentPrivate: e.target.checked
+                        ? false
+                        : conversation.data.attachmentPrivate,
+                    },
+                  })
                   .catch((e) => onError(e.message))
               }
             />
-            {t('Allow this chat in memory & past-conversation search')}
+            {t(
+              conversation.data.attachmentPrivate
+                ? 'Conversation-only attachments: enable memory explicitly to retain derived information'
+                : 'Allow this chat in memory & past-conversation search',
+            )}
           </label>
         ) : null}
         {conversation?.data.logContext ? (
@@ -804,67 +821,6 @@ export default function Chat({
             </button>
           </details>
         ) : null}
-        {resources.length > 0 &&
-          !conversation?.data.matrixTask &&
-          !conversation?.data.readOnlyMachine &&
-          !conversation?.data.reportReadOnly && (
-            <div className="chat-context-selection">
-              <button
-                type="button"
-                ref={contextTrigger}
-                disabled={responding}
-                aria-controls={contextPickerId}
-                aria-expanded={contextOpen}
-                onClick={() => setContextOpen(!contextOpen)}
-              >
-                {t('Choose context')}
-              </button>
-              {contextOpen && (
-                <div
-                  className="chat-context-picker"
-                  id={contextPickerId}
-                  onKeyDown={(event) => {
-                    if (event.key === 'Escape') {
-                      event.stopPropagation();
-                      closeContext();
-                    }
-                  }}
-                >
-                  <label>
-                    {t('Find a resource')}
-                    <input
-                      autoFocus
-                      value={contextQuery}
-                      onChange={(e) => setContextQuery(e.target.value)}
-                    />
-                  </label>
-                  <small>
-                    {t(
-                      'Selecting sends the name and ID. Content is shared only with effective access; the agent can ask for your approval.',
-                    )}
-                  </small>
-                  {candidates.map((e) => (
-                    <label key={e.id}>
-                      <input
-                        aria-label={e.title + ' · ' + t(resourceLabel(e.kind))}
-                        type="checkbox"
-                        checked={context.some((p) => p.id === e.id)}
-                        disabled={responding}
-                        onChange={(event) => toggleContext(e, event.target.checked)}
-                      />
-                      <span>
-                        {e.title}
-                        <small>{t(resourceLabel(e.kind))}</small>
-                      </span>
-                    </label>
-                  ))}
-                  <button type="button" onClick={closeContext}>
-                    {t('Done')}
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
         {context.length ? (
           <div className="context-chips">
             {context.slice(0, 4).map((e) => (
@@ -884,6 +840,20 @@ export default function Chat({
           </div>
         ) : null}
         <div className="composer">
+          {attachedFiles.length > 0 && (
+            <div className="chat-source-chips">
+              {attachedFiles.map((file) => (
+                <span
+                  key={file.id}
+                  title={t(
+                    file.retention === 'project' ? 'Kept in project' : 'This conversation only',
+                  )}
+                >
+                  {file.name} · {t(file.retention === 'project' ? 'Project' : 'Chat')}
+                </span>
+              ))}
+            </div>
+          )}
           {images.length ? (
             <div className="chat-images">
               {images.map((url, i) => (
@@ -922,16 +892,13 @@ export default function Chat({
             <div className="composer-tools chat-controls">
               {conversation?.data.matrixTask ? (
                 <div className="matrix-model-control">
-                  <select
-                    className="composer-select chat-model-select"
-                    aria-label={t('Choose model')}
-                    disabled
-                    title={t('Model selected by the Matrix list. Open Matrix to change it.')}
+                  <button
+                    className="icon-button"
+                    aria-label={t('Matrix agent settings')}
+                    data-tooltip={settings.agentName + ' · ' + (info?.model || settings.model)}
+                    onClick={onSettings}
                   >
-                    <option>{info?.model || t('Task model')}</option>
-                  </select>
-                  <button aria-label={t('Matrix model settings')} onClick={onSettings}>
-                    ↗
+                    <Icon name="brain" />
                   </button>
                 </div>
               ) : (
@@ -942,23 +909,24 @@ export default function Chat({
                   onError={onError}
                 />
               )}
-              <button
-                className="attach-image"
-                aria-label={t('Attach image')}
-                disabled={responding || images.length >= 4 || settings.visionEnabled === false}
-                onClick={() =>
-                  void api
-                    .image('vision')
-                    .then((url) => {
-                      if (url) setImages((old) => (old.length < 4 ? [...old, url] : old));
-                    })
-                    .catch((e) => onError(e.message))
-                }
-              >
-                <span className="image-symbol" aria-hidden="true">
-                  <span />
-                </span>
-              </button>
+              {!conversation?.data.matrixTask &&
+                !conversation?.data.readOnlyMachine &&
+                !conversation?.data.reportReadOnly && (
+                  <ChatSources
+                    conversation={conversation}
+                    resources={resources}
+                    context={context}
+                    onToggle={toggleContext}
+                    settings={settings}
+                    onError={onError}
+                    disabled={responding}
+                    files={attachedFiles}
+                    onFiles={setAttachedFiles}
+                    ensureConversation={async () =>
+                      conversation || (await onNew(context.map((e) => e.id)))
+                    }
+                  />
+                )}
               <button
                 aria-label={t('Show thinking')}
                 aria-pressed={settings.showThinking ?? false}
@@ -1076,7 +1044,7 @@ export default function Chat({
               <button
                 className="send"
                 aria-label={t('Send message')}
-                disabled={!draft.trim() && !images.length}
+                disabled={!draft.trim() && !images.length && !attachedFiles.length}
                 onClick={() => void send()}
               >
                 ↑

@@ -1,4 +1,18 @@
-# Intelligence 1.0 — verification
+# Intelligence 1.01 — verification
+
+The 1.01 update adds saved workspace/window state, shared searchable pickers, retained conversation attachments, named task agents, computer scope and command policy, managed commands and durable inbox monitoring. The update is verified locally on dev. No push/publication or Linux binary build is authorized.
+
+## 1.01 results
+
+All **232 enabled backend checks** pass. TypeScript and the production renderer build pass; the existing large-chunk warning remains. The new workspace suite covers assignment migration, window bounds, file-scope and symlink checks, live revocation, stale file revisions, ephemeral image reads, conversation/branch retention, actual backup restoration, managed-command ownership/cleanup and durable file arrivals during active work and after restart. Restored computer grants require review; interrupted queue entries require attention.
+
+The production Electron workspace fixture passes 11 captures with actual preload/IPC/SQLite and local model responses: compact searchable pickers, profile assignments, source retention, direct image messages, computer permissions, inbox setup, short windows and Romanian. Onboarding passes 17 captures including native permission requests in both chats; Settings passes 27 captures. Profiles, chat/memory controls, Matrix and agent-control fixtures also pass. Provider-qualified model choices preserve duplicate model names across providers; disconnection stops active work. Matrix verification includes native file/image/report tools, ASAR document parsing and task triggers. Representative picker/source/access screens were visually inspected. No renderer errors or horizontal overflow were reported by these fixtures.
+
+The tracked-source audit passes with 930 files, 442 complete indexed notices and no optional runtime/model/data/credential artifacts. Intelligence-source.zip is refreshed from the audited tracked source. Artwork, original translations, user-authored content and historical release records are preserved.
+
+These checks ran on Windows with isolated fixture data. Actual Linux shell execution/process-group cancellation, desktop/window restoration across Wayland/X11, live providers and real download workflows remain target-host acceptance checks. Inbox readiness is a size/mtime stability heuristic, not a guarantee that another program has closed a file. Monitoring requires the application to run, including in its tray; startup/resume reconciles missed files. Command jobs end with their response/run; persistent shell state and a standalone monitoring service remain deferred. Context-length benchmarking and token-overhead work remain excluded. No binary was built, pushed or published.
+
+## 1.0 baseline
 
 The authorized 1.0 implementation follows a separately verified cleanup commit on dev. The six-stage setup, offline guide/lessons, inline provider help and reviewed agent access/configuration flows are implemented; this is local source preparation, not a published binary release.
 
@@ -30,17 +44,17 @@ Generated logs, screenshots and fixture databases are ignored and excluded from 
 
 The production Electron fixture compares the verified cleanup commit c8a2b90 (0.94) with 1.0 on the same Windows machine. Four isolated runs used baseline / 1.0 / 1.0 / baseline order, without other acceptance fixtures running. Each run opened Settings five times and recorded a separate DOM/layout commit probe. Closed setup/help features add no polling, background model requests or recurring timers.
 
-| Measure | Cleanup baseline | 1.0 |
-| --- | ---: | ---: |
-| Median startup, two runs each | 878.5 ms | 857.5 ms |
-| Median summed idle process working sets | 396.9 MiB | 394.8 MiB |
-| Median Settings DOM/layout commit, ten probes each | 3.8 ms | 4.15 ms |
-| Total production JavaScript, including lazy chunks | 1,391,965 bytes | 1,470,922 bytes |
-| Entry and shared JSX chunks combined | 756,068 bytes | 731,741 bytes |
+| Measure                                            | Cleanup baseline |             1.0 |
+| -------------------------------------------------- | ---------------: | --------------: |
+| Median startup, two runs each                      |         878.5 ms |        857.5 ms |
+| Median summed idle process working sets            |        396.9 MiB |       394.8 MiB |
+| Median Settings DOM/layout commit, ten probes each |           3.8 ms |         4.15 ms |
+| Total production JavaScript, including lazy chunks |  1,391,965 bytes | 1,470,922 bytes |
+| Entry and shared JSX chunks combined               |    756,068 bytes |   731,741 bytes |
 
 The full JavaScript output grows by 78,957 bytes (5.7%); setup, Settings, lessons and the selected guide language load on demand. The initial entry/shared JSX output shrinks by 24,327 bytes. Idle process CPU samples stayed below 0.14% in both builds; warmed Settings working sets were approximately 413–415 MiB. These samples show no material startup/idle regression on this machine, but two runs per build do not establish a statistical guarantee. Working sets include resident shared code and are not a heap measurement. The DOM/layout probe does not measure final paint; Playwright click wall times include hidden-window scheduling and are not treated as user interaction latency.
 
-Reproduce with node scripts/verify-performance.mjs LABEL [APPLICATION_ROOT] after building each checkout. Raw metrics remain in ignored .test-data/performance-* directories and are included in the separate screenshot review archive. Existing real chat/local-server and renderer lifecycle fixtures pass; real-model throughput, Linux compositor behavior and target hardware remain acceptance limits below.
+Reproduce with node scripts/verify-performance.mjs LABEL [APPLICATION_ROOT] after building each checkout. Raw metrics remain in ignored .test-data/performance-\* directories and are included in the separate screenshot review archive. Existing real chat/local-server and renderer lifecycle fixtures pass; real-model throughput, Linux compositor behavior and target hardware remain acceptance limits below.
 
 ## Acceptance limits
 

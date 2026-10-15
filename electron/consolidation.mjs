@@ -159,8 +159,11 @@ export class Consolidator {
       !this.store.settings().memoryAccess
     )
       return;
-    const conversations = this.store.all(false,true)
-      .filter((c) => c.kind === 'conversation' && this.store.access(c.id));
+    const conversations = this.store
+      .all(false, true)
+      .filter(
+        (c) => c.kind === 'conversation' && !c.data.attachmentPrivate && this.store.access(c.id),
+      );
     for (const c of conversations) {
       const messages = this.store
         .messages(c.id)

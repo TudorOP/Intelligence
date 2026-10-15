@@ -1,6 +1,6 @@
 {
   "name": "intelligence",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "A thoughtful local-first AI companion for your Linux desktop.",
   "desktopName": "app.intelligence.desktop.desktop",
@@ -42,6 +42,7 @@
     "test:themes": "node scripts/verify-themes.mjs",
     "test:chat-memory-order": "node scripts/verify-chat-memory-order.mjs",
     "test:onboarding": "node scripts/verify-onboarding.mjs",
+    "test:workspace-automation": "node scripts/verify-workspace-automation.mjs",
     "test:performance": "node scripts/verify-performance.mjs"
   },
   "dependencies": {

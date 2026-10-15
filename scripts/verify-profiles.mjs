@@ -82,6 +82,7 @@ try {
     .first()
     .click();
   await page.getByRole('heading', { name: 'Intelligence', exact: true }).waitFor();
+  await page.locator('.agent-ratings-card > summary').click();
   for (const [label, value] of [
     ['Intelligence', 5],
     ['Knowledge', 4],

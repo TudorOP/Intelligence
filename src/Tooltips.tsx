@@ -2,6 +2,20 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { t, useLanguage, sourceText } from './i18n';
 const help: Record<string, string> = {
+  'Add sources':
+    'Attach files, images or a folder snapshot, or identify an existing workspace resource. Choose whether external files stay with the chat or in a project.',
+  'Choose agent':
+    'Choose the profile that performs this work, including its model, skills and permission limits.',
+  'Search choices': 'Filter the list by name, provider or model.',
+  'File access scope':
+    'Choose authorized projects, selected additional folders or system-wide file access. Native app resources keep their own permissions.',
+  'Folder permission': 'Allow reading only, or reading and editing, in this additional folder.',
+  'Ask before destructive or unclassified actions':
+    'Require native review for destructive computer-file operations and shell commands that cannot be classified safely.',
+  'Keep attached files':
+    'Conversation-only copies follow chat deletion. Project copies remain after the chat is deleted.',
+  'Attachment project':
+    'Choose where retained file copies are stored. Original external files are preserved.',
   'Choose context':
     'Choose resource names for this chat. Their content is shared only when this agent has effective access.',
   Revoke:

@@ -1,6 +1,8 @@
 import { lazy, Suspense, useState, type ReactNode } from 'react';
 import { api } from './api';
 import { t } from './i18n';
+import AgentPicker from './AgentPicker';
+import { assignedAgent } from '../electron/assignments.mjs';
 import type { Entity, Settings } from './types';
 const Report = lazy(() => import('./ReportReader').then((m) => ({ default: m.TaskReportReader })));
 export default function TaskDetail({
@@ -29,6 +31,16 @@ export default function TaskDetail({
   const [expanded, setExpanded] = useState(false),
     [tab, setTab] = useState('details');
   const agentAccess = card.agentAccess === true;
+  const assignmentStore = {
+    get: (id: string) => entities.find((e) => e.id === id),
+    settings: () => settings,
+  };
+  const effectiveAgent = assignedAgent(assignmentStore, card);
+  const inheritedAgent = assignedAgent(
+    assignmentStore,
+    entities.find((e) => e.id === card.parent),
+  );
+  const missingAgent = !entities.some((e) => e.id === effectiveAgent && e.kind === 'agent-profile');
   const local = (value: string) => {
     const d = new Date(value);
     return new Date(+d - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
@@ -74,24 +86,32 @@ export default function TaskDetail({
               placeholder={t('What does a good result look like?')}
             />
           </label>
-          {agentAccess && (
+          {(agentAccess || missingAgent) && (
             <label>
               {t('Assignment')}
-              <select
-                aria-label={t('Card assignment')}
-                value={card.data.assigned == null ? 'inherit' : card.data.assigned ? 'yes' : 'no'}
-                onChange={(e) =>
+              <AgentPicker
+                entities={entities}
+                settings={settings}
+                manual
+                inherit={
+                  entities.find((e) => e.id === inheritedAgent)?.title || t('Unavailable agent')
+                }
+                value={
+                  card.data.assigned === false
+                    ? 'manual'
+                    : card.data.assigned == null
+                      ? 'inherit'
+                      : effectiveAgent
+                }
+                onChange={(id) =>
                   action(() =>
                     onPatch({
-                      assigned: e.target.value === 'inherit' ? null : e.target.value === 'yes',
+                      assigned: id === 'inherit' ? null : id !== 'manual',
+                      assignedAgent: ['manual', 'inherit'].includes(id) ? null : id,
                     }),
                   )
                 }
-              >
-                <option value="inherit">{t('Inherit assignment')}</option>
-                <option value="yes">{t('Agent task')}</option>
-                <option value="no">{t('Manual only')}</option>
-              </select>
+              />
               <small>
                 {t(
                   'Board and list assignment applies when inherited. Manual only prevents automatic work.',

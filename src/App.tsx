@@ -1,3 +1,4 @@
+import AgentPicker from './AgentPicker';
 import { locale } from './i18n';
 import { t } from './i18n';
 import { useLanguage, setLanguage } from './i18n';
@@ -284,6 +285,7 @@ export default function App() {
     return () => clearTimeout(timer);
   }, [pendingReport, form, settingsOpen, guideOpen, focusMode]);
   const bootVersion = useRef(0);
+  const restoredProject = useRef(false);
   const navigateRef = useRef<(id?: string) => void>(() => {});
   const newShortcutRef = useRef<(shift: boolean) => void>(() => {});
   const bootTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -316,11 +318,34 @@ export default function App() {
     const version = ++bootVersion.current;
     try {
       const next = await api.bootstrap();
-      if (version === bootVersion.current) setSnapshot(next);
+      if (version === bootVersion.current) {
+        if (!restoredProject.current) {
+          const saved = next.settings.lastProject;
+          setProjectId(
+            next.entities.some((e) => e.id === saved && e.kind === 'project' && !e.deleted)
+              ? saved
+              : null,
+          );
+          restoredProject.current = true;
+        }
+        setSnapshot(next);
+      }
     } catch (e) {
       if (version === bootVersion.current) setError((e as Error).message);
     }
   }, []);
+  useEffect(() => {
+    if (!snapshot || !restoredProject.current) return;
+    if (
+      projectId &&
+      !snapshot.entities.some((e) => e.id === projectId && e.kind === 'project' && !e.deleted)
+    ) {
+      setProjectId(null);
+      return;
+    }
+    if ((snapshot.settings.lastProject || '') !== (projectId || ''))
+      void api.settings({ lastProject: projectId || '' }).catch((e) => setError(e.message));
+  }, [projectId, snapshot?.entities]);
   useEffect(() => {
     void boot();
     const unsubscribe = api.onEvent((e) => {
@@ -430,9 +455,7 @@ export default function App() {
     const trap = (event: KeyboardEvent) => {
       if (event.key !== 'Tab') return;
       const dialogs = Array.from(document.querySelectorAll<HTMLElement>('[role="dialog"]'));
-      const dialog =
-        document.querySelector<HTMLElement>('.onboarding[role="dialog"]') ??
-        dialogs[dialogs.length - 1];
+      const dialog = dialogs[dialogs.length - 1];
       if (!dialog) return;
       const controls = Array.from(
         dialog.querySelectorAll<HTMLElement>(
@@ -1564,14 +1587,7 @@ export default function App() {
                   ))}
                 </select>
               ) : null}
-              <button
-                className="quiet-button"
-                onClick={() =>
-                  page === 'tasks' || page === 'notebooks'
-                    ? setAccessOpen(true)
-                    : setSettingsOpen('access')
-                }
-              >
+              <button className="quiet-button" onClick={() => setSettingsOpen('access')}>
                 {t('◎ Agent access')}
               </button>
               <button
@@ -2108,8 +2124,14 @@ export default function App() {
                                 checked={board.data.assigned === true}
                                 onChange={(e) => void patch(board, { assigned: e.target.checked })}
                               />{' '}
-                              {t('Let')} {settings.agentName} {t('work on this board')}
+                              {t('Agent tasks')}
                             </label>
+                            <AgentPicker
+                              entities={entities}
+                              settings={settings}
+                              value={board.data.assignedAgent || settings.activeAgent}
+                              onChange={(id) => void patch(board, { assignedAgent: id })}
+                            />
                             <button
                               className="quiet-button"
                               onClick={() => newEntity('list', board.id)}
@@ -2277,6 +2299,22 @@ export default function App() {
                                   />{' '}
                                   {t('Agent tasks')}
                                 </label>
+                                <AgentPicker
+                                  entities={entities}
+                                  settings={settings}
+                                  value={list.data.assignedAgent || 'inherit'}
+                                  inherit={
+                                    entities.find(
+                                      (e) =>
+                                        e.id === (board.data.assignedAgent || settings.activeAgent),
+                                    )?.title || t('Unavailable agent')
+                                  }
+                                  onChange={(id) =>
+                                    void patch(list, {
+                                      assignedAgent: id === 'inherit' ? null : id,
+                                    })
+                                  }
+                                />
                                 {children(list.id).map((c) => (
                                   <article
                                     className={
@@ -3289,6 +3327,11 @@ export default function App() {
               setGuideOpen(false);
               setLesson(article);
               if (article.page) setPage(article.page as Page);
+            }}
+            onResources={(target) => {
+              setPage(target);
+              setSettingsOpen(null);
+              setAccessOpen(true);
             }}
             onTrash={() => setTrashOpen(true)}
             trashOpen={trashOpen}

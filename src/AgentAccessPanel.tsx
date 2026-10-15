@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { api } from './api';
 import { t } from './i18n';
 import Switch from './Switch';
@@ -8,16 +8,33 @@ export default function AgentAccessPanel({
   snapshot,
   onChanged,
   onError,
+  profileId,
 }: {
   snapshot: Snapshot;
   onChanged: () => Promise<any>;
   onError: (e: any) => void;
+  profileId?: string;
 }) {
   const profiles = snapshot.entities.filter((e) => e.kind === 'agent-profile');
   const [selected, setSelected] = useState(snapshot.settings.activeAgent),
     [busy, setBusy] = useState(false);
   const [query, setQuery] = useState('');
-  const profile = profiles.find((e) => e.id === selected) || profiles[0];
+  const profile = profiles.find((e) => e.id === (profileId || selected)) || profiles[0];
+  const [overview, setOverview] = useState<{ id: string; title: string; reason: string }[]>([]);
+  const [overviewOpen, setOverviewOpen] = useState(false);
+  useEffect(() => {
+    let live = true;
+    if (profile && overviewOpen)
+      void api
+        .workspace({ action: 'access-overview', profile: profile.id, query })
+        .then((value) => {
+          if (live) setOverview(value);
+        })
+        .catch(() => {});
+    return () => {
+      live = false;
+    };
+  }, [profile?.id, profile?.revision, query, snapshot.settings, overviewOpen]);
   if (!profile) return null;
   const grants: { id: string; permission: string; fingerprint?: string }[] =
     profile.data.resourceGrants || [];
@@ -57,16 +74,18 @@ export default function AgentAccessPanel({
   return (
     <section className="settings-card agent-grants">
       <h3>{t('Access for each agent')}</h3>
-      <label>
-        {t('Agent')}
-        <select value={profile.id} onChange={(e) => setSelected(e.target.value)} disabled={busy}>
-          {profiles.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.title}
-            </option>
-          ))}
-        </select>
-      </label>
+      {!profileId && (
+        <label>
+          {t('Agent')}
+          <select value={profile.id} onChange={(e) => setSelected(e.target.value)} disabled={busy}>
+            {profiles.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.title}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
       <label>
         {t('Resource policy')}
         <select
@@ -98,6 +117,15 @@ export default function AgentAccessPanel({
           'Global switches and profile tool scopes still apply. Child exceptions, task assignment and host-command approvals stay separate.',
         )}
       </p>
+      <details onToggle={(event) => setOverviewOpen(event.currentTarget.open)}>
+        <summary>{t('Effective access')}</summary>
+        {overview.map((item) => (
+          <p key={item.id}>
+            {item.title} · <small>{t(item.reason)}</small>
+          </p>
+        ))}
+        <small>{t('Shows up to 100 matching collections. Child exceptions still apply.')}</small>
+      </details>
       {grants.map((g) => (
         <div className="grant-row" key={g.id}>
           <span>

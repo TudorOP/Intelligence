@@ -1,3 +1,4 @@
+import { settingsSection } from './ui-pickers.mjs';
 import { _electron as electron } from 'playwright';
 import electronPath from 'electron';
 import fs from 'node:fs';
@@ -70,7 +71,7 @@ try {
   assert.ok(previews.every((width) => width > 100));
   await page.locator('.theme-options button').filter({ hasText: 'Summer' }).click();
   assert.equal(await page.getByLabel('Layout', { exact: true }).count(), 0);
-  await page.getByRole('button', { name: 'Icons & identity', exact: true }).click();
+  await settingsSection(page, 'Icons & identity');
   await page.getByLabel('App window icon', { exact: true }).selectOption('prism');
   await page.getByLabel('Tray icon', { exact: true }).selectOption('aurora');
   await page.getByLabel('In-app logo', { exact: true }).selectOption('aurora');

@@ -14,6 +14,7 @@ import { AutomationPanel, BackupPanel } from './WorkspacePanels';
 import AppearanceSettings from './AppearanceSettings';
 import OptionalModulesPanel from './OptionalModulesPanel';
 import LicensesPanel from './LicensesPanel';
+import ComputerAccessPanel from './ComputerAccessPanel';
 
 export default function SettingsDialog({
   section,
@@ -30,6 +31,7 @@ export default function SettingsDialog({
   guideOpen,
   setupReturn = false,
   onLesson,
+  onResources,
 }: {
   section: string;
   settings: Settings;
@@ -45,6 +47,7 @@ export default function SettingsDialog({
   guideOpen: boolean;
   setupReturn?: boolean;
   onLesson: (article: HelpArticle) => void;
+  onResources: (page: 'notebooks' | 'tasks') => void;
 }) {
   const [settingsQuery, setSettingsQuery] = useState('');
   const [licensesOpen, setLicensesOpen] = useState(false);
@@ -87,8 +90,11 @@ export default function SettingsDialog({
                 title: 'Personal',
                 items: [
                   ['profile', 'Your profile', 'user name identity sharing'],
-                  ['appearance', 'Look & feel', 'theme notebook background language layout accent'],
-                  ['icons', 'Icons & identity', 'app tray logo icons'],
+                  [
+                    'appearance',
+                    'Look & feel',
+                    'theme notebook background language layout accent icons identity app tray logo',
+                  ],
                 ],
               },
               {
@@ -99,7 +105,7 @@ export default function SettingsDialog({
                     'Model & providers',
                     'model provider api credentials connection tools repair agent',
                   ],
-                  ['chat', 'Chat & context', 'thinking context compaction approval width'],
+                  ['chat', 'Chat & context', 'thinking context compaction width'],
                   ['search', 'Search providers', 'web brave searxng research'],
                   [
                     'modules',
@@ -114,7 +120,7 @@ export default function SettingsDialog({
                   [
                     'access',
                     'Agent access',
-                    'permissions scopes terminal notebook vault calendar reports memory',
+                    'permissions scopes terminal notebook vault calendar reports memory approvals commands computer system files destructive',
                   ],
                   [
                     'automation',
@@ -263,11 +269,19 @@ export default function SettingsDialog({
             <ChatPreferences settings={settings} onUpdate={changeSettings} />
           ) : null}
           {(section === 'appearance' || section === 'icons') && (
-            <AppearanceSettings
-              settings={settings}
-              onUpdate={changeSettings}
-              identity={section === 'icons'}
-            />
+            <>
+              <AppearanceSettings
+                settings={settings}
+                onUpdate={changeSettings}
+                identity={section === 'icons'}
+              />
+              {section === 'appearance' && (
+                <details>
+                  <summary>{t('Icons & identity')}</summary>
+                  <AppearanceSettings settings={settings} onUpdate={changeSettings} identity />
+                </details>
+              )}
+            </>
           )}
           {section === 'access' && (
             <section className="settings-section">
@@ -276,6 +290,8 @@ export default function SettingsDialog({
               <div className="settings-grid">
                 <section className="settings-card">
                   <h3>{t('Workspace resources')}</h3>
+                  <button onClick={() => onResources('notebooks')}>{t('Notebook sharing')}</button>
+                  <button onClick={() => onResources('tasks')}>{t('Task sharing')}</button>
                   {(
                     [
                       ['notebookAccess', 'Notebook access'],
@@ -296,12 +312,7 @@ export default function SettingsDialog({
                 </section>
                 <section className="settings-card">
                   <h3>{t('Memory & host tools')}</h3>
-                  {(
-                    [
-                      ['memoryAccess', 'Memory recall'],
-                      ['terminalAccess', 'Host terminal commands'],
-                    ] as const
-                  ).map(([key, label]) => (
+                  {([['memoryAccess', 'Memory recall']] as const).map(([key, label]) => (
                     <label className="setting-switch" key={key}>
                       <span>{t(label)}</span>
                       <Switch
@@ -322,6 +333,7 @@ export default function SettingsDialog({
                   </p>
                 </section>
               </div>
+              <ComputerAccessPanel settings={settings} onUpdate={changeSettings} onError={fail} />
               <details className="agent-grants-menu">
                 <summary>{t('Access for each agent')}</summary>
                 <AgentAccessPanel snapshot={snapshot} onChanged={boot} onError={fail} />

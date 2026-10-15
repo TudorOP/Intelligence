@@ -19,6 +19,8 @@ export const profileGroups = [
   'reports',
 ];
 export function validateProfile(data) {
+  if (data.computerAccess !== undefined && !['inherit', 'projects'].includes(data.computerAccess))
+    throw Error('Invalid profile computer access');
   if (data.resourcePolicy !== undefined && !['shared', 'ask'].includes(data.resourcePolicy))
     throw Error('Invalid agent resource policy');
   if (data.resourceGrants !== undefined) validateResourceGrants(data.resourceGrants);
@@ -103,11 +105,51 @@ export function ensureProfiles(store) {
     .all(false, true)
     .filter((e) => e.kind === 'conversation' && !e.data.agentProfile))
     store.mutate({ id: conversation.id, data: { agentProfile: profiles[0].id } });
+  for (const list of store
+    .all(false, true)
+    .filter((e) => e.kind === 'matrix-list' && !e.data.assignedAgent)) {
+    let id = store.settings().activeAgent;
+    const legacy = list.data.modelProfile;
+    if (legacy) {
+      const base = store.get(id);
+      const copy = store.mutate({
+        kind: 'agent-profile',
+        title: list.title + ' · ' + legacy.model,
+        data: validateProfile({
+          ...base.data,
+          provider: legacy.provider,
+          model: legacy.model,
+          inheritModel: false,
+          migratedFrom: list.id,
+        }),
+      });
+      profiles.push(copy);
+      id = copy.id;
+    }
+    store.mutate({
+      id: list.id,
+      data: { assignedAgent: id, modelProfile: null, legacyModelProfile: legacy || null },
+    });
+  }
+  if (store.settings().assignmentVersion !== 1) {
+    for (const item of store
+      .all(false, true)
+      .filter(
+        (e) =>
+          ['board', 'list', 'card'].includes(e.kind) &&
+          e.data.assigned === true &&
+          !e.data.assignedAgent,
+      ))
+      store.mutate({ id: item.id, data: { assignedAgent: store.settings().activeAgent } });
+    store.setSettings({ assignmentVersion: 1 });
+  }
   return profiles;
 }
 export function profileSettings(store, conversation = null) {
   const base = store.settings(),
     profile = store.get(conversation?.data.agentProfile ?? base.activeAgent);
+  if (conversation?.data.agentProfile && profile?.kind !== 'agent-profile')
+    throw Error('The assigned agent is unavailable. Choose another agent.');
   if (profile?.kind !== 'agent-profile') {
     const provider = conversation?.data.branchProvider ?? base.provider;
     return {
@@ -173,8 +215,8 @@ export function toolGroup(name) {
     return 'memory';
   if (name === 'zim_action') return 'search';
   if (/search_web|web_search|browse_web/.test(name)) return 'search';
-  if (/terminal|host_command|run_command/.test(name)) return 'terminal';
-  if (name === 'read_file' || name === 'write_file') return 'projects';
+  if (/terminal|host_command|run_command|command_session/.test(name)) return 'terminal';
+  if (name === 'read_file' || name === 'write_file' || name === 'computer_files') return 'projects';
   if (/machine|inspect_|container|logs/.test(name)) return 'machine';
   if (/matrix|schedule_task|task_result/.test(name)) return 'matrix';
   return 'workspace';

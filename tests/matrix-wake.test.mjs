@@ -59,7 +59,7 @@ function fixture(t, runtime = {}) {
   return { root, store, matrix, agent, calls, loads, add };
 }
 
-test('per-list inference uses saved provider settings without changing chat; off uses loaded chat only', async (t) => {
+test('per-list inference stays fixed when preparation is off, without changing chat', async (t) => {
   const f = fixture(t);
   f.store.setSettings({
     provider: 'lmstudio',
@@ -79,8 +79,8 @@ test('per-list inference uses saved provider settings without changing chat; off
   f.store.setSettings({ matrixPreload: false });
   f.add();
   await f.matrix.tick();
-  assert.equal(f.calls[1].inference.model, 'chat-model');
-  assert.equal(f.calls[1].inference.provider, 'ollama');
+  assert.equal(f.calls[1].inference.model, 'list-model');
+  assert.equal(f.calls[1].inference.provider, 'lmstudio');
   assert.equal(f.loads.length, 0);
 });
 

@@ -6,6 +6,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import http from 'node:http';
 import assert from 'node:assert/strict';
+import { pickValue } from './ui-pickers.mjs';
 
 const pending = [];
 const requests = [];
@@ -119,7 +120,7 @@ try {
   );
   await page.locator('.task-actions').waitFor({ state: 'detached' });
   assert.equal(await page.locator('.task-agent-report').count(), 0);
-  assert.equal(await page.getByLabel('Card assignment').count(), 0);
+  assert.equal(await page.getByRole('button', { name: 'Choose agent', exact: true }).count(), 0);
   assert.equal(
     await page.getByPlaceholder('What should be done?').inputValue(),
     'Conținut păstrat — Știință',
@@ -151,13 +152,13 @@ try {
   await page.getByLabel('Inference provider', { exact: true }).selectOption('lmstudio');
   await page.keyboard.press('Escape');
   await nav('Chat');
-  const picker = page.locator('.chat-surface:not(.compact) .chat-model-select');
+  const mainChat = page.locator('.chat-surface:not(.compact)');
+  await mainChat.getByRole('button', { name: 'Choose model', exact: true }).click();
   await page.waitForFunction(
-    () =>
-      document.querySelectorAll('.chat-surface:not(.compact) .chat-model-select optgroup')
-        .length === 4,
+    () => document.querySelectorAll('.search-picker-panel .picker-group').length === 4,
   );
-  await picker.selectOption(JSON.stringify(['llamacpp', 'shared-model']));
+  await page.keyboard.press('Escape');
+  await pickValue(page, 'Choose model', JSON.stringify(['llamacpp', 'shared-model']), mainChat);
   await page.waitForFunction(
     async () => (await window.intelligence.bootstrap()).settings.provider === 'llamacpp',
   );
@@ -185,7 +186,7 @@ try {
   const conversation = snapshot.entities.find(
     (e) => e.kind === 'conversation' && !e.data.temporary,
   );
-  await picker.selectOption(JSON.stringify(['lmstudio', 'other-model']));
+  await pickValue(page, 'Choose model', JSON.stringify(['lmstudio', 'other-model']), mainChat);
   await page.waitForFunction(
     async (id) =>
       (await window.intelligence.bootstrap()).entities.find((e) => e.id === id)?.data
@@ -195,12 +196,14 @@ try {
   await page.evaluate(() =>
     window.intelligence.inferenceKey({ action: 'disconnect', provider: 'llamacpp' }),
   );
+  await mainChat.getByRole('button', { name: 'Choose model', exact: true }).click();
   await page.waitForFunction(
     () =>
-      ![...document.querySelectorAll('.chat-model-select optgroup')].some(
-        (e) => e.label === 'llama.cpp',
+      ![...document.querySelectorAll('.search-picker-panel .picker-group')].some(
+        (e) => e.textContent === 'llama.cpp',
       ),
   );
+  await page.keyboard.press('Escape');
   await page.reload();
   await page.locator('.sidebar').waitFor();
   const restored = await page.evaluate(() => window.intelligence.bootstrap());

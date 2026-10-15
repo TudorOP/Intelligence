@@ -1,3 +1,4 @@
+import { pickChoice } from './ui-pickers.mjs';
 import { _electron as electron } from 'playwright';
 import electronPath from 'electron';
 import { createServer } from 'node:http';
@@ -191,20 +192,12 @@ try {
     await page.mouse.move(0, 0);
     await capture(width + '-saved');
   }
-  const modelSelect = page.getByLabel('Choose model');
-  await page.waitForFunction(
-    () => document.querySelector('.chat-model-select')?.querySelectorAll('option').length >= 5,
-  );
-  assert.equal(await modelSelect.locator('option').filter({ hasText: modelNames[1] }).count(), 1);
-  const modelBounds = await modelSelect.boundingBox();
-  assert.ok(modelBounds.width <= 240);
-  assert.ok(
-    modelBounds.x + modelBounds.width <= 1920 && modelBounds.y + modelBounds.height <= 1080,
-  );
+  const modelButton = page.getByRole('button', { name: 'Choose model', exact: true });
+  assert.equal(Math.round((await modelButton.boundingBox()).width), 32);
+  await modelButton.click();
+  await page.getByRole('textbox', { name: 'Search choices', exact: true }).fill(modelNames[1]);
   await capture('model-selector');
-  await modelSelect.selectOption(
-    await modelSelect.locator('option').filter({ hasText: modelNames[1] }).getAttribute('value'),
-  );
+  await page.locator('.picker-option').filter({ hasText: modelNames[1] }).first().click();
   await page.getByRole('button', { name: 'Tasks', exact: true }).click();
   await page.getByRole('button', { name: /Right click task/ }).click({ button: 'right' });
   await page

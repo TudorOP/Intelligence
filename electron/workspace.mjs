@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { profileAction, profileSettings } from './profiles.mjs';
+import { requireAssignedAgent } from './assignments.mjs';
 import { projectFiles, projectPath } from './projects.mjs';
 import { nextOccurrence } from './schedule.mjs';
 import { matrixInference } from './matrix-config.mjs';
@@ -59,7 +60,12 @@ export class Workspace {
       original = s.get(input.id);
     if (input.model && (typeof input.model !== 'string' || input.model.length > 500))
       throw Error('Invalid branch model');
-    if (original?.kind !== 'conversation' || original.data.task || original.data.matrixTask || original.data.readOnlyMachine)
+    if (
+      original?.kind !== 'conversation' ||
+      original.data.task ||
+      original.data.matrixTask ||
+      original.data.readOnlyMachine
+    )
       throw Error('Branch an ordinary conversation');
     const messages = s.messages(input.id),
       at = messages.findIndex((m) => m.id === input.message);
@@ -109,6 +115,8 @@ export class Workspace {
       for (const m of prefix) {
         const mid = randomUUID(),
           md = { ...m.data, sharedPrefix: true, originMessage: m.data.originMessage ?? m.id };
+        if (md.visionImage?.kind === 'attachment')
+          md.visionImage = { ...md.visionImage, conversation: id };
         s.db
           .prepare('INSERT INTO messages VALUES(?,?,?,?,?,?)')
           .run(mid, id, m.role, m.content, JSON.stringify(md), m.created);
@@ -116,6 +124,22 @@ export class Workspace {
           s.db.prepare('INSERT INTO message_search VALUES(?,?,?)').run(mid, id, m.content);
       }
       s.index(id);
+      if (
+        s.db
+          .prepare("SELECT 1 FROM sqlite_master WHERE type='table' AND name='chat_file_refs'")
+          .get()
+      ) {
+        for (const attachment of [
+          ...new Set(
+            prefix.flatMap((m) => m.data.promptContext?.attachments?.map((f) => f.id) || []),
+          ),
+        ])
+          s.db
+            .prepare(
+              'INSERT OR IGNORE INTO chat_file_refs SELECT ?,id FROM chat_file_refs WHERE conversation=? AND id=?',
+            )
+            .run(id, input.id, attachment);
+      }
       s.db.exec('COMMIT');
     } catch (e) {
       s.db.exec('ROLLBACK');
@@ -337,8 +361,13 @@ export class Workspace {
       let list = s.get(task.parent);
       while (list?.kind === 'matrix-task') list = s.get(list.parent);
       const settings = matrixInference(
-          profileSettings(s),
-          s.settings().matrixPreload ? list?.data.modelProfile : null,
+          profileSettings(
+            s,
+            list?.data.assignedAgent
+              ? { data: { agentProfile: requireAssignedAgent(s, list) } }
+              : null,
+          ),
+          list?.data.assignedAgent ? null : list?.data.modelProfile,
         ),
         occurrences = [];
       if (!task.data.trigger || task.data.trigger.kind === 'time') {
@@ -365,7 +394,9 @@ export class Workspace {
         accessible: s.access(task.id, true),
         occurrences,
         timeline: s.db
-          .prepare('SELECT * FROM runs WHERE card=? ORDER BY start DESC LIMIT 20')
+          .prepare(
+            'SELECT runs.*,run_profiles.name AS agentName,run_profiles.provider,run_profiles.model FROM runs LEFT JOIN run_profiles ON run_profiles.run=runs.id WHERE card=? ORDER BY start DESC LIMIT 20',
+          )
           .all(task.id),
       };
     }

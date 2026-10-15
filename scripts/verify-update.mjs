@@ -1,3 +1,4 @@
+import { pickChoice } from './ui-pickers.mjs';
 import { _electron as electron } from 'playwright';
 import electronPath from 'electron';
 import { createServer } from 'node:http';
@@ -151,10 +152,8 @@ try {
   await capture('settings-preview');
   await page.getByRole('button', { name: 'Model & providers', exact: true }).click();
   await page.getByRole('button', { name: /Test connection/ }).click();
-  assert.equal(await page.getByLabel('Selected model').locator('option').count(), 4);
-  await page.getByLabel('Selected model').selectOption('model-b');
-  assert.equal(await page.getByLabel('Selected model').locator('option').count(), 4);
-  await page.getByLabel('Selected model').selectOption('model-a');
+  await pickChoice(page, 'Selected model', 'model-b');
+  await pickChoice(page, 'Selected model', 'model-a');
   await page.getByRole('button', { name: 'Chat & context', exact: true }).click();
   await page.getByLabel('Chat width').selectOption('wide');
   await page.getByRole('button', { name: 'Close settings', exact: true }).click();
@@ -166,8 +165,8 @@ try {
     .first()
     .click();
   assert.ok((await page.locator('.compose-wrap').boundingBox()).width > 1300);
-  await page.getByLabel('Choose model').selectOption('model-b');
-  await page.getByLabel('Choose model').selectOption('model-a');
+  await pickChoice(page, 'Choose model', 'model-b');
+  await pickChoice(page, 'Choose model', 'model-a');
   await page.getByRole('button', { name: 'Compact context', exact: true }).click();
   await page.getByRole('button', { name: 'Compact context', exact: true }).waitFor();
   assert.ok(

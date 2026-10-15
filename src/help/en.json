@@ -88,7 +88,8 @@
     "paragraphs": [
       "An agent profile has a name, image, assistance style, default model and tool scopes. Style changes never replace mandatory app instructions. Ratings are yours to set; they are not measured guarantees of model quality.",
       "Skills are reusable instructions. You can inspect them and choose learning/review behavior. User notes, memories and tool results never authorize an agent to expand its own permissions.",
-      "Connections expose external tools. MCP server setup always receives native review showing the executable/arguments or HTTP address before configuration changes, even with Full Access. Configuration, connection, tool discovery and verified capability are distinct outcomes. Sign-in, keys and dependency installation use dedicated user workflows."
+      "Connections expose external tools. MCP server setup always receives native review showing the executable/arguments or HTTP address before configuration changes, even with Full Access. Configuration, connection, tool discovery and verified capability are distinct outcomes. Sign-in, keys and dependency installation use dedicated user workflows.",
+      "Matrix lists and Tasks choose agent profiles, carrying their models, skills and restrictions. Tasks may inherit board/list defaults or stay manual. Switching the active chat agent does not reassign saved work. Missing assigned profiles need your attention."
     ],
     "setting": "models"
   },
@@ -99,7 +100,8 @@
       "Global resource switches can suspend access. Individual items, inherited access, child exceptions and agent profiles still decide what can be used. Read is not Read & edit; task assignment and host-command approvals remain separate.",
       "Selected resources only limits this agent to the resources you grant. An agent may ask for a resource you explicitly selected or that it can already discover; it cannot inventory private resources to request wider access. An exact approval can grant the selected scope without changing every agent’s access.",
       "Allow for this request expires when that user-request run ends, is stopped, steered or cancelled. Another message, chat branch, agent or scheduled task does not inherit it. Always allow for this agent keeps the exact resource and access level enabled for that named profile until revoked. Child exceptions and global gates still apply.",
-      "Decline has no grant effect. Configuration cards show exact before/after changes and tell you whether the change persists. Permanent resource permission does not bypass command approvals or mandatory MCP setup review. Review and revoke saved grants in Agent access."
+      "Decline has no grant effect. Configuration cards show exact before/after changes and tell you whether the change persists. Permanent resource permission does not bypass command approvals or mandatory MCP setup review. Review and revoke saved grants in Agent access.",
+      "Computer access selects projects, additional read/edit folders or system-wide account files. Profiles can restrict this further. File scopes do not sandbox shell commands; reviewed commands can use your OS account access. Separate destructive/unclassified action protection still applies under Full Access, and MCP setup always requires review."
     ],
     "setting": "access"
   },
@@ -155,5 +157,25 @@
       "If a connection fails, check the server, address, key permissions, model availability and quota separately. Include app version, operating system and sanitized steps in a bug report. Never share keys, private conversations or your full database. Full local licenses and third-party notices are available under Settings → Licenses."
     ],
     "setting": "data"
+  },
+  {
+    "id": "sources",
+    "title": "Add sources and keep files",
+    "page": "chat",
+    "paragraphs": [
+      "Use the + button in either chat for files/images, bounded folder snapshots or optional internal-resource selection. Notebooks show chapters and notes; Tasks show boards, lists and cards. Natural questions can search resources the agent already has permission to use. Selection identifies an exact private item for an access request without sharing its contents.",
+      "The harness asks whether file copies belong only to the conversation or should be kept in a project. Originals remain untouched. Conversation-only copies follow the chat into recoverable Trash and are removed on permanent deletion when no branch uses them. Project copies survive. Old exported backups remain independent.",
+      "Text/PDF/DOCX files support bounded extraction. Images need vision input and must fit its limit; scanned PDFs need page images or a text export. Folder snapshots skip hidden files/symlinks and are limited to 200 files and 100 MB, with 25 MB per file. Automatic memory/skill learning is off for conversation-only sources until explicitly enabled."
+    ]
+  },
+  {
+    "id": "ongoing-files",
+    "title": "Continuous file monitoring",
+    "page": "matrix",
+    "paragraphs": [
+      "Choose an agent for a Matrix list. Open a task’s Schedule & triggers, choose File monitoring and New completed files continuously, select a folder and decide whether to process files already present. Authorize the folder in Agent access and integrate the list. Assignment does not grant file permission.",
+      "The native harness watches without an open terminal or idle model calls. It queues stable new files and skips partial-download names, processes bounded batches with the assigned agent, records outcomes and returns to monitoring. New arrivals wait while other work runs. Stable size/time is a readiness heuristic; unusual download tools may need a longer wait or manual review.",
+      "Monitoring works while the app is open or in the tray. Pause AI suspends it; quit/sleep stops observation. Startup/resume scans catch up. Interrupted or failed runs need review before retry. Known native outputs are tracked to avoid loops. Legacy change triggers remain separate; a standalone system service and persistent shell state are not included."
+    ]
   }
 ]
