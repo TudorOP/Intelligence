@@ -1,5 +1,7 @@
 # Agent profile layout review — 15 October 2026
 
+Follow-up: the user requested [five new layout alternatives](../agent-profile-alternatives-2026-10-15/README.md) after this implementation. Those proposals omit User context and prioritize the image, name, system prompt, ratings and easy tool access. They do not change the 1.05 application.
+
 ## Final requested layout — 1.05
 
 The final target restores the **1.0 three-column arrangement**, inspected directly from commit `830d401`: identity/personality on the left, model/tools in the middle, ratings/user context on the right. Resource access is now a profile-header button opening the existing per-agent grant editor in a modal. This replaces the four-column 1.04 layout and the unpublished two-pane experiment.

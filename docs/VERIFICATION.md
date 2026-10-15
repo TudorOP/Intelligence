@@ -1,5 +1,9 @@
 # Intelligence 1.05 — verification
 
+## Profile design alternatives — 15 October 2026
+
+Five [ImageGen layout proposals](design/agent-profile-alternatives-2026-10-15/README.md) explore a no-page-scroll 1920×1080 profile with visible image/name/system prompt/ratings and easy tool access, omitting User context. These are concept images, not implemented layouts or new Electron verification evidence. All five are visually inspected for the requested sections and complete screen composition. Exact generation prompts and a fixture style reference are retained. Documentation links, whitespace, source audit and refreshed ignored source archive are checked before the local documentation commit. Application code and version stay unchanged; no application tests, provider calls or unrelated fixtures are rerun. Nothing is pushed or published.
+
 ## 1.05 classic profile and resource-access modal — 15 October 2026
 
 The user preferred the original 1.0 profile arrangement after reviewing the 1.04 captures and generated design studies. The implementation restores the layout from `830d401` while preserving current model selection, native fields and live draft merging. Resource access moves into the shared Modal component. See the [final layout review and retained concepts](design/agent-profile-2026-10-15/README.md).
