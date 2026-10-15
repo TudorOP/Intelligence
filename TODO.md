@@ -46,3 +46,8 @@ Develop on `dev`; `main` holds reviewed releases. The reviewed plan is implement
 ## 1.01 workspace and automation
 
 The authorized implementation and acceptance checklist are recorded in [WORKSPACE_1_01_PLAN.md](docs/WORKSPACE_1_01_PLAN.md). This update includes project/window state, shared model/agent selection, retained conversation sources, native computer scopes, managed command jobs and continuous inbox queues. Packaging/publication still require the target-Linux and exact binary/source/license gates above.
+
+## Development continuity
+
+- [x] Record a harness-independent [agent handoff](docs/AGENT_HANDOFF.md) with the current checkpoint, required reading, verification commands, version mapping, local commit/source-ZIP sequence and explicit remote authorization rules. Link it from the project entry points and retain version 1.01 for this documentation-only follow-up.
+- [x] Document that Intelligence-source.zip is refreshed locally after verified source/doc changes, ignored through \*.zip and excluded from Git pushes. Preserve the separate binary/source/license release gates above.

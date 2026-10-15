@@ -86,11 +86,15 @@ Data normally lives in `~/.config/Intelligence/`, follows `XDG_CONFIG_HOME`, and
 
 `main` holds reviewed releases and remains the default branch. New work is developed on `dev` and pushed there first when authorized. Merging to `main` and publishing a release are separate, explicit actions.
 
+Continuing with another coding harness or agent? Start with the [development handoff](docs/AGENT_HANDOFF.md). It covers the current checkpoint, required reading, native boundaries, verification, versioning, local commits and the separate authorization required for remote actions.
+
 The [1.0 plan](docs/ONBOARDING_1_0_PLAN.md), [implementation notes](docs/ONBOARDING_1_0_IMPLEMENTATION.md) and retained ImageGen concepts document this development milestone. Main still holds the reviewed 0.94 release; 1.01 is prepared locally on dev and is not published. The [workspace and automation plan](docs/WORKSPACE_1_01_PLAN.md) records this update.
 
 Use `npm ci`, `npm run dev`, `npm run build` and `npm test`. Run `node scripts/verify-source.mjs` before sharing source. Desktop fixtures use isolated data under `.test-data/`. See [verification](docs/VERIFICATION.md), [architecture and development](docs/DEVELOPMENT.md), [appearance](docs/APPEARANCE.md) and [release acceptance](docs/RELEASE_CHECKLIST.md).
 
 The public release label is 1.01 (package 1.0.1). Normal updates continue to add 0.01: 1.02, 1.03 and so on. `node scripts/bump-version.mjs` advances the label and its semantic package version together.
+
+After verified changes, refresh the relevant docs and local `Intelligence-source.zip`, then create the local commit with `scripts/commit-version.mjs`. Documentation-only follow-ups retain the app version. The ZIP is rebuilt from audited tracked source by `scripts/archive-source.ps1`; `*.zip` intentionally keeps it out of Git. It does not contain Git history, installed dependencies or user data, and is not uploaded by a Git push. Stage intended new files before archiving; inspect the entire tree before the commit helper, which runs `git add .`.
 
 ## License
 

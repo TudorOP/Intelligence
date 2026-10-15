@@ -2,6 +2,8 @@
 
 ## 1.01 — local workspace and automation update on dev
 
+- Documentation follow-up: add a harness-independent agent handoff, update architecture/Linux/release guidance, and document local commits, source-ZIP regeneration and separate remote authorization. Application/package versions stay 1.01/1.0.1.
+
 - Restore the selected project and normal/maximized window bounds; first launch fits a smaller 1280×800 window.
 - Share searchable model/agent pickers, symbolic chat model buttons and a unified Add sources dialog with resource trees.
 - Support text/PDF/DOCX/image attachments, bounded folder snapshots, explicit project retention, branch-aware cleanup and backup inclusion.
