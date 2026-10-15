@@ -65,11 +65,26 @@ Start with `src/SearchPicker.tsx` and `src/pickers.css`. The panel is a height-l
 
 ![Image 6: The same picker overflow appears in the narrow assistant panel.](6.png)
 
+## 6. Full UI and theme consistency pass
+
+The user additionally requested a full UI pass and reported that the large image in Chat seems bigger in Autumn than in other themes. This is a reported discrepancy to reproduce; no new screenshot or size measurement has been supplied for it yet.
+
+- [ ] Review every primary screen: Chat, the assistant panel, notebooks/chapters/notes, Vault, Tasks, Cognition Matrix, Projects, Calendar, Reports, Memory, agents, Skills and Connections. Include all Settings sections, setup/help/lessons, Trash, resource/access views and their dialogs, menus and pickers.
+- [ ] Review each screen across all ten themes: Ink, Day, Night, Summer, Autumn, Winter Wonderland, Festive, Tech, Astral and Marble & gold. Record the screen/theme coverage and defects so this does not stop at the existing six screenshots or a few representative themes.
+- [ ] Compare spacing, padding, alignment, page widths, card hierarchy, typography, icon/button/input dimensions, borders, radii, shadows and artwork proportions. Keep shared layout and control geometry consistent while preserving each theme's intended palette and original artwork.
+- [ ] Check text/control contrast and readability over artwork, hover/focus/selected/disabled/error states, expanded/collapsed sections, empty/populated views and loading/active states where applicable.
+- [ ] Reproduce the large Chat image difference using the same viewport, UI scale, panel widths and Chat state in Autumn and the other nine themes. Identify the exact image before changing it; capture screenshots and compare rendered bounds and perceived artwork size, including source aspect ratio, transparent padding, cropping, object-fit and theme-specific CSS.
+- [ ] Correct unintended theme-dependent image sizing or prominence without stretching/cropping away original artwork or replacing assets. Confirm the image's proportions, spacing and relationship to the Chat text/composer remain consistent across themes and window sizes.
+- [ ] Check 1920×1080 first, then shorter/narrower and larger windows, the narrow assistant, increased text scale, English and Romanian. Inspect clipping, overlap, scroll containment, keyboard focus and viewport-safe overlays.
+- [ ] Save comparable before/after captures for discovered defects, review the actual rendered screens and record the completed coverage and remaining limitations. Automated overflow checks alone do not establish visual quality.
+
+Use existing theme, Settings and all-app desktop fixtures as a starting point and extend only the meaningful coverage needed. This pass includes any styling regressions discovered beyond items 1–5; preserve application behavior, user content, appearance preferences, artwork/provenance and native access boundaries.
+
 ## Completion checks for implementation
 
 - [ ] Reproduce each defect before changing it, using isolated fixture data and a sufficiently long model catalog.
 - [ ] Visually compare repaired screens against these six references at 1920×1080 first, then 1366×768, larger windows, a narrow assistant and increased text scale.
-- [ ] Inspect English and Romanian, representative light/dark/artwork themes, scroll bounds, horizontal overflow, keyboard access and focus.
+- [ ] Inspect English and Romanian, all ten themes as specified in item 6, scroll bounds, horizontal overflow, keyboard access and focus.
 - [ ] Run TypeScript/build and meaningful affected Settings/profile/picker desktop fixtures; review screenshots as well as automated results.
 - [ ] Run affected native permission regressions if consolidation changes access-related behavior or wiring. Keep deferred context-length and token-overhead work excluded.
 - [ ] Record what actually passed and any remaining limits in `docs/VERIFICATION.md`. Do not reuse the earlier fixture results as evidence that these defects are fixed.

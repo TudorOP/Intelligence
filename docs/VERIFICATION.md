@@ -18,6 +18,8 @@ The [queued repair checklist](design/ui-repairs-2026-10-15/README.md) records th
 
 This is documentation and visual context only. Spacing, access consolidation, agent layout and picker overflow remain unfixed. Application tests were not rerun; the earlier results above do not establish acceptance for these reported defects. No push or publication occurred.
 
+The checklist was subsequently extended to require a full UI pass across every screen and all ten themes, including reproduction of the reported larger Chat image in Autumn under matched viewport/scale conditions. This follow-up checks the documentation, local links and source/archive contents only; no theme comparison, UI repair or application test is claimed as completed. Version remains 1.01/package 1.0.1.
+
 ## 1.0 baseline
 
 The authorized 1.0 implementation follows a separately verified cleanup commit on dev. The six-stage setup, offline guide/lessons, inline provider help and reviewed agent access/configuration flows are implemented; this is local source preparation, not a published binary release.

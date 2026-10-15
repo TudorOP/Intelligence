@@ -11,6 +11,7 @@ The [repair checklist and six original screenshots](docs/design/ui-repairs-2026-
 - [ ] Streamline Agent access and Access for each agent into a coherent flow, remove duplicated controls and preserve every native permission boundary (image 3).
 - [ ] Repair the agent profile layout so ratings and access sections do not leave large empty grid areas (image 4).
 - [ ] Fix shared model-picker scrolling so choices cannot overlap status text or the footer in either chat surface (images 5–6).
+- [ ] Complete a full UI pass across every screen and all ten themes: check consistent spacing, typography, controls, imagery, contrast and interaction states. Investigate the reported larger Chat image in Autumn against the same view in other themes; details and acceptance criteria are in the repair checklist.
 - [ ] Complete the checklist's visual, keyboard, localization and permission checks before marking these repairs complete; then follow the normal version/docs/archive/local-commit workflow.
 
 ## Required on the target Linux host

@@ -27,7 +27,7 @@ The 1.01 implementation includes saved project/window state, shared searchable m
 
 Monitoring needs the application open or in the tray. It reconciles missed files after startup/resume; file readiness is a stability heuristic. Command jobs are bounded to their response/run. True persistent shell state and a standalone background monitoring service remain deferred. Do not silently promise either capability.
 
-The 15 October screenshot review is queued in [the UI repair checklist](design/ui-repairs-2026-10-15/README.md), with six original visual references and the user's feedback retained alongside it. This documentation follow-up records spacing, access consolidation, profile layout and model-picker overflow work; no application fixes have landed from that review. Read the checklist and current user request before implementation.
+The 15 October screenshot review is queued in [the UI repair checklist](design/ui-repairs-2026-10-15/README.md), with six original visual references and the user's feedback retained alongside it. This documentation follow-up records spacing, access consolidation, profile layout and model-picker overflow work, plus a full UI consistency pass across every screen and all ten themes. The user also reports that the large Chat image seems bigger in Autumn; reproduce and compare its sizing across themes. No application fixes have landed from that review. Read the checklist and current user request before implementation.
 
 The next work comes from the user's request or the still-open target-Linux acceptance checklist in TODO.md. Do not automatically resume context-length benchmarks, token-overhead testing/estimation or animated backgrounds; those are explicitly deferred or excluded.
 
