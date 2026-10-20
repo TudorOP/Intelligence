@@ -74,7 +74,7 @@ chmod +x release/Intelligence-1.0.6-x86_64.AppImage
 ./release/Intelligence-1.0.6-x86_64.AppImage
 ```
 
-Release/AppImage packaging runs only inside Linux Docker. Docker is needed to build, not to run. See [the Linux handoff](docs/LINUX_HANDOFF.md) for runtime dependencies, sandbox/desktop checks and the source-distribution checklist.
+Release/AppImage packaging runs only inside Linux Docker. Docker is needed to build, not to run. See [the Linux build and acceptance guide](docs/LINUX_HANDOFF.md) for runtime dependencies, sandbox/desktop checks and the source-distribution checklist.
 
 ## First run
 
@@ -92,9 +92,9 @@ Data normally lives in `~/.config/Intelligence/`, follows `XDG_CONFIG_HOME`, and
 
 `main` holds reviewed releases and remains the default branch. New work is developed on `dev` and pushed there first when authorized. Merging to `main` and publishing a release are separate, explicit actions.
 
-Continuing with another coding harness or agent? Start with the [development handoff](docs/AGENT_HANDOFF.md). It covers the current checkpoint, required reading, native boundaries, verification, versioning, local commits and the separate authorization required for remote actions.
+Continuing with another coding harness or agent? Start with the [development guide](docs/AGENT_HANDOFF.md). It covers the current checkpoint, required reading, native boundaries, verification, versioning, local commits and the separate authorization required for remote actions.
 
-The [1.0 plan](docs/ONBOARDING_1_0_PLAN.md), [implementation notes](docs/ONBOARDING_1_0_IMPLEMENTATION.md) and retained ImageGen concepts document that development milestone. Main still holds the reviewed 0.94 release; 1.06 is prepared locally on dev and is not published. The [workspace and automation plan](docs/WORKSPACE_1_01_PLAN.md) records the prior 1.01 update.
+The [1.0 plan](docs/ONBOARDING_1_0_PLAN.md), [implementation notes](docs/ONBOARDING_1_0_IMPLEMENTATION.md) and retained ImageGen concepts document that development milestone. `main` holds the reviewed 1.06 release; development continues on `dev` as the staging branch. The [workspace and automation plan](docs/WORKSPACE_1_01_PLAN.md) records the prior 1.01 update.
 
 Use `npm ci`, `npm run dev`, `npm run build` and `npm test`. Run `node scripts/verify-source.mjs` before sharing source. Desktop fixtures use isolated data under `.test-data/`. See [verification](docs/VERIFICATION.md), [architecture and development](docs/DEVELOPMENT.md), [appearance](docs/APPEARANCE.md) and [release acceptance](docs/RELEASE_CHECKLIST.md).
 

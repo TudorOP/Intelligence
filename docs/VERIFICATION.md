@@ -1,5 +1,7 @@
 # Intelligence 1.06 — verification
 
+> Status: development and verification now run on Linux. The entries below record each pass exactly as it was run; the 1.0x fixture results were produced on Windows and remain historical evidence, not fresh Linux results. Linux compositor/font/scaling/device acceptance and the binary release gates in TODO.md remain open until executed on this host.
+
 ## 1.06 balanced agent profile — 15 October 2026
 
 The selected [concept A](design/agent-profile-alternatives-2026-10-15/README.md) is implemented with separate identity/model, prompt and ratings/tools columns. User context is removed. Common tool controls remain visible; More tool categories, Skills and MCP servers use the shared keyboard-safe modal with search and adaptive pages. The existing resource-access grant modal remains separate. The editable prompt still stores the user's personality/preferences and does not replace mandatory guidance.

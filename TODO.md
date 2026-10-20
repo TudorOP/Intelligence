@@ -1,6 +1,6 @@
 # Intelligence 1.06 — release acceptance
 
-The current workspace features are described in README.md. The 1.0 baseline passed 223 enabled backend checks. Current verification is recorded in docs/VERIFICATION.md. Source publication is separate from the remaining binary-release gates. Verification procedures and limitations are documented in docs/VERIFICATION.md.
+The current workspace features are described in README.md. The 1.0 baseline passed 223 enabled backend checks. Current verification is recorded in docs/VERIFICATION.md. The 1.06 source is published on `main`; the acceptance gates below still apply before any binary/AppImage distribution. Verification procedures and limitations are documented in docs/VERIFICATION.md.
 
 ## Balanced profile — 1.06, 15 October 2026
 

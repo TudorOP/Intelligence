@@ -1,6 +1,6 @@
-# Development handoff for any harness or agent
+# Development guide for any harness or agent
 
-This guide is for continuing Intelligence development in another coding assistant, editor or terminal. It requires no Codex-specific tools or conversation history. Work from the repository, the user's current request and verified local state. Read this guide together with [AGENTS.md](../AGENTS.md), [README.md](../README.md), [TODO.md](../TODO.md) and [UI_UX.md](../UI_UX.md) before editing.
+This guide is for continuing Intelligence development in any coding assistant, editor or terminal. Work from the repository, the user's current request and verified local state. Read this guide together with [AGENTS.md](../AGENTS.md), [README.md](../README.md), [TODO.md](../TODO.md) and [UI_UX.md](../UI_UX.md) before editing.
 
 ## Starting a session
 
@@ -21,27 +21,21 @@ If starting from `Intelligence-source.zip`, remember that it contains source, no
 
 ## Current checkpoint
 
-As of 15 October 2026, the app is **1.06**, package **1.0.6**, prepared locally on `dev`. The user selected [Balanced workspace concept A](design/agent-profile-alternatives-2026-10-15/README.md), now implemented with image/name/model on the left, a large central system-prompt editor and visible ratings/tools on the right. User context is omitted. More tool categories, Skills and MCP servers use searchable, adaptively paged dialogs so no profile/dialog scrolling is needed in the tested desktop states. Native grants and mandatory guidance remain enforced. The focused fixture passes 38 captures plus draft/selection persistence and keyboard checks; see [verification](VERIFICATION.md). The preceding design-only commit is `ea82cd7`; read `git log` for the final implementation commit. No push of this work is authorized.
+As of 20 October 2026, the app is **1.06**, package **1.0.6**. Development and verification run on Linux. On the user's explicit request, 1.06 was merged from `dev` into `main` and published; development continues on `dev` as the staging branch. The next normal app update is public 1.07/package 1.0.7.
 
-The prior 1.05 local commit is `0bbbfb7`, restoring the 1.0 arrangement with a Resource access modal; its [layout review](design/agent-profile-2026-10-15/README.md) is historical. The prior 1.04 local commit is `626303d`; its native file/prompt changes remain. The prior 1.03 commit is `0dec533`. The 1.02 commit `7abc941` and four preceding commits were pushed to `origin/dev` at the user's request; no push of 1.03–1.06 is authorized. The last observed `main` was reviewed 0.94 at `12a56d2`. This dated checkpoint does not replace checking current refs; remote-tracking refs can be stale.
+The user selected [Balanced workspace concept A](design/agent-profile-alternatives-2026-10-15/README.md), implemented with image/name/model on the left, a large central system-prompt editor and visible ratings/tools on the right; user context is omitted. More tool categories, Skills and MCP servers use searchable, adaptively paged dialogs so no profile/dialog scrolling is needed in the tested desktop states. Native grants and mandatory guidance remain enforced. The 1.06 evidence — 38 focused captures plus draft/selection persistence and keyboard checks — is recorded in [VERIFICATION.md](VERIFICATION.md). Earlier 1.0x fixture results were recorded on Windows and remain historical evidence, not fresh Linux results.
 
-The 1.01 implementation includes saved project/window state, shared searchable model/agent pickers, Add sources with retention, Matrix/Tasks agent assignments, computer scopes, managed commands and durable inbox monitoring. The completed checklist is [WORKSPACE_1_01_PLAN.md](WORKSPACE_1_01_PLAN.md). The implementation passed 232 enabled backend checks, TypeScript, the production build and the desktop fixtures recorded in VERIFICATION.md. This is source verification on Windows, not a verified Linux binary release.
-
-Monitoring needs the application open or in the tray. It reconciles missed files after startup/resume; file readiness is a stability heuristic. Command jobs are bounded to their response/run. True persistent shell state and a standalone background monitoring service remain deferred. Do not silently promise either capability.
-
-The 1.02 [UI repair checklist](design/ui-repairs-2026-10-15/README.md) retains the six original visual references and feedback. It covers spacing, consolidated access controls, independent profile columns, bounded model-picker scrolling, normalized Autumn Chat artwork and a full UI review across all ten themes. Secondary text contrast is improved within the existing palettes. See VERIFICATION.md for the actual Windows fixture results, capture coverage and remaining target-Linux/live-provider limits. Permission and revision enforcement remains native; no artwork assets or user data were replaced.
-
-The next work comes from the user's request or the still-open target-Linux acceptance checklist in TODO.md. The user explicitly requested the bounded prompt/file changes in 1.04; that is not a standing benchmark queue. Do not automatically resume context-length benchmarks, token-overhead testing/estimation or animated backgrounds; those are explicitly deferred or excluded.
+The next work comes from the user's request or the still-open acceptance checklist in [TODO.md](../TODO.md). Deferred or excluded work — do not resume automatically: context-length benchmarks, token-overhead testing/estimation and animated backgrounds. True persistent shell state and a standalone background monitoring service are also deferred: monitoring requires the application open or in the tray and reconciles missed files after startup/resume, with file readiness as a stability heuristic. Do not silently promise either capability.
 
 ## Branches, commits and publication
 
-| Action                                                               | When to do it                                                                                                                                                                   |
-| -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Implement and verify locally                                         | When requested. New work belongs on `dev`; keep changes reviewable.                                                                                                             |
-| Create a local commit                                                | After the requested work is verified and the relevant docs/source archive are refreshed. The standing workflow authorizes this; a local commit does not authorize a push.       |
-| Push                                                                 | Only when explicitly requested by the user. Push new work to `dev` first, and inspect the full outgoing range.                                                                  |
-| Merge into `main`                                                    | Only on an explicit user request. `main` holds reviewed releases and remains the GitHub default branch.                                                                         |
-| Push `main`, tag, upload an archive or publish a release/site/binary | Only within the user's explicit authorization for that action and after its checks pass. Do not treat a dev push or a merge request as permission for every publication action. |
+| Action                                                                | When to do it                                                                                                                                                             |
+| --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Implement and verify locally                                          | When requested. New work belongs on `dev`; keep changes reviewable.                                                                                                       |
+| Create a local commit                                                 | After the requested work is verified and the relevant docs/source archive are refreshed. The standing workflow authorizes this; a local commit does not authorize a push. |
+| Push                                                                  | Only when explicitly requested by the user. Push new work to `dev` first, and inspect the full outgoing range.                                                             |
+| Merge into `main`                                                     | Only on an explicit user request. `main` holds reviewed releases and remains the GitHub default branch.                                                                    |
+| Push `main`, tag, upload an archive or publish a release/site/binary  | Only within the user's explicit authorization for that action and after its checks pass. Do not treat a dev push or a merge request as permission for every publication action. |
 
 Do not ask again for an action the user has already authorized within the current scope. If pushing was not requested, finish local work and report the local commit. Do not infer publication permission from an old agent's summary or from this document.
 
@@ -80,20 +74,7 @@ node --test --test-skip-pattern="^(context discovery prefers|manual and automati
 
 The skip pattern matches `package.json` and preserves the deferred context/compaction exclusions. Check the current package script if it changes; do not broaden the exclusions to hide failures. Do not run the legacy `verify-update.mjs` fixture: it mixes deferred context/compaction work. Do not use `verify-source.mjs --initial` on this established repository; it is an initial-history-only gate.
 
-Run meaningful affected tests and desktop fixtures after the production build. Examples for 1.01 work:
-
-```text
-node --test tests/workspace-automation.test.mjs
-node scripts/verify-workspace-automation.mjs
-node scripts/verify-agent-controls.mjs
-node scripts/verify-chat-memory-order.mjs
-node scripts/verify-settings.mjs
-node scripts/verify-profiles.mjs
-node scripts/verify-matrix.mjs
-node scripts/verify-onboarding.mjs
-```
-
-Run only tests and fixtures relevant to the change; do not run the full suite or fixture catalog by default. Broaden testing only when a failure or issue needs debugging. For collection layout changes, use `node scripts/verify-collection-layout.mjs` after building the renderer. Inspect representative screenshots with varied content and optional states, renderer errors, overflow and localized labels. Keep exact checks and any failures/limitations in VERIFICATION.md. Documentation-only follow-ups need link/content checks and the source/archive audit; unchanged application tests need not be rerun. Never present old tests as freshly rerun. Windows fixtures do not establish Linux shell/process-group, Wayland/X11, live provider, download or device behavior.
+Run only tests and fixtures relevant to the change; do not run the full suite or fixture catalog by default. Broaden testing only when a failure or issue needs debugging. For collection layout changes, use `node scripts/verify-collection-layout.mjs` after building the renderer. Inspect representative screenshots with varied content and optional states, renderer errors, overflow and localized labels. Keep exact checks and any failures/limitations in VERIFICATION.md. Documentation-only follow-ups need link/content checks and the source/archive audit; unchanged application tests need not be rerun. Never present old tests as freshly rerun. Fixture results from another host or OS do not establish this host's shell/process-group, Wayland/X11, live provider, download or device behavior.
 
 ## Version, source ZIP and local commit
 
@@ -113,14 +94,14 @@ git diff --cached --check
 node scripts/verify-source.mjs
 ```
 
-From PowerShell at the root, rebuild the archive:
+Rebuild the archive from PowerShell at the root; on Linux that requires PowerShell:
 
-```powershell
-./scripts/archive-source.ps1
+```text
+pwsh -NoProfile -File scripts/archive-source.ps1
 git check-ignore -v Intelligence-source.zip
 ```
 
-On Linux with PowerShell installed, the same script runs with `pwsh -NoProfile -File scripts/archive-source.ps1`. If that tooling is unavailable, report the gap instead of replacing the script with a recursive workspace ZIP. The script audits tracked source, includes current working-file bytes and required source/licenses/artwork, excludes private/generated data, and reports version, file count, size and SHA-256. Review its result. If source/docs change after archiving, regenerate it before the commit.
+If that tooling is unavailable, report the gap instead of replacing the script with a recursive workspace ZIP. The script audits tracked source, includes current working-file bytes and required source/licenses/artwork, excludes private/generated data, and reports version, file count, size and SHA-256. Review its result. If source/docs change after archiving, regenerate it before the commit.
 
 `Intelligence-source.zip` is local and intentionally ignored through `*.zip` in `.gitignore`. It is refreshed after completed work, including documentation updates, but is not part of Git commits or ordinary Git pushes. Never force-add it to Git. Sharing/uploading it is a separate authorized action. Do not archive node_modules, dist, release binaries, `.test-data`, credentials, user databases, backups or downloaded engines/models. The source archive does not replace a user's data backup.
 
@@ -134,7 +115,7 @@ git log -1 --oneline
 
 **The helper runs `git add .` and then commits.** Inspect the entire working tree first. Do not run it in a shared/dirty tree containing unrelated changes; isolate the task without discarding other work. It checks version/README consistency but does not run tests, rebuild the ZIP or authorize a push. Use a documentation message for documentation-only work. Do not amend established commits merely to update handoff notes; keep a reviewable follow-up commit.
 
-## Linux release gates and end-of-task report
+## Release gates and end-of-task report
 
 Linux is the target platform. AppImage builds belong in Linux Docker using `docker compose run --build --rm appimage`. Run the resulting AppImage as a regular desktop user with the sandbox enabled; Docker is for building, not an application runtime requirement. Follow [LINUX_HANDOFF.md](LINUX_HANDOFF.md) and the release checklist for Wayland/X11, tray, mixed DPI, sleep/resume, shell/process trees, actual providers and optional engines/devices.
 
