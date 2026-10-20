@@ -91,4 +91,4 @@ The authorized implementation and acceptance checklist are recorded in [WORKSPAC
 ## Development continuity
 
 - [x] Record a harness-independent [agent handoff](docs/AGENT_HANDOFF.md) with the current checkpoint, required reading, verification commands, version mapping, local commit/source-ZIP sequence and explicit remote authorization rules. Link it from the project entry points and retain version 1.01 for this documentation-only follow-up.
-- [x] Document that Intelligence-source.zip is refreshed locally after verified source/doc changes, ignored through \*.zip and excluded from Git pushes. Preserve the separate binary/source/license release gates above.
+- [x] Document that the local source archive is refreshed after verified source/doc changes, ignored through \*.tar.gz and excluded from Git pushes. Preserve the separate binary/source/license release gates above.

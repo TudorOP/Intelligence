@@ -100,7 +100,7 @@ Use `npm ci`, `npm run dev`, `npm run build` and `npm test`. Run `node scripts/v
 
 The public release label is 1.06 (package 1.0.6). Normal updates continue to add 0.01: 1.07, 1.08 and so on. `node scripts/bump-version.mjs` advances the label and its semantic package version together. Run only tests relevant to the change; broaden testing when an issue needs debugging.
 
-After verified changes, refresh the relevant docs and local `Intelligence-source.zip`, then create the local commit with `scripts/commit-version.mjs`. Documentation-only follow-ups retain the app version. The ZIP is rebuilt from audited tracked source by `scripts/archive-source.ps1`; `*.zip` intentionally keeps it out of Git. It does not contain Git history, installed dependencies or user data, and is not uploaded by a Git push. Stage intended new files before archiving; inspect the entire tree before the commit helper, which runs `git add .`.
+After verified changes, refresh the relevant docs and local `Intelligence-source.tar.gz`, then create the local commit with `scripts/commit-version.mjs`. Documentation-only follow-ups retain the app version. The archive is rebuilt from audited tracked source by `scripts/archive-source.mjs` (host `tar` plus Node zlib); `*.tar.gz` intentionally keeps it out of Git. It does not contain Git history, installed dependencies or user data, and is not uploaded by a Git push. Stage intended new files before archiving; inspect the entire tree before the commit helper, which runs `git add .`.
 
 ## License
 

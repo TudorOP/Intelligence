@@ -19,6 +19,6 @@ Follow [AGENT_HANDOFF.md](AGENT_HANDOFF.md) for local preparation and authorizat
 - Review exact binary/dependency/model/content licenses; ship complete notices and offer complete corresponding source matching each binary.
 - Refresh README, CHANGELOG, TODO, verification and source archive; commit locally. Upload only with an explicit user request.
 
-Stage intended new source/doc files before the tracked-source audit and archive. Rebuild the ignored local ZIP with scripts/archive-source.ps1; do not force-add archives or assume a Git push uploads them. Inspect the whole tree before scripts/commit-version.mjs because it runs git add . before the commit.
+Stage intended new source/doc files before the tracked-source audit and archive. Rebuild the ignored local archive with `node scripts/archive-source.mjs`; do not force-add archives or assume a Git push uploads them. Inspect the whole tree before scripts/commit-version.mjs because it runs git add . before the commit.
 
 Normal application release labels increase by 0.01 through scripts/bump-version.mjs. Documentation-only follow-ups retain the app version unless a new release is requested. Context-length benchmarks are deferred. Token-overhead work is not queued.
