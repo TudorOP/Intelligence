@@ -2,18 +2,21 @@ import { useEffect, useState } from 'react';
 import { api } from './api';
 import { t } from './i18n';
 import type { Settings } from './types';
+import SearchPicker from './SearchPicker';
 export default function ModelPicker({
   settings,
   models: provided,
   onUpdate,
   onError,
   matrix = false,
+  manualEntry = true,
 }: {
   settings: Settings;
   models?: string[];
   onUpdate: (input: Partial<Settings>) => Promise<any>;
   onError: (error: any) => void;
   matrix?: boolean;
+  manualEntry?: boolean;
 }) {
   const [models, setModels] = useState<string[]>(provided ?? []),
     [manual, setManual] = useState(false),
@@ -38,19 +41,14 @@ export default function ModelPicker({
   const values = [...new Set([settings.model, ...models].filter(Boolean))];
   return (
     <div className="model-picker">
-      <select
-        aria-label={t('Selected model')}
+      <SearchPicker
+        label={t('Selected model')}
         value={settings.model}
         disabled={busy}
-        onChange={(e) => void onUpdate({ model: e.target.value }).catch(onError)}
-      >
-        <option value="">{t('Choose a model')}</option>
-        {values.map((model) => (
-          <option key={model} value={model}>
-            {model}
-          </option>
-        ))}
-      </select>
+        options={values.map((model) => ({ value: model, label: model }))}
+        placeholder={t('Choose a model')}
+        onChange={(model) => void onUpdate({ model }).catch(onError)}
+      />
       <button
         type="button"
         disabled={busy}
@@ -66,10 +64,12 @@ export default function ModelPicker({
       >
         ↻
       </button>
-      <button type="button" aria-expanded={manual} onClick={() => setManual((v) => !v)}>
-        {t('Model ID')}
-      </button>
-      {manual ? (
+      {manualEntry && (
+        <button type="button" aria-expanded={manual} onClick={() => setManual((v) => !v)}>
+          {t('Model ID')}
+        </button>
+      )}
+      {manualEntry && manual ? (
         <input
           className="manual-model"
           key={settings.provider + settings.model}

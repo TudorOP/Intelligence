@@ -129,6 +129,7 @@ export function skillAction(store, input, ctx) {
     settings.profileScope?.allowSkillCreation === false ||
     live?.data.allowSkillCreation === false ||
     convo?.data.temporary ||
+    convo?.data.attachmentPrivate ||
     convo?.data.readOnlyMachine ||
     ctx.readOnlyMachineSession ||
     convo?.data.logContext ||

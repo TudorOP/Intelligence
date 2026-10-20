@@ -10,4 +10,6 @@ Lucide SVG symbols retain public/assets/icons/SOURCE.json and the complete local
 
 See docs/APPEARANCE.md for the design research and docs/LICENSES.md for distribution obligations.
 
+Proposed 1.0 onboarding/help/permission renders are documentation assets under docs/design/onboarding-1.0, generated with the built-in image_gen tool. Exact prompts and the guide-copy correction are retained in that directory's provenance.json. These project-created review concepts use GPL-3.0-only and do not replace runtime theme/branding assets or claim implemented functionality.
+
 The microphone.svg and grip.svg symbols are original, code-authored project vectors under GPL-3.0-only. Their source is retained beside the other UI symbols; they do not derive from the Lucide source recorded in SOURCE.json. Existing Lucide artwork and license/provenance are preserved.

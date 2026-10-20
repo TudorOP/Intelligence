@@ -1,3 +1,4 @@
+import { pickChoice } from './ui-pickers.mjs';
 import { _electron as electron } from 'playwright';
 import electronPath from 'electron';
 import fs from 'node:fs';
@@ -376,24 +377,31 @@ try {
     window.intelligence.mutate({ id: 'matrix-core', data: { integrated: false } }),
   );
   await core.locator('.matrix-configuration > summary').click();
-  await core.getByLabel('Selected model').selectOption('second fixture model');
+  const matrixAgent = await page.evaluate(() =>
+    window.intelligence.workspace({
+      action: 'profile-save',
+      title: 'Matrix fixture agent',
+      data: {
+        provider: 'ollama',
+        model: 'second fixture model',
+        inheritModel: false,
+        toolGroups: null,
+      },
+    }),
+  );
+  await pickChoice(page, 'Choose agent', 'Matrix fixture agent', core);
   await page.waitForFunction(
-    async () =>
+    async (id) =>
       (await window.intelligence.bootstrap()).entities.find((e) => e.id === 'matrix-core').data
-        .modelProfile?.model === 'second fixture model',
+        .assignedAgent === id,
+    matrixAgent.id,
   );
-  await page.waitForFunction(
-    () =>
-      !document.querySelector('.matrix-list:first-child .matrix-model input[type="checkbox"]')
-        .checked,
-  );
-  await capture('matrix-model-controls-1080.png');
-  await core.getByRole('switch', { name: 'Use chat model', exact: true }).click();
-  await page.waitForFunction(
-    async () =>
-      !(await window.intelligence.bootstrap()).entities.find((e) => e.id === 'matrix-core').data
-        .modelProfile,
-  );
+  await capture('matrix-agent-controls-1080.png');
+  const defaultName = await page.evaluate(async () => {
+    const s = await window.intelligence.bootstrap();
+    return s.entities.find((e) => e.id === s.settings.activeAgent).title;
+  });
+  await pickChoice(page, 'Choose agent', defaultName, core);
   await core
     .getByRole('button', { name: 'Expand Research local search options', exact: true })
     .click();

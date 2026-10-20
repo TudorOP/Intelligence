@@ -1,4 +1,5 @@
 import { providerInfo } from './inference-providers.mjs';
+import path from 'node:path';
 
 export function matrixInference(settings, profile = null) {
   if (!profile) return { ...settings };
@@ -39,6 +40,25 @@ export function validateMatrixTrigger(store, id, trigger) {
   )
     throw Error('Trigger cooldown must be from 5 to 86400 seconds');
   const source = store.get(trigger.source);
+  if (
+    trigger.kind === 'file' &&
+    trigger.mode !== undefined &&
+    !['inbox', 'changes'].includes(trigger.mode)
+  )
+    throw Error('Invalid file monitoring mode');
+  if (trigger.includeExisting !== undefined && typeof trigger.includeExisting !== 'boolean')
+    throw Error('Invalid initial folder scan policy');
+  if (trigger.directory !== undefined) {
+    if (
+      trigger.kind !== 'file' ||
+      trigger.mode !== 'inbox' ||
+      typeof trigger.directory !== 'string' ||
+      !path.isAbsolute(trigger.directory) ||
+      trigger.directory.length > 16000
+    )
+      throw Error('Choose an absolute inbox folder');
+    return;
+  }
   if (trigger.kind === 'external') {
     if (typeof trigger.channel !== 'string' || !/^[a-zA-Z0-9_-]{1,60}$/.test(trigger.channel))
       throw Error('Choose a short external event channel');

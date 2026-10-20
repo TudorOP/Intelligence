@@ -4,9 +4,12 @@ import { randomUUID, createHash } from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { EventEmitter } from 'node:events';
+import { AsyncLocalStorage } from 'node:async_hooks';
 import { validateMatrixProfile, validateMatrixTrigger } from './matrix-config.mjs';
 import { nextOccurrence } from './schedule.mjs';
 import { searchProviderIds } from './search-providers.mjs';
+import { initialSetup, validateSetup } from './onboarding.mjs';
+import { conversationSources } from './resource-catalog.mjs';
 import {
   inferenceProviders,
   providerInfo,
@@ -14,6 +17,8 @@ import {
 } from './inference-providers.mjs';
 import { validateEvent, validateReportTemplate } from './planning-schema.mjs';
 import { redactLog } from './workloads.mjs';
+import { validateComputerSettings } from './computer-access.mjs';
+import { workspaceSchema } from './workspace-storage.mjs';
 
 export const kinds = [
   'machine',
@@ -41,6 +46,12 @@ export const kinds = [
   'vault-file',
 ];
 export const defaults = {
+  lastProject: '',
+  assignmentVersion: 0,
+  computerScope: 'projects',
+  computerFolders: [],
+  askDestructive: true,
+  windowBounds: {},
   theme: 'night',
   returnTheme: 'day',
   chatWidth: 'comfortable',
@@ -71,6 +82,8 @@ export const defaults = {
   pinnedItems: [],
   recentItems: [],
   onboardingComplete: false,
+  setupReminderDismissed: false,
+  onboarding: initialSetup,
   missedTaskPolicy: 'ask',
   externalEventsEnabled: false,
   externalEventsPort: 30091,
@@ -159,6 +172,7 @@ const now = () => new Date().toISOString();
 export class Store extends EventEmitter {
   constructor(directory) {
     super();
+    this.agentScope = new AsyncLocalStorage();
     fs.mkdirSync(directory, { recursive: true });
     this.directory = directory;
     this.db = new DatabaseSync(path.join(directory, 'intelligence.sqlite'));
@@ -177,6 +191,7 @@ export class Store extends EventEmitter {
       CREATE TABLE IF NOT EXISTS search_credentials (provider TEXT PRIMARY KEY,value BLOB NOT NULL);
       CREATE VIRTUAL TABLE IF NOT EXISTS message_search USING fts5(id UNINDEXED,conversation UNINDEXED,content);
     `);
+    this.db.exec(workspaceSchema);
     this.db.exec(`INSERT INTO message_search SELECT id,conversation,content FROM messages
       WHERE role IN ('user','assistant') AND coalesce(json_extract(data,'$.tool'),0)=0
       AND coalesce(json_extract(data,'$.error'),0)=0 AND id NOT IN (SELECT id FROM message_search)`);
@@ -212,11 +227,58 @@ export class Store extends EventEmitter {
       settings.connectedProviders = [
         ...new Set([settings.provider, ...Object.keys(settings.providerProfiles)]),
       ];
+    if (!rows.some((r) => r.key === 'onboarding'))
+      settings.onboarding = {
+        ...initialSetup,
+        status: settings.onboardingComplete
+          ? 'completed'
+          : this.firstRun
+            ? 'not-started'
+            : 'deferred',
+      };
     return settings;
   }
   setSettings(value) {
     if (!value || typeof value !== 'object') throw new Error('Invalid settings');
+    const initializingDefaults = value === defaults;
+    if (
+      value.onboarding === undefined &&
+      typeof value.onboardingComplete === 'boolean' &&
+      !initializingDefaults
+    )
+      value = {
+        ...value,
+        onboarding: {
+          ...this.settings().onboarding,
+          status: value.onboardingComplete ? 'completed' : 'deferred',
+        },
+      };
+    if (value.onboarding !== undefined) {
+      value = {
+        ...value,
+        onboarding: validateSetup(value.onboarding),
+        onboardingComplete: value.onboarding.status === 'completed',
+      };
+    }
     validateAppearanceSettings(value);
+    validateComputerSettings(value);
+    if (value.assignmentVersion !== undefined && ![0, 1].includes(value.assignmentVersion))
+      throw Error('Invalid assignment migration version');
+    if (
+      value.windowBounds !== undefined &&
+      (!value.windowBounds ||
+        Array.isArray(value.windowBounds) ||
+        Object.entries(value.windowBounds).some(([k, v]) =>
+          k === 'maximized'
+            ? typeof v !== 'boolean'
+            : !['x', 'y', 'width', 'height'].includes(k) ||
+              !Number.isFinite(v) ||
+              (['width', 'height'].includes(k) && (v < 100 || v > 30000)),
+        ))
+    )
+      throw Error('Invalid window bounds');
+    if (value.lastProject && this.get(value.lastProject)?.kind !== 'project')
+      throw Error('Project no longer exists');
     if (value.autoReadAloud !== undefined && typeof value.autoReadAloud !== 'boolean')
       throw Error('Invalid automatic reading preference');
     validateOptionalModules(value.optionalModules);
@@ -331,10 +393,7 @@ export class Store extends EventEmitter {
         throw new Error('Use an HTTP endpoint without embedded credentials');
       clean.endpoint = u.origin + u.pathname.replace(/\/$/, '');
     }
-    if (
-      clean.theme &&
-      ![...themeIds, 'system'].includes(clean.theme)
-    )
+    if (clean.theme && ![...themeIds, 'system'].includes(clean.theme))
       throw new Error('Invalid theme');
     if (
       clean.returnTheme &&
@@ -387,7 +446,7 @@ export class Store extends EventEmitter {
     )
       throw Error('Tool-step limit must be an integer from 1 to 256');
     delete clean.connectedProviders;
-    if (value.connectedProviders !== undefined && value !== defaults)
+    if (value.connectedProviders !== undefined && !initializingDefaults)
       throw Error('Connections are managed by the app');
     if (clean.language !== undefined && !['en', 'ro'].includes(clean.language))
       throw new Error('Choose English or Romanian');
@@ -525,6 +584,15 @@ export class Store extends EventEmitter {
   }
   access(id, edit = false, seen = new Set(), includeDeleted = false) {
     if (seen.has(id)) return false;
+    const native = this.baseAccess(id, edit, seen, includeDeleted);
+    const scope = this.agentScope.getStore();
+    return scope ? scope(id, edit, native, seen, includeDeleted) : native;
+  }
+  withAgentScope(scope, action) {
+    return this.agentScope.run(scope, action);
+  }
+  baseAccess(id, edit = false, seen = new Set(), includeDeleted = false) {
+    if (seen.has(id)) return false;
     seen.add(id);
     let e = this.get(id, includeDeleted);
     if (!e) return false;
@@ -547,9 +615,8 @@ export class Store extends EventEmitter {
         !e.data.temporary &&
         !e.data.logContext &&
         !e.data.memoryExcluded &&
-        (e.data.context ?? []).every((source) => this.access(source, false, new Set(seen))) &&
-        this.messages(e.id).every((m) =>
-          (m.data.context ?? []).every((source) => this.access(source, false, new Set(seen))),
+        conversationSources(e, this.messages(e.id)).every((source) =>
+          this.access(source, false, new Set(seen)),
         )
       );
     const root = e.kind.startsWith('vault-')
@@ -730,6 +797,23 @@ export class Store extends EventEmitter {
       if (!p || !parentKinds[kind].includes(p.kind)) throw new Error('Choose a valid parent');
     } else if (parent) throw new Error('This item cannot have a parent');
     const data = { ...previous?.data, ...input.data };
+    if (input.data?.assignedAgent !== undefined) {
+      if (
+        !['board', 'list', 'card', 'matrix-list'].includes(kind) ||
+        (data.assignedAgent !== null &&
+          (typeof data.assignedAgent !== 'string' ||
+            this.get(data.assignedAgent)?.kind !== 'agent-profile'))
+      )
+        throw Error('Choose an available agent');
+      if (agent) throw Error('Only the user can change access and assignment');
+    }
+    if (
+      input.data?.assigned === true &&
+      !data.assignedAgent &&
+      !parent &&
+      this.settings().activeAgent
+    )
+      data.assignedAgent = this.settings().activeAgent;
     if (kind === 'calendar-event') Object.assign(data, validateEvent(data));
     if (kind === 'report-template') Object.assign(data, validateReportTemplate(data));
     if (agent && kind === 'report') throw Error('Reports are created by the native report runner');
@@ -958,6 +1042,7 @@ export class Store extends EventEmitter {
         this.db
           .prepare('DELETE FROM runs WHERE card=? OR conversation=?')
           .run(deletedId, deletedId);
+        this.db.exec('DELETE FROM run_profiles WHERE run NOT IN (SELECT id FROM runs)');
         for (const table of ['versions', 'vectors', 'search', 'entities'])
           this.db.prepare(`DELETE FROM ${table} WHERE id=?`).run(deletedId);
       }
@@ -1188,15 +1273,13 @@ export class Store extends EventEmitter {
         };
       }),
       messageCount: messages.length,
-      messages: messages
-        .slice(0, 12)
-        .map((m) => ({
-          id: m.id,
-          role: m.role,
-          created: m.created,
-          content: redactLog(m.content).slice(0, 800),
-          truncated: m.content.length > 800,
-        })),
+      messages: messages.slice(0, 12).map((m) => ({
+        id: m.id,
+        role: m.role,
+        created: m.created,
+        content: redactLog(m.content).slice(0, 800),
+        truncated: m.content.length > 800,
+      })),
     };
   }
   commitConsolidation(conversation, cursor, summary, facts, messageIds, sourceIds) {
@@ -1370,19 +1453,21 @@ export class Store extends EventEmitter {
       .all(model)
       .map((row) => row.id);
   }
-  snapshot() {
+  snapshot(includeEntities = true) {
     return {
       settings: this.settings(),
-      entities: this.all().map((entity) =>
-        entity.kind === 'card'
-          ? {
-              ...entity,
-              agentAccess: this.access(entity.id),
-              agentEditable: this.access(entity.id, true),
-              agentAssigned: this.assigned(entity.id),
-            }
-          : entity,
-      ),
+      entities: includeEntities
+        ? this.all().map((entity) =>
+            entity.kind === 'card'
+              ? {
+                  ...entity,
+                  agentAccess: this.access(entity.id),
+                  agentEditable: this.access(entity.id, true),
+                  agentAssigned: this.assigned(entity.id),
+                }
+              : entity,
+          )
+        : [],
       runs: this.db.prepare('SELECT * FROM runs ORDER BY start DESC LIMIT 100').all(),
     };
   }

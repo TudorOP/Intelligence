@@ -27,7 +27,10 @@ const server = createServer(async (req, res) => {
   }
   let text = '';
   for await (const part of req) text += part;
-  if (!text) { res.end(JSON.stringify({ data: [{id:'search-fixture'}], models: [] })); return; }
+  if (!text) {
+    res.end(JSON.stringify({ data: [{ id: 'search-fixture' }], models: [] }));
+    return;
+  }
   const body = JSON.parse(text);
   modelRequests.push(body);
   const delta =
@@ -53,7 +56,7 @@ await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
 const endpoint = 'http://127.0.0.1:' + server.address().port;
 const env = { ...process.env, INTELLIGENCE_TEST: '1', INTELLIGENCE_DATA_DIR: directory };
 delete env.ELECTRON_RUN_AS_NODE;
-env.INTELLIGENCE_DEV_URL ||= 'http://127.0.0.1:5173';
+
 let desktop;
 try {
   desktop = await electron.launch({

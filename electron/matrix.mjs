@@ -3,6 +3,7 @@ import { MatrixFiles } from './matrix-files.mjs';
 import { nextOccurrence } from './schedule.mjs';
 import { matrixInference } from './matrix-config.mjs';
 import { profileSettings } from './profiles.mjs';
+import { requireAssignedAgent } from './assignments.mjs';
 import { residentModel, prepareModel } from './model-residency.mjs';
 import { providerInfo } from './inference-providers.mjs';
 import { MatrixTriggers } from './matrix-triggers.mjs';
@@ -34,7 +35,8 @@ export class CognitionMatrix {
     this.triggers = new MatrixTriggers(this, runtime);
     this.onChange = () => this.refresh();
     store.on('changed', this.onChange);
-    const interrupted = store.all(false,true)
+    const interrupted = store
+      .all(false, true)
       .filter((e) => e.kind === 'matrix-task' && e.data.status === 'running');
     for (const task of interrupted)
       store.db
@@ -42,7 +44,8 @@ export class CognitionMatrix {
           "UPDATE runs SET status='needs_input',end=?,result=? WHERE card=? AND status='running'",
         )
         .run(new Date().toISOString(), 'Interrupted run requires review.', task.id);
-    for (const task of store.all(false,true)
+    for (const task of store
+      .all(false, true)
       .filter((e) => e.kind === 'matrix-task' && e.data.status === 'running'))
       store.mutate({
         id: task.id,
@@ -63,8 +66,20 @@ export class CognitionMatrix {
       .map((row) => this.store.decode(row));
   }
   profile(list) {
-    const settings = profileSettings(this.store);
-    const value = matrixInference(settings, settings.matrixPreload ? list.data.modelProfile : null);
+    if (
+      list.data.assignedAgent &&
+      this.store.get(list.data.assignedAgent)?.kind !== 'agent-profile'
+    )
+      return {
+        ...this.store.settings(),
+        model: '',
+        profileId: list.data.assignedAgent,
+        unavailableAgent: true,
+        matrixExecution: true,
+      };
+    const id = list.data.assignedAgent ? requireAssignedAgent(this.store, list) : null;
+    const settings = profileSettings(this.store, id ? { data: { agentProfile: id } } : null);
+    const value = matrixInference(settings, id ? null : list.data.modelProfile);
     return { ...value, matrixExecution: true, matrixLoadedOnly: !settings.matrixPreload };
   }
   preparationKey(task, list) {
@@ -75,6 +90,8 @@ export class CognitionMatrix {
       profile.provider,
       profile.endpoint,
       profile.model,
+      profile.profileId,
+      this.store.get(profile.profileId)?.revision,
       this.store.settings().matrixPreload,
       this.store.settings().tools,
     ]);
@@ -367,6 +384,7 @@ export class CognitionMatrix {
       revision: task.revision,
       status: task.data.status ?? 'queued',
       output: task.data.output ?? 'auto',
+      incomingFiles: task.data.watchBatch || [],
       schedule: task.data.schedule ?? null,
       trigger:
         task.data.trigger?.source && !this.store.access(task.data.trigger.source)
@@ -433,6 +451,7 @@ export class CognitionMatrix {
     return entry;
   }
   queue(id) {
+    this.triggers.inbox.retry(id);
     const task = this.store.get(id);
     if (task?.kind !== 'matrix-task') throw new Error('Matrix task not found');
     if (
@@ -567,7 +586,8 @@ export class CognitionMatrix {
     throw new Error('Unknown Matrix tool');
   }
   attention(conversation, pending) {
-    const task = this.store.all(false,true)
+    const task = this.store
+      .all(false, true)
       .find((e) => e.kind === 'matrix-task' && e.data.conversation === conversation);
     if (!task) return;
     this.store.mutate({
@@ -684,9 +704,17 @@ export class CognitionMatrix {
       }
       const task = tasks.find((e) => this.eligible(this.store.get(e.id)));
       if (!task) continue;
-      const profile = this.profile(list);
+      let profile;
+      try {
+        profile = this.profile(list);
+      } catch (error) {
+        this.triggerError(task.id, error.message);
+        continue;
+      }
       if (!profile.model || !this.store.settings().tools) {
-        const message = 'Choose a model and enable agent tools in Settings, then resume this list.';
+        const message = profile.unavailableAgent
+          ? 'The assigned agent is unavailable. Choose another agent.'
+          : 'Choose a model for the assigned agent and enable agent tools in Settings, then resume this list.';
         this.store.mutate({ id: list.id, data: { attention: { task: task.id, message } } });
         this.store.mutate({
           id: task.id,
@@ -769,15 +797,32 @@ export class CognitionMatrix {
     }
   }
   async run(task, list, inference = this.profile(list)) {
+    const inbox = task.data.trigger?.mode === 'inbox';
+    const batch = inbox ? this.triggers.inbox.claim(task) : [];
+    if (inbox && !batch.length) {
+      this.store.mutate({ id: task.id, data: { triggerPending: false } });
+      return;
+    }
+    if (inbox) {
+      this.store.mutate({ id: task.id, data: { watchBatch: batch } });
+      task = this.store.get(task.id);
+    }
     const conversation =
       this.store.get(task.data.conversation) ??
       this.store.mutate({
         kind: 'conversation',
         title: 'Matrix · ' + task.title,
-        data: { matrixTask: task.id, context: [task.id], memoryExcluded: true },
+        data: {
+          matrixTask: task.id,
+          context: [task.id],
+          memoryExcluded: true,
+          agentProfile: inference.profileId,
+        },
         project: null,
       });
     const run = randomUUID();
+    if (inference.profileId && conversation.data.agentProfile !== inference.profileId)
+      this.store.mutate({ id: conversation.id, data: { agentProfile: inference.profileId } });
     this.running = { task: task.id, list: list.id, conversation: conversation.id, run };
     this.store.mutate({
       id: task.id,
@@ -787,6 +832,9 @@ export class CognitionMatrix {
         startedAt: new Date().toISOString(),
         awaitingApproval: false,
         triggerPending: false,
+        lastAgent: inference.profileId,
+        lastModel: inference.model,
+        lastProvider: inference.provider,
         ...(task.data.trigger?.kind === 'completion'
           ? { lastTriggeredAt: new Date().toISOString() }
           : {}),
@@ -799,6 +847,15 @@ export class CognitionMatrix {
     this.store.db
       .prepare('INSERT INTO runs VALUES(?,?,?,?,?,?,?)')
       .run(run, task.id, 'running', new Date().toISOString(), null, null, conversation.id);
+    this.store.db
+      .prepare('INSERT INTO run_profiles VALUES(?,?,?,?,?)')
+      .run(
+        run,
+        inference.profileId || null,
+        inference.agentName || 'Intelligence',
+        inference.provider || null,
+        inference.model || null,
+      );
     this.changed();
     const firstMessage = this.store.messages(conversation.id).length;
     const firstResponses = this.store
@@ -874,6 +931,7 @@ export class CognitionMatrix {
     } finally {
       clearTimeout(timer);
       const completed = this.store.get(task.id);
+      if (inbox && completed) this.triggers.inbox.finish(completed, run);
       if (
         completed?.data.status === 'done' &&
         completed.data.schedule?.repeat &&

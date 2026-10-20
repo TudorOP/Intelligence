@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 import fsSync from 'node:fs';
 import path from 'node:path';
-import { Worker } from 'node:worker_threads';
+import { extractDocument } from './document-extract.mjs';
 import { randomUUID } from 'node:crypto';
 
 export const matrixFileLimit = 25 * 1024 * 1024;
@@ -121,35 +121,7 @@ export class MatrixFiles {
         throw new Error('Vision attachments must be smaller than 10 MB');
       return { id, name: file.title, mime: file.data.mime, imageAttachment: true };
     }
-    const text = await new Promise((resolve, reject) => {
-      const worker = new Worker(new URL('./matrix-file-worker.mjs', import.meta.url), {
-        workerData: { bytes, extension: path.extname(target) },
-        resourceLimits: { maxOldGenerationSizeMb: 192 },
-      });
-      let finished = false;
-      const finish = (error, value) => {
-        if (finished) return;
-        finished = true;
-        clearTimeout(timer);
-        signal?.removeEventListener('abort', abort);
-        void worker.terminate();
-        error ? reject(error) : resolve(value);
-      };
-      const abort = () => finish(signal.reason ?? new Error('Stopped'));
-      const timer = setTimeout(
-        () => finish(new Error('Document extraction timed out; provide a smaller file')),
-        25000,
-      );
-      worker.once('message', (result) =>
-        finish(result.error ? new Error(result.error) : null, result.text),
-      );
-      worker.once('error', (error) => finish(error));
-      worker.once('exit', (code) => {
-        if (!finished) finish(new Error('Document extractor exited: ' + code));
-      });
-      signal?.addEventListener('abort', abort, { once: true });
-      if (signal?.aborted) abort();
-    });
+    const text = await extractDocument(target, signal);
     return {
       id,
       name: file.title,

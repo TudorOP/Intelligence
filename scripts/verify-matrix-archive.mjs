@@ -15,6 +15,7 @@ fs.copyFileSync(
   'electron/matrix-file-worker.mjs',
   path.join(stage, 'electron', 'matrix-file-worker.mjs'),
 );
+fs.copyFileSync('electron/docx.mjs', path.join(stage, 'electron', 'docx.mjs'));
 const copied = new Set();
 function copyPackage(packagePath) {
   if (copied.has(packagePath)) return;
@@ -40,7 +41,8 @@ function copyPackage(packagePath) {
   }
 }
 copyPackage(path.join(root, 'node_modules', 'pdf2json'));
-copyPackage(path.join(root, 'node_modules', 'mammoth'));
+// DOCX uses the existing native bounded ZIP/XML parser; Mammoth is no longer a runtime dependency.
+copyPackage(path.join(root, 'node_modules', 'adm-zip'));
 const archive = path.join(directory, 'parser.asar');
 await createPackage(stage, archive);
 const stream = 'BT /F1 12 Tf 20 100 Td (Archived PDF fixture) Tj ET';

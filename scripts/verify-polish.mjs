@@ -354,6 +354,18 @@ try {
         .click({ modifiers: ['Shift'] });
       assert.equal(await page.locator('.task-card-shell[data-selected=true]').count(), 3);
       await shot('tasks-selected');
+      if (await page.locator('.toast').count()) {
+        const geometry = await page.evaluate(() => ({
+          bar: document.querySelector('.bulk-bar').getBoundingClientRect().top,
+          toasts: [...document.querySelectorAll('.toast')].map(
+            (e) => e.getBoundingClientRect().bottom,
+          ),
+        }));
+        assert(
+          geometry.toasts.every((bottom) => bottom <= geometry.bar),
+          'Notifications cover selected-item actions',
+        );
+      }
       await page.keyboard.press('Escape');
       await marquee('.kanban-board', '.task-card-shell');
       await page.locator('.task-card').first().click();

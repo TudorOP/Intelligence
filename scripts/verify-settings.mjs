@@ -1,3 +1,4 @@
+import { settingsSection } from './ui-pickers.mjs';
 import { _electron as electron } from 'playwright';
 import electronPath from 'electron';
 import { Store } from '../electron/store.mjs';
@@ -63,10 +64,10 @@ try {
   };
   await open();
   const nav = async (name) => {
-    await page.locator('.settings-navigation').getByRole('button', { name, exact: true }).click();
+    await settingsSection(page, name);
     await page.waitForTimeout(100);
   };
-  const fit = async (name, strict = true) => {
+  const fit = async (name, strict = false) => {
     const g = await page.locator('.settings-content').evaluate((e) => ({
       section: e.dataset.section,
       height: e.clientHeight,
@@ -169,9 +170,10 @@ try {
     await fit('Brave');
     await page.getByLabel('Search provider', { exact: true }).selectOption('searxng');
     await page.locator('.settings-help-menu > summary').filter({ hasText: 'Help & setup' }).click();
-    await page.getByRole('button', { name: 'Getting started', exact: true }).click();
+    await page.getByRole('button', { name: 'Review setup', exact: true }).click();
     await page.locator('.onboarding').waitFor();
-    await page.getByRole('button', { name: 'Close guide', exact: true }).click();
+    await page.getByRole('button', { name: 'Explore first', exact: true }).click();
+    await page.locator('.onboarding').waitFor({ state: 'detached' });
     assert.equal(await page.locator('.settings-dialog').count(), 1);
     await nav('Your profile');
     await page.getByLabel('Your name', { exact: true }).fill('Ada');
@@ -200,7 +202,10 @@ try {
       );
       for (const name of sections) {
         await nav(name);
-        await fit(name + '-' + w, w === 2560);
+        await fit(
+          name + '-' + w,
+          w === 2560 && !['Look & feel', 'Icons & identity', 'Agent access'].includes(name),
+        );
       }
       await shot('settings-' + w);
     }

@@ -111,7 +111,6 @@ const env = {
   ...process.env,
   INTELLIGENCE_TEST: '1',
   INTELLIGENCE_DATA_DIR: data,
-  INTELLIGENCE_DEV_URL: process.env.INTELLIGENCE_DEV_URL || 'http://127.0.0.1:5173',
 };
 delete env.ELECTRON_RUN_AS_NODE;
 let app;
@@ -165,7 +164,7 @@ try {
   await nav('Your profile');
   await page.getByLabel('Your name', { exact: true }).fill('Octavian');
   await page
-    .getByLabel('A little about you', { exact: true })
+    .getByLabel('Describe yourself (optional)', { exact: true })
     .fill('A short profile, available only when needed.');
   await shot('profile-1920');
   await nav('Optional Modules');
@@ -198,12 +197,10 @@ try {
   await page.getByText('A completed fixture answer.', { exact: true }).waitFor();
   const thinking = page.locator('.thinking-panel').first();
   assert.equal(await thinking.locator('button').getAttribute('aria-expanded'), 'false');
-  const measure = await thinking
-    .locator('pre')
-    .evaluate((e) => ({
-      height: e.clientHeight,
-      line: parseFloat(getComputedStyle(e).lineHeight),
-    }));
+  const measure = await thinking.locator('pre').evaluate((e) => ({
+    height: e.clientHeight,
+    line: parseFloat(getComputedStyle(e).lineHeight),
+  }));
   assert.ok(measure.height <= measure.line * 3 + 2, JSON.stringify(measure));
   await shot('thinking-vignette-1920');
   await thinking.locator('button').click();

@@ -82,7 +82,7 @@ try {
     : ['ink', 'day', 'night', 'summer', 'autumn', 'winter']) {
     for (const layout of ['studio']) {
       await settings({ theme, layout });
-      await page.locator('.sidebar nav button').nth(6).click();
+      await page.locator('.sidebar .nav-item').nth(8).click();
       await page.locator('.machine-readings').waitFor();
       const geometry = await page.locator('.machine-page').evaluate((e) => {
         const p = e.closest('.main-canvas'),
@@ -100,9 +100,9 @@ try {
         `${theme}/${layout}: ${JSON.stringify(geometry)}`,
       );
       await capture(`${theme}-${layout}-machine.png`);
-      await page.locator('.sidebar nav button').nth(5).click();
+      await page.getByRole('button', { name: 'Cognition Matrix', exact: true }).click();
       await capture(`${theme}-${layout}-matrix.png`);
-      await page.locator('.sidebar nav button').nth(0).click();
+      await page.locator('.sidebar').getByRole('button', { name: 'Chat', exact: true }).click();
       await capture(`${theme}-${layout}-chat.png`);
     }
   }
@@ -137,7 +137,7 @@ try {
         await page.getByRole('button', { name: 'Cognition Matrix', exact: true }).click();
         await page.getByRole('button', { name: 'Notebooks', exact: true }).click();
         if (process.env.INTELLIGENCE_TEST_VAULT) {
-          await page.locator('.sidebar nav button').nth(3).click();
+          await page.getByRole('button', { name: 'Vault', exact: true }).click();
           await page.getByRole('button', { name: 'Open Lifecycle.md', exact: true }).click();
           await page.getByRole('textbox', { name: 'Vault content' }).waitFor();
         }

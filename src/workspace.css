@@ -114,18 +114,8 @@
   background-size: cover;
   background-position: center;
 }
-[data-theme='autumn'] .welcome .welcome-orbit {
-  width: min(100%, 660px);
-  height: auto;
-  aspect-ratio: 1817 / 866;
-}
 [data-theme='autumn'] .welcome-orbit .theme-banner {
   background-size: contain;
-}
-@media (max-height: 800px) {
-  [data-theme='autumn'] .welcome .welcome-orbit {
-    width: min(100%, 460px);
-  }
 }
 .machine-overview > .theme-banner {
   width: clamp(180px, 24%, 390px);

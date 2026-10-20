@@ -34,7 +34,6 @@ const env = {
   ...process.env,
   INTELLIGENCE_TEST: '1',
   INTELLIGENCE_DATA_DIR: path.join(directory, 'data'),
-  INTELLIGENCE_DEV_URL: process.env.INTELLIGENCE_DEV_URL || 'http://127.0.0.1:5173',
 };
 delete env.ELECTRON_RUN_AS_NODE;
 const app = await electron.launch({

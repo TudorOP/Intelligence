@@ -13,7 +13,7 @@ import {
   moduleModelStorageId,
 } from './optional-modules.mjs';
 const maximumBackupBytes = 128 * 1024 ** 3;
-const roots = ['assets', 'Vault', 'matrix-files'];
+const roots = ['assets', 'Vault', 'matrix-files', 'chat-files'];
 async function digest(file) {
   const hash = createHash('sha256');
   for await (const bytes of createReadStream(file)) hash.update(bytes);
@@ -72,7 +72,7 @@ export async function exportBackup(
   const copy = new DatabaseSync(path.join(target, 'intelligence.sqlite'));
   try {
     copy.exec(
-      'DELETE FROM search_credentials; DELETE FROM vectors; CREATE TABLE IF NOT EXISTS activity(id TEXT PRIMARY KEY,created TEXT NOT NULL,type TEXT NOT NULL,entity TEXT,summary TEXT NOT NULL,data TEXT NOT NULL,read INTEGER DEFAULT 0);',
+      `DELETE FROM search_credentials; DELETE FROM vectors; UPDATE entities SET data=json_remove(data,'$.resourceGrants') WHERE kind='agent-profile'; CREATE TABLE IF NOT EXISTS activity(id TEXT PRIMARY KEY,created TEXT NOT NULL,type TEXT NOT NULL,entity TEXT,summary TEXT NOT NULL,data TEXT NOT NULL,read INTEGER DEFAULT 0);`,
     );
   } finally {
     copy.close();
@@ -130,6 +130,8 @@ export async function exportBackup(
     files,
     excluded: [
       'credentials',
+      'agent resource grants',
+      'computer folder/system grants (review after restore)',
       'module trust key',
       ...(includeModules ? [] : ['optional modules']),
       ...(includeModelCaches ? [] : ['model caches']),
@@ -165,7 +167,7 @@ export async function inspectBackup(directory) {
       /[\\:\x00]/.test(entry.path) ||
       entry.path.split('/').some((p) => !p || p === '..' || p === '.') ||
       path.isAbsolute(entry.path) ||
-      !/^(intelligence\.sqlite$|assets\/|Vault\/|matrix-files\/|models\/|modules\/)/.test(
+      !/^(intelligence\.sqlite$|assets\/|Vault\/|matrix-files\/|chat-files\/|models\/|modules\/)/.test(
         entry.path,
       ) ||
       seen.has(entry.path)
@@ -398,17 +400,28 @@ export async function restoreBackup(store, directory) {
       );
     }
     store.db.exec(
-      "DELETE FROM vectors; DELETE FROM search; DELETE FROM message_search; UPDATE entities SET data=json_set(data,'$.status','needs_input','$.result','Restored run requires review.') WHERE kind IN ('card','matrix-task') AND json_extract(data,'$.status')='running'; UPDATE entities SET data=json_set(data,'$.enabled',json('false')) WHERE kind='connection'; UPDATE runs SET status='needs_input',end=strftime('%Y-%m-%dT%H:%M:%fZ','now'),result='Restored run requires review.' WHERE status='running'",
+      "DELETE FROM vectors; DELETE FROM search; DELETE FROM message_search; UPDATE entities SET data=json_set(data,'$.resourceGrants',json('[]')) WHERE kind='agent-profile'; UPDATE entities SET data=json_set(data,'$.status','needs_input','$.result','Restored run requires review.') WHERE kind IN ('card','matrix-task') AND json_extract(data,'$.status')='running'; UPDATE entities SET data=json_set(data,'$.enabled',json('false')) WHERE kind='connection'; UPDATE runs SET status='needs_input',end=strftime('%Y-%m-%dT%H:%M:%fZ','now'),result='Restored run requires review.' WHERE status='running'",
     );
     store.db.exec(
       "INSERT INTO search SELECT id,title,coalesce(json_extract(data,'$.content'),json_extract(data,'$.description'),'') FROM entities WHERE deleted=0; INSERT INTO message_search SELECT id,conversation,content FROM messages WHERE role IN ('user','assistant') AND coalesce(json_extract(data,'$.tool'),0)=0",
     );
-    for (const table of ['execution_ledger', 'report_occurrences'])
+    for (const table of [
+      'execution_ledger',
+      'report_occurrences',
+      'chat_files',
+      'chat_file_refs',
+      'file_queue',
+      'file_watches',
+      'run_profiles',
+    ])
       if (store.db.prepare('SELECT 1 FROM main.sqlite_master WHERE name=?').get(table)) {
         store.db.exec('DELETE FROM main.' + table);
         if (store.db.prepare('SELECT 1 FROM restored.sqlite_master WHERE name=?').get(table))
           store.db.exec('INSERT INTO main.' + table + ' SELECT * FROM restored.' + table);
       }
+    store.db.exec(
+      "UPDATE file_queue SET state='needs_input',result='Restored file run requires review.' WHERE state='running'; INSERT OR REPLACE INTO settings(key,value) VALUES('computerScope','\"projects\"'),('computerFolders','[]'),('askDestructive','true');",
+    );
     store.db.exec(
       "UPDATE entities SET data=json_set(data,'$.status','interrupted','$.error','Restored report requires review.') WHERE kind='report' AND json_extract(data,'$.status')='running'",
     );

@@ -99,6 +99,16 @@ venv/
 .codex/
 .claude/
 .cursor/
+.opencode/
+.gemini/
+.qwen/
+.factory/
+.aider*
+.continue/
+.windsurf/
+.roo/
+.kiro/
+.amazonq/
 .history/
 .idea/
 .vscode/

@@ -89,30 +89,6 @@ export default function ChatPreferences({
               )}
             </small>
           </label>
-          <label>
-            {t('Command approvals')}
-            <select
-              aria-label={t('Command approvals')}
-              data-tooltip={t(
-                'Ask reviews each host action. Approve for me automatically accepts supported read-only project commands and writes inside an editable project; other actions still ask. Full Access skips action approvals. Selecting either automatic mode enables host commands; the host-terminal switch can revoke them. Resource grants and read-only machine sessions remain enforced.',
-              )}
-              value={settings.approvalMode ?? 'ask'}
-              onChange={(e) =>
-                void onUpdate({ approvalMode: e.target.value as Settings['approvalMode'] })
-              }
-            >
-              {approvalChoices.map(([value, label]) => (
-                <option key={value} value={value}>
-                  {t(label)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <p>
-            {t(
-              'Full Access skips ordinary per-action approval. MCP server setup still requires review. Resource grants and read-only sessions still apply.',
-            )}
-          </p>
         </section>
       </div>
     </section>

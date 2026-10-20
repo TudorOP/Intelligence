@@ -163,7 +163,7 @@ export async function projectFiles(store, args, options = {}) {
   }
   throw Error('Unknown project file action');
 }
-export async function createProject(store, title) {
+export async function createProject(store, title, shared = true) {
   if (typeof title !== 'string' || !title.trim()) throw Error('Give the project a name');
   const base = path.join(os.homedir(), 'Intelligence', 'Projects');
   const directory = path.join(
@@ -174,6 +174,6 @@ export async function createProject(store, title) {
   return store.mutate({
     kind: 'project',
     title,
-    data: { directory, access: true, permission: 'edit' },
+    data: { directory, access: shared, permission: 'edit' },
   });
 }

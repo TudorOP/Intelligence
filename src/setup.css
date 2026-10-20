@@ -1,0 +1,323 @@
+.setup-dialog {
+  width: min(1080px, calc(100vw - 48px));
+  max-width: calc(100% - 48px);
+  max-height: calc(100% - 64px);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.setup-dialog > header {
+  display: block;
+  flex-shrink: 0;
+  padding: 24px 30px 18px;
+  position: relative;
+  border-bottom: 1px solid var(--line);
+}
+.setup-dialog > header .icon-button {
+  position: absolute;
+  right: 20px;
+  top: 18px;
+}
+.setup-dialog h1 {
+  margin: 12px 0 10px;
+  font-size: 30px;
+}
+.setup-dialog header p {
+  color: var(--muted);
+  margin: 0;
+  line-height: 1.6;
+  max-width: 90%;
+}
+.setup-progress {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+.setup-progress > span {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  font-size: 11px;
+  color: var(--muted);
+}
+.setup-progress > span > span {
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+}
+.setup-progress .reached > span {
+  background: var(--accent-soft);
+}
+.setup-progress [aria-current='step'] {
+  color: var(--text);
+  font-weight: 600;
+}
+.setup-body {
+  overflow: auto;
+  min-height: 0;
+  padding: 24px 30px;
+}
+.setup-body p {
+  line-height: 1.65;
+  color: var(--muted);
+}
+.setup-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  margin: 16px 0;
+}
+.setup-dialog > footer {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  border-top: 1px solid var(--line);
+  padding: 16px 30px;
+  margin: 0;
+  flex-shrink: 0;
+}
+.setup-dialog > footer .primary {
+  margin-left: auto;
+}
+.setup-dialog button:disabled {
+  opacity: 0.5;
+}
+.setup-body label {
+  display: grid;
+  gap: 8px;
+}
+.setup-body .setting-switch {
+  display: flex;
+}
+.setup-dialog textarea {
+  resize: vertical;
+  min-height: 110px;
+}
+.setup-dialog .models-settings {
+  min-width: 0;
+}
+.setup-dialog .models-settings summary {
+  font-size: 12px;
+  margin: 12px 0;
+}
+.provider-help {
+  font-size: 12px;
+  line-height: 1.65;
+  margin: 12px 0 18px;
+}
+.provider-help ol {
+  padding-left: 20px;
+}
+.provider-help li {
+  margin: 8px 0;
+}
+.provider-help small {
+  display: block;
+  margin-top: 8px;
+  color: var(--muted);
+}
+.setup-connection-choices {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.setup-connection-choices [aria-pressed='true'] {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+.setup-reply-test,
+.setup-exit-prompt {
+  padding: 14px;
+  margin: 14px 0;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.setup-exit-prompt button {
+  margin-right: 8px;
+}
+.setup-resource-list {
+  max-height: 340px;
+  overflow: auto;
+}
+.setup-resource-list > div {
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+.setup-resource-list small {
+  display: block;
+  color: var(--muted);
+}
+.setup-review {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 16px;
+  line-height: 1.6;
+}
+.setup-review dd {
+  margin: 0;
+}
+.setup-edit-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.setup-body input,
+.setup-body select,
+.setup-body textarea {
+  max-width: 100%;
+  min-width: 0;
+}
+.help-search {
+  display: grid;
+  gap: 8px;
+  max-width: 520px;
+  margin-bottom: 20px;
+}
+.help-layout {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--surface);
+}
+.settings-section.help-guide > .settings-note {
+  margin: 18px 0 0;
+}
+.help-layout nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px;
+  border-right: 1px solid var(--line);
+}
+.help-layout nav button {
+  text-align: left;
+  font-size: 12px;
+}
+.help-layout nav [aria-current='page'] {
+  background: var(--accent-soft);
+}
+.help-layout article {
+  padding: 24px;
+  min-width: 0;
+}
+.help-layout article h3 {
+  margin-top: 0;
+}
+.help-layout article p {
+  line-height: 1.75;
+  font-size: 14px;
+  color: var(--muted);
+}
+.help-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 22px;
+}
+.feature-lesson {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  width: min(380px, calc(100vw - 48px));
+  max-height: calc(100dvh - 80px);
+  overflow: auto;
+  z-index: 85;
+  padding: 18px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  border-radius: 14px;
+}
+.feature-lesson header,
+.feature-lesson footer {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+}
+.feature-lesson header button {
+  margin-left: auto;
+}
+.feature-lesson p {
+  line-height: 1.65;
+}
+.feature-lesson small {
+  color: var(--muted);
+}
+.feature-lesson footer {
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+.setup-reminder {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.setup-reminder button {
+  font-size: 11px;
+}
+@media (max-width: 1100px) {
+  .help-layout {
+    grid-template-columns: 1fr;
+  }
+  .help-layout nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+}
+@media (max-width: 1050px) {
+  .setup-cards,
+  .setup-dialog .settings-grid {
+    grid-template-columns: 1fr;
+  }
+  .setup-dialog h1 {
+    font-size: 24px;
+  }
+}
+@media (max-height: 800px) {
+  .setup-dialog > header {
+    padding: 18px 24px 12px;
+  }
+  .setup-progress {
+    margin-top: 12px;
+  }
+  .setup-body {
+    padding: 18px 24px;
+  }
+  .setup-dialog {
+    max-height: calc(100% - 32px);
+  }
+}
+
+.configuration-diff {
+  margin: 12px 0;
+  max-height: 260px;
+  overflow: auto;
+}
+.configuration-diff > div {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+.configuration-diff dt {
+  font-weight: 600;
+}
+.configuration-diff dd {
+  margin: 4px 0;
+  display: grid;
+  gap: 6px;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}

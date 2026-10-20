@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import type { Entity, Settings, Snapshot } from './types';
 import { t } from './i18n';
-import ModelPicker from './ModelPicker';
+import AgentPicker from './AgentPicker';
+import { api } from './api';
 import Switch from './Switch';
 
 import { providerDefaults, providers } from './providers';
@@ -19,85 +20,19 @@ export function MatrixModel({
   onError: (e: any) => void;
   embedded?: boolean;
 }) {
-  const settings = snapshot.settings,
-    profile = list.data.modelProfile;
-  const [open, setOpen] = useState(embedded),
-    [provider, setProvider] = useState<Settings['provider']>(
-      profile?.provider ?? settings.provider,
-    );
-  useEffect(
-    () => setProvider(profile?.provider ?? settings.provider),
-    [profile?.provider, settings.provider],
-  );
-  const saved = provider === settings.provider ? settings : settings.providerProfiles?.[provider];
-  const draft = {
-    ...settings,
-    provider,
-    endpoint: saved?.endpoint ?? providerDefaults[provider],
-    model: provider === profile?.provider ? profile.model : '',
-  };
   return (
-    <details
-      className="matrix-model"
-      open={embedded || undefined}
-      onToggle={(e) => setOpen(e.currentTarget.open)}
-    >
-      <summary
-        title={t(
-          'Select the provider and model for this list. Provider addresses and API keys come from Model & providers settings.',
-        )}
-      >
-        {t('Task model')} · {profile ? profile.model : t('Use chat model')}
-      </summary>
-      {open ? (
-        <>
-          <label className="check-label">
-            <Switch
-              checked={!profile}
-              onChange={(e) =>
-                void update({
-                  modelProfile: e.target.checked
-                    ? null
-                    : { provider: settings.provider, model: settings.model || '' },
-                })
-              }
-              disabled={!profile && !settings.model}
-            />
-            {t('Use chat model')}
-          </label>
-          <label>
-            {t('Inference provider')}
-            <select
-              value={provider}
-              aria-label={t('Provider for ') + list.title}
-              onChange={(e) => setProvider(e.target.value as Settings['provider'])}
-            >
-              {(snapshot.inference?.providers ?? providers).map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name}
-                </option>
-              ))}
-            </select>
-          </label>
-          <ModelPicker
-            matrix
-            settings={draft}
-            onError={onError}
-            onUpdate={async ({ model }) =>
-              update({ modelProfile: model ? { provider, model } : null })
-            }
-          />
-          <small>
-            {t('Provider addresses and API keys come from Model & providers settings.')}
-          </small>
-          {!settings.matrixPreload ? (
-            <small>
-              {t('Preloading is off: this list currently uses the loaded chat model instead.')}
-            </small>
-          ) : null}
-        </>
-      ) : null}
-    </details>
+    <div className="matrix-model">
+      <label>{t('List agent')}</label>
+      <AgentPicker
+        entities={snapshot.entities}
+        settings={snapshot.settings}
+        value={list.data.assignedAgent || snapshot.settings.activeAgent}
+        onChange={(id) => void update({ assignedAgent: id, modelProfile: null }).catch(onError)}
+      />
+      <small>
+        {t('Tasks inherit the agent from this list. Assignment does not grant access.')}
+      </small>
+    </div>
   );
 }
 
@@ -119,6 +54,9 @@ export function MatrixTaskSchedule({
     [gitEvent, setGitEvent] = useState(trigger.event ?? 'commit'),
     [channel, setChannel] = useState(trigger.channel ?? ''),
     [source, setSource] = useState(trigger.source ?? ''),
+    [directory, setDirectory] = useState(trigger.directory || ''),
+    [fileMode, setFileMode] = useState(trigger.mode || 'changes'),
+    [includeExisting, setIncludeExisting] = useState(trigger.includeExisting === true),
     [watchPath, setWatchPath] = useState(trigger.path ?? '.'),
     [cooldown, setCooldown] = useState(trigger.cooldownSeconds ?? 60),
     [start, setStart] = useState(''),
@@ -131,6 +69,9 @@ export function MatrixTaskSchedule({
     setGitEvent(trigger.event ?? 'commit');
     setChannel(trigger.channel ?? '');
     setSource(trigger.source ?? '');
+    setDirectory(trigger.directory || '');
+    setFileMode(trigger.mode || 'changes');
+    setIncludeExisting(trigger.includeExisting === true);
     setWatchPath(trigger.path ?? '.');
     setCooldown(trigger.cooldownSeconds ?? 60);
     setRepeat(schedule.repeat ?? 'none');
@@ -169,6 +110,13 @@ export function MatrixTaskSchedule({
                     source,
                     path: watchPath,
                     cooldownSeconds: Number(cooldown),
+                    ...(kind === 'file'
+                      ? {
+                          mode: fileMode,
+                          includeExisting,
+                          ...(directory ? { directory, source: undefined } : {}),
+                        }
+                      : {}),
                     ...(kind === 'system'
                       ? { metric, threshold: Number(threshold) }
                       : kind === 'git'
@@ -199,11 +147,12 @@ export function MatrixTaskSchedule({
               onChange={(e) => {
                 setKind(e.target.value);
                 setSource('');
+                if (e.target.value === 'file') setFileMode('inbox');
               }}
             >
               <option value="time">{t('Scheduled time')}</option>
               <option value="completion">{t('Another task completes')}</option>
-              <option value="file">{t('A file or folder changes')}</option>
+              <option value="file">{t('File monitoring')}</option>
               <option value="git">{t('A Git commit or branch changes')}</option>
               <option value="system">{t('A machine threshold is crossed')}</option>
               <option value="external">{t('An external event arrives')}</option>
@@ -261,7 +210,63 @@ export function MatrixTaskSchedule({
             </>
           ) : (
             <>
-              {kind !== 'external' ? (
+              {kind === 'file' && (
+                <>
+                  <label>
+                    {t('Monitor for')}
+                    <select
+                      aria-label={t('Monitor for')}
+                      value={fileMode}
+                      onChange={(e) => {
+                        setFileMode(e.target.value);
+                        if (e.target.value !== 'inbox') setDirectory('');
+                      }}
+                    >
+                      <option value="inbox">{t('New completed files continuously')}</option>
+                      <option value="changes">{t('Any file or folder change')}</option>
+                    </select>
+                  </label>
+                  {fileMode === 'inbox' && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          void api.directory().then((value) => {
+                            if (value) {
+                              setDirectory(value);
+                              setSource('');
+                            }
+                          })
+                        }
+                      >
+                        {t('Choose computer folder')}
+                      </button>
+                      {directory && (
+                        <div>
+                          <code>{directory}</code>
+                          <button type="button" onClick={() => setDirectory('')}>
+                            {t('Use workspace source instead')}
+                          </button>
+                        </div>
+                      )}
+                      <label className="check-label">
+                        <input
+                          type="checkbox"
+                          checked={includeExisting}
+                          onChange={(e) => setIncludeExisting(e.target.checked)}
+                        />
+                        {t('Also process files already present when monitoring starts')}
+                      </label>
+                      <small>
+                        {t(
+                          'Authorize the folder in Agent access. Monitoring runs while Intelligence is open or in the tray, queues arrivals while busy and catches up after resume. Partial downloads wait until settled.',
+                        )}
+                      </small>
+                    </>
+                  )}
+                </>
+              )}
+              {kind !== 'external' && !directory ? (
                 <label>
                   {t('Trigger source')}
                   <select required value={source} onChange={(e) => setSource(e.target.value)}>
@@ -324,6 +329,7 @@ export function MatrixTaskSchedule({
                 </label>
               ) : null}
               {kind === 'file' &&
+              !directory &&
               snapshot.entities.find((e) => e.id === source)?.kind === 'project' ? (
                 <label>
                   {t('Path within project')}
@@ -341,13 +347,17 @@ export function MatrixTaskSchedule({
                 />
               </label>
               <small>
-                {kind === 'file'
+                {kind === 'file' && fileMode === 'inbox'
                   ? t(
-                      'Watches the selected file or direct folder children. Changes during Matrix work are ignored to prevent loops. Monitoring stops when integration or access is disabled.',
+                      'New arrivals stay queued while the agent is busy. Each execution is bounded; monitoring continues until paused. Download readiness uses temporary-file exclusions and a stability delay.',
                     )
-                  : t(
-                      'Runs after a verified Matrix completion or a task card marked complete. Failed or unverified results do not trigger work.',
-                    )}
+                  : kind === 'file'
+                    ? t(
+                        'Watches the selected file or direct folder children. Changes during Matrix work are ignored to prevent loops. Monitoring stops when integration or access is disabled.',
+                      )
+                    : t(
+                        'Runs after a verified Matrix completion or a task card marked complete. Failed or unverified results do not trigger work.',
+                      )}
               </small>
             </>
           )}
@@ -360,6 +370,32 @@ export function MatrixTaskSchedule({
           {task.data.triggerDetail}
         </small>
       ) : null}
+    </details>
+  );
+}
+
+export function FileQueueHistory({ task }: { task: Entity }) {
+  const [events, setEvents] = useState<any[]>([]),
+    [error, setError] = useState('');
+  return (
+    <details
+      onToggle={(e) => {
+        if (e.currentTarget.open)
+          void api
+            .workspace({ action: 'matrix-file-queue', id: task.id })
+            .then(setEvents)
+            .catch((e) => setError(e.message));
+      }}
+    >
+      <summary>{t('File processing history')}</summary>
+      {error && <p role="status">{error}</p>}
+      {events.map((event) => (
+        <p key={event.id}>
+          <code>{event.file}</code> · {t(event.state)}
+          <small>{event.result}</small>
+        </p>
+      ))}
+      {!events.length && <small>{t('No files have been queued yet.')}</small>}
     </details>
   );
 }

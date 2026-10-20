@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import SearchPicker from './SearchPicker';
 import { api } from './api';
 import { t } from './i18n';
 import type { Settings } from './types';
@@ -65,18 +66,52 @@ export default function ChatModelMenu({
     };
   });
   return (
-    <select
-      className="composer-select chat-model-select"
-      aria-label={t('Choose model')}
-      title={settings.model || t('Choose model')}
+    <SearchPicker
+      compact
+      label={t('Choose model')}
       value={current}
       disabled={saving}
-      onChange={(e) => {
-        if (e.target.value === '__intelligence_settings__') {
-          onSettings();
-          return;
-        }
-        const [provider, model] = JSON.parse(e.target.value);
+      options={[
+        ...groups.flatMap(({ provider, models, error }) => [
+          ...models.map((model) => ({
+            value: choice(provider, model),
+            label: model,
+            group: names[provider],
+          })),
+          ...(error
+            ? [
+                {
+                  value: '__unavailable__' + provider,
+                  label: t('Models unavailable — open Settings'),
+                  group: names[provider],
+                  disabled: true,
+                },
+              ]
+            : []),
+        ]),
+        ...(settings.model &&
+        !groups.some((g) => g.provider === settings.provider && g.models.includes(settings.model))
+          ? [
+              {
+                value: current,
+                label: settings.model,
+                group: names[settings.provider],
+                detail: t('Disconnected'),
+                disabled: true,
+              },
+            ]
+          : []),
+      ]}
+      status={
+        loading
+          ? t('Loading models…')
+          : groups.some((g) => g.error)
+            ? t('Models unavailable — open Settings')
+            : undefined
+      }
+      footer={{ label: t('Model & providers'), action: onSettings }}
+      onChange={(value) => {
+        const [provider, model] = JSON.parse(value);
         setSaving(true);
         void api
           .workspace(
@@ -87,33 +122,6 @@ export default function ChatModelMenu({
           .catch((e) => onError(e.message))
           .finally(() => setSaving(false));
       }}
-    >
-      <option value="" disabled>
-        {t('Choose a model')}
-      </option>
-      {settings.model &&
-        !groups.some(
-          (group) => group.provider === settings.provider && group.models.includes(settings.model),
-        ) && (
-          <option value={current} disabled>
-            {names[settings.provider]} · {settings.model} · {t('Disconnected')}
-          </option>
-        )}
-      {groups.map(({ provider, models, error }) => (
-        <optgroup key={provider} label={names[provider]}>
-          {models.map((model) => (
-            <option key={model} value={choice(provider, model)}>
-              {names[provider]} · {model}
-            </option>
-          ))}
-          {error && <option disabled>{t('Models unavailable — open Settings')}</option>}
-        </optgroup>
-      ))}
-      {loading && <option disabled>{t('Loading models…')}</option>}
-      {!loading && !groups.some((group) => group.models.length) && (
-        <option disabled>{t('No models found. Configure your provider in Settings.')}</option>
-      )}
-      <option value="__intelligence_settings__">{t('Model & providers')}…</option>
-    </select>
+    />
   );
 }

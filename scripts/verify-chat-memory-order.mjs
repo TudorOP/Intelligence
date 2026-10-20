@@ -1,3 +1,4 @@
+import { pickChoice } from './ui-pickers.mjs';
 import { _electron as electron } from 'playwright';
 import electronPath from 'electron';
 import { Store } from '../electron/store.mjs';
@@ -136,20 +137,13 @@ try {
         .evaluate((el) => [...el.children].map((node) => node.getAttribute('aria-label'))),
       [
         'Choose model',
-        'Attach image',
+        'Add sources',
         'Show thinking',
         'Automatically read replies aloud',
         'Dictate',
         'Command approvals',
       ],
     );
-    const selectStyles = await surface.locator('.composer-select').evaluateAll((nodes) =>
-      nodes.map((node) => {
-        const s = getComputedStyle(node);
-        return [s.height, s.fontSize, s.borderRadius, s.backgroundColor];
-      }),
-    );
-    assert.deepEqual(selectStyles[0], selectStyles[1]);
     for (const button of await surface.locator('.composer-tools > button').all()) {
       const box = await button.boundingBox();
       assert.equal(box.width, 32);
@@ -179,7 +173,7 @@ try {
     })
     .waitFor();
   await checkControls(main);
-  await main.getByLabel('Choose model').selectOption(JSON.stringify(['ollama', 'fixture-two-with-a-long-model-name']));
+  await pickChoice(page, 'Choose model', 'fixture-two-with-a-long-model-name', main);
   await page.waitForFunction(
     (id) =>
       window.intelligence

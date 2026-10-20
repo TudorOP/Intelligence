@@ -349,9 +349,11 @@ const preview: API = {
     );
   },
   models: desktopOnly,
+  modelTest: desktopOnly,
   chat: desktopOnly,
   stop: desktopOnly,
   approve: desktopOnly,
+  accessRevoke: desktopOnly,
   async image() {
     return new Promise((resolve) => {
       const input = document.createElement('input');

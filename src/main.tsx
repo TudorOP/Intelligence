@@ -26,3 +26,5 @@ import './matrix.css';
 import './polish.css';
 import './settings.css';
 import './theme-extensions.css';
+import './pickers.css';
+import './agent-profile.css';

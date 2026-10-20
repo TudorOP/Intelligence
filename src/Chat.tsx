@@ -1,5 +1,8 @@
+import ChatSources, { type ChatAttachment } from './ChatSources';
+import { resourceKinds, resourceLabel } from '../electron/resource-catalog.mjs';
+import ApprovalCard from './ApprovalCard';
 import { t } from './i18n';
-import { memo, useEffect, useRef, useState, useId } from 'react';
+import { memo, useMemo, useEffect, useRef, useState, useId } from 'react';
 import ReactMarkdown, { defaultUrlTransform } from 'react-markdown';
 import ZimReader from './ZimReader';
 import remarkGfm from 'remark-gfm';
@@ -141,7 +144,8 @@ const MessageBody = memo(function MessageBody({ content }: { content: string }) 
 export default function Chat({
   settings,
   conversation,
-  context,
+  context: inheritedContext,
+  resources = [],
   onNew,
   onSettings,
   compact = false,
@@ -154,6 +158,7 @@ export default function Chat({
   settings: Settings;
   conversation: Entity | null;
   context: Entity[];
+  resources?: Entity[];
   onNew: (context: string[]) => Promise<Entity>;
   onSettings: () => void;
   compact?: boolean;
@@ -163,6 +168,59 @@ export default function Chat({
   onBranched?: (e: Entity) => void;
   screenFocus?: { section: string; mode: string; entities: string[] };
 }) {
+  const contextPickerId = useId(),
+    contextTrigger = useRef<HTMLButtonElement>(null);
+  const closeContext = () => {
+    setContextOpen(false);
+    contextTrigger.current?.focus();
+  };
+  const [selectedIds, setSelectedIds] = useState<string[]>([]),
+    [contextOpen, setContextOpen] = useState(false),
+    [contextQuery, setContextQuery] = useState('');
+  const [suppressedIds, setSuppressedIds] = useState<string[]>([]);
+  const context = useMemo(
+    () => [
+      ...inheritedContext.filter((e) => !suppressedIds.includes(e.id)),
+      ...(selectedIds.length
+        ? resources.filter(
+            (e) => selectedIds.includes(e.id) && !inheritedContext.some((p) => p.id === e.id),
+          )
+        : []),
+    ],
+    [inheritedContext, resources, selectedIds, suppressedIds],
+  );
+  const toggleContext = (entity: Entity, checked: boolean) => {
+    if (responding) return;
+    const ids = checked
+      ? [...new Set([...context.map((e) => e.id), entity.id])].slice(0, 20)
+      : context.filter((e) => e.id !== entity.id).map((e) => e.id);
+    if (inheritedContext.some((e) => e.id === entity.id))
+      setSuppressedIds((old) =>
+        checked ? old.filter((id) => id !== entity.id) : [...old, entity.id],
+      );
+    else
+      setSelectedIds((old) =>
+        checked ? [...old, entity.id].slice(0, 20) : old.filter((id) => id !== entity.id),
+      );
+    if (conversation)
+      void api
+        .mutate({ id: conversation.id, revision: conversation.revision, data: { context: ids } })
+        .catch((e) => onError(e.message));
+  };
+  const candidates = useMemo(
+    () =>
+      contextOpen
+        ? resources
+            .filter(
+              (e) =>
+                resourceKinds.has(e.kind) &&
+                !e.deleted &&
+                e.title.toLocaleLowerCase().includes(contextQuery.toLocaleLowerCase()),
+            )
+            .slice(0, 100)
+        : [],
+    [contextOpen, resources, contextQuery],
+  );
   const [messages, setMessages] = useState<Message[]>([]),
     [draft, setDraft] = useState(''),
     [stream, setStream] = useState(''),
@@ -170,6 +228,7 @@ export default function Chat({
     [activity, setActivity] = useState(''),
     [approvals, setApprovals] = useState<AgentEvent[]>([]);
   const [images, setImages] = useState<string[]>([]);
+  const [attachedFiles, setAttachedFiles] = useState<ChatAttachment[]>([]);
   const [branching, setBranching] = useState(false);
   const [spokenMessage, setSpokenMessage] = useState(''),
     [speechState, setSpeechState] = useState('');
@@ -323,6 +382,9 @@ export default function Chat({
     setLiveThinkingOpen(false);
     setBusy(false);
     setApprovals([]);
+    setSelectedIds([]);
+    setSuppressedIds([]);
+    setContextOpen(false);
     setImages([]);
     if (conversation) load();
     if (conversation) loadInfo();
@@ -366,7 +428,8 @@ export default function Chat({
           load();
           setThinking('');
         }
-        if (e.type === 'approval') setApprovals((a) => [...a, e]);
+        if (e.type === 'approval')
+          setApprovals((a) => (a.some((p) => p.id === e.id) ? a : [...a, e]));
         if (e.type === 'approval-resolved') setApprovals((a) => a.filter((x) => x.id !== e.id));
       }),
     [],
@@ -391,7 +454,8 @@ export default function Chat({
       }
       return;
     }
-    if (!text.trim() && !images.length) return;
+    if (!text.trim() && !images.length && !attachedFiles.length) return;
+    if (!text.trim() && attachedFiles.length) text = t('Please review the attached sources.');
     if (!settings.model && !conversation?.data.matrixTask) {
       onSettings();
       return;
@@ -649,17 +713,8 @@ export default function Chat({
             {activity || t('Thinking through it…')}
           </div>
         ) : null}
-        {approvals.map((a) => (
-          <div className="approval" key={a.id}>
-            <b>{a.summary}</b>
-            <pre>{a.details}</pre>
-            <div>
-              <button onClick={() => void api.approve(a.id!, false)}>{t('Decline')}</button>
-              <button className="primary" onClick={() => void api.approve(a.id!, true)}>
-                {t('Approve action')}
-              </button>
-            </div>
-          </div>
+        {approvals.map((request) => (
+          <ApprovalCard key={request.id} request={request} onError={onError} />
         ))}
         <div ref={end} />
       </div>
@@ -718,14 +773,28 @@ export default function Chat({
           <label className="chat-memory-control">
             <input
               type="checkbox"
-              checked={conversation.data.memoryExcluded !== true}
+              checked={
+                conversation.data.memoryExcluded !== true && !conversation.data.attachmentPrivate
+              }
               onChange={(e) =>
                 void api
-                  .mutate({ id: conversation.id, data: { memoryExcluded: !e.target.checked } })
+                  .mutate({
+                    id: conversation.id,
+                    data: {
+                      memoryExcluded: !e.target.checked,
+                      attachmentPrivate: e.target.checked
+                        ? false
+                        : conversation.data.attachmentPrivate,
+                    },
+                  })
                   .catch((e) => onError(e.message))
               }
             />
-            {t('Allow this chat in memory & past-conversation search')}
+            {t(
+              conversation.data.attachmentPrivate
+                ? 'Conversation-only attachments: enable memory explicitly to retain derived information'
+                : 'Allow this chat in memory & past-conversation search',
+            )}
           </label>
         ) : null}
         {conversation?.data.logContext ? (
@@ -755,11 +824,36 @@ export default function Chat({
         {context.length ? (
           <div className="context-chips">
             {context.slice(0, 4).map((e) => (
-              <span key={e.id}>✳ {e.title}</span>
+              <span key={e.id}>
+                ✳ {e.title}
+                {
+                  <button
+                    disabled={responding}
+                    aria-label={t('Remove context') + ' · ' + e.title}
+                    onClick={() => toggleContext(e, false)}
+                  >
+                    ×
+                  </button>
+                }
+              </span>
             ))}
           </div>
         ) : null}
         <div className="composer">
+          {attachedFiles.length > 0 && (
+            <div className="chat-source-chips">
+              {attachedFiles.map((file) => (
+                <span
+                  key={file.id}
+                  title={t(
+                    file.retention === 'project' ? 'Kept in project' : 'This conversation only',
+                  )}
+                >
+                  {file.name} · {t(file.retention === 'project' ? 'Project' : 'Chat')}
+                </span>
+              ))}
+            </div>
+          )}
           {images.length ? (
             <div className="chat-images">
               {images.map((url, i) => (
@@ -798,16 +892,13 @@ export default function Chat({
             <div className="composer-tools chat-controls">
               {conversation?.data.matrixTask ? (
                 <div className="matrix-model-control">
-                  <select
-                    className="composer-select chat-model-select"
-                    aria-label={t('Choose model')}
-                    disabled
-                    title={t('Model selected by the Matrix list. Open Matrix to change it.')}
+                  <button
+                    className="icon-button"
+                    aria-label={t('Matrix agent settings')}
+                    data-tooltip={settings.agentName + ' · ' + (info?.model || settings.model)}
+                    onClick={onSettings}
                   >
-                    <option>{info?.model || t('Task model')}</option>
-                  </select>
-                  <button aria-label={t('Matrix model settings')} onClick={onSettings}>
-                    ↗
+                    <Icon name="brain" />
                   </button>
                 </div>
               ) : (
@@ -818,23 +909,24 @@ export default function Chat({
                   onError={onError}
                 />
               )}
-              <button
-                className="attach-image"
-                aria-label={t('Attach image')}
-                disabled={responding || images.length >= 4 || settings.visionEnabled === false}
-                onClick={() =>
-                  void api
-                    .image('vision')
-                    .then((url) => {
-                      if (url) setImages((old) => (old.length < 4 ? [...old, url] : old));
-                    })
-                    .catch((e) => onError(e.message))
-                }
-              >
-                <span className="image-symbol" aria-hidden="true">
-                  <span />
-                </span>
-              </button>
+              {!conversation?.data.matrixTask &&
+                !conversation?.data.readOnlyMachine &&
+                !conversation?.data.reportReadOnly && (
+                  <ChatSources
+                    conversation={conversation}
+                    resources={resources}
+                    context={context}
+                    onToggle={toggleContext}
+                    settings={settings}
+                    onError={onError}
+                    disabled={responding}
+                    files={attachedFiles}
+                    onFiles={setAttachedFiles}
+                    ensureConversation={async () =>
+                      conversation || (await onNew(context.map((e) => e.id)))
+                    }
+                  />
+                )}
               <button
                 aria-label={t('Show thinking')}
                 aria-pressed={settings.showThinking ?? false}
@@ -952,7 +1044,7 @@ export default function Chat({
               <button
                 className="send"
                 aria-label={t('Send message')}
-                disabled={!draft.trim() && !images.length}
+                disabled={!draft.trim() && !images.length && !attachedFiles.length}
                 onClick={() => void send()}
               >
                 ↑

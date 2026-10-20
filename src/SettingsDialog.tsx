@@ -1,4 +1,8 @@
-import { useEffect, useState } from 'react';
+import AgentAccessPanel from './AgentAccessPanel';
+const HelpGuide = lazy(() => import('./HelpGuide'));
+import type { HelpArticle } from './HelpGuide';
+import UserProfileFields from './UserProfileFields';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import type { Settings, Snapshot } from './types';
 import { api } from './api';
 import { t } from './i18n';
@@ -10,6 +14,7 @@ import { AutomationPanel, BackupPanel } from './WorkspacePanels';
 import AppearanceSettings from './AppearanceSettings';
 import OptionalModulesPanel from './OptionalModulesPanel';
 import LicensesPanel from './LicensesPanel';
+import ComputerAccessPanel from './ComputerAccessPanel';
 
 export default function SettingsDialog({
   section,
@@ -24,6 +29,9 @@ export default function SettingsDialog({
   onTrash,
   trashOpen,
   guideOpen,
+  setupReturn = false,
+  onLesson,
+  onResources,
 }: {
   section: string;
   settings: Settings;
@@ -37,6 +45,9 @@ export default function SettingsDialog({
   onTrash: () => void;
   trashOpen: boolean;
   guideOpen: boolean;
+  setupReturn?: boolean;
+  onLesson: (article: HelpArticle) => void;
+  onResources: (page: 'notebooks' | 'tasks') => void;
 }) {
   const [settingsQuery, setSettingsQuery] = useState('');
   const [licensesOpen, setLicensesOpen] = useState(false);
@@ -79,8 +90,11 @@ export default function SettingsDialog({
                 title: 'Personal',
                 items: [
                   ['profile', 'Your profile', 'user name identity sharing'],
-                  ['appearance', 'Look & feel', 'theme notebook background language layout accent'],
-                  ['icons', 'Icons & identity', 'app tray logo icons'],
+                  [
+                    'appearance',
+                    'Look & feel',
+                    'theme notebook background language layout accent icons identity app tray logo',
+                  ],
                 ],
               },
               {
@@ -91,7 +105,7 @@ export default function SettingsDialog({
                     'Model & providers',
                     'model provider api credentials connection tools repair agent',
                   ],
-                  ['chat', 'Chat & context', 'thinking context compaction approval width'],
+                  ['chat', 'Chat & context', 'thinking context compaction width'],
                   ['search', 'Search providers', 'web brave searxng research'],
                   [
                     'modules',
@@ -106,7 +120,7 @@ export default function SettingsDialog({
                   [
                     'access',
                     'Agent access',
-                    'permissions scopes terminal notebook vault calendar reports memory',
+                    'permissions scopes terminal notebook vault calendar reports memory approvals commands computer system files destructive',
                   ],
                   [
                     'automation',
@@ -159,7 +173,17 @@ export default function SettingsDialog({
           </a>
           <details className="settings-help-menu">
             <summary>{t('Help & setup')}</summary>
-            <button onClick={onGuide}>{t('Getting started')}</button>
+            <button onClick={onGuide}>
+              {t(
+                settings.onboardingComplete
+                  ? 'Review setup'
+                  : settings.onboarding?.status === 'deferred'
+                    ? 'Continue setup'
+                    : 'Getting started',
+              )}
+            </button>
+            <button onClick={() => onSection('guide')}>{t('Written guide')}</button>
+            <button onClick={() => onSection('lessons')}>{t('Feature lessons')}</button>
           </details>
           <details className="settings-help-menu">
             <summary>{t('Licenses')}</summary>
@@ -175,6 +199,21 @@ export default function SettingsDialog({
           ×
         </button>
         <div className="settings-content" data-section={section}>
+          {setupReturn && (
+            <button className="setup-return" onClick={() => onSection(null)}>
+              {t('Return to setup')}
+            </button>
+          )}
+          {(section === 'guide' || section === 'lessons') && (
+            <Suspense fallback={<p role="status">{t('Opening guide…')}</p>}>
+              <HelpGuide
+                settings={settings}
+                onSetting={(section) => onSection(section)}
+                onLesson={onLesson}
+                lessons={section === 'lessons'}
+              />
+            </Suspense>
+          )}
           {section === 'profile' && (
             <section className="user-profile-settings settings-section">
               <span className="eyebrow">{t('YOUR PROFILE')}</span>
@@ -213,53 +252,7 @@ export default function SettingsDialog({
                     {t('Your photo stays on this device until you allow the agent to request it.')}
                   </p>
                 </section>
-                <div className="settings-card profile-settings-card">
-                  <label>
-                    {t('Your name')}
-                    <input
-                      aria-label={t('Your name')}
-                      maxLength={100}
-                      value={settings.preferredName || ''}
-                      onChange={(e) => void changeSettings({ preferredName: e.target.value })}
-                    />
-                  </label>
-                  <label className="setting-switch">
-                    <span>
-                      {t('Share my name with agents')}
-                      <small>
-                        {t('Your name is shared as context data with the selected model provider.')}
-                      </small>
-                    </span>
-                    <Switch
-                      checked={settings.shareName}
-                      onChange={(e) => void changeSettings({ shareName: e.target.checked })}
-                    />
-                  </label>
-                  <label>
-                    {t('A little about you')}
-                    <textarea
-                      aria-label={t('A little about you')}
-                      maxLength={2000}
-                      rows={5}
-                      value={settings.profileDescription || ''}
-                      onChange={(e) => void changeSettings({ profileDescription: e.target.value })}
-                    />
-                  </label>
-                  <label className="setting-switch">
-                    <span>
-                      {t('Allow profile access on demand')}
-                      <small>
-                        {t(
-                          'The agent can request your description and photo when useful. They are not added to every prompt.',
-                        )}
-                      </small>
-                    </span>
-                    <Switch
-                      checked={settings.shareProfile || false}
-                      onChange={(e) => void changeSettings({ shareProfile: e.target.checked })}
-                    />
-                  </label>
-                </div>
+                <UserProfileFields settings={settings} onUpdate={changeSettings} />
               </div>
             </section>
           )}
@@ -276,64 +269,75 @@ export default function SettingsDialog({
             <ChatPreferences settings={settings} onUpdate={changeSettings} />
           ) : null}
           {(section === 'appearance' || section === 'icons') && (
-            <AppearanceSettings
-              settings={settings}
-              onUpdate={changeSettings}
-              identity={section === 'icons'}
-            />
+            <>
+              <AppearanceSettings
+                settings={settings}
+                onUpdate={changeSettings}
+                identity={section === 'icons'}
+              />
+              {section === 'appearance' && (
+                <details className="settings-disclosure identity-disclosure">
+                  <summary>{t('Icons & identity')}</summary>
+                  <AppearanceSettings
+                    settings={settings}
+                    onUpdate={changeSettings}
+                    identity
+                    embedded
+                  />
+                </details>
+              )}
+            </>
           )}
           {section === 'access' && (
-            <section className="settings-section">
+            <section className="settings-section access-settings">
               <span className="eyebrow">{t('IN YOUR HANDS')}</span>
               <h2>{t('Agent access')}</h2>
-              <div className="settings-grid">
+              <p>{t('Set app-wide access, then choose what each agent can use.')}</p>
+              <div className="access-settings-stack">
                 <section className="settings-card">
                   <h3>{t('Workspace resources')}</h3>
-                  {(
-                    [
-                      ['notebookAccess', 'Notebook access'],
-                      ['vaultAccess', 'Vault access'],
-                      ['kanbanAccess', 'Task board access'],
-                      ['calendarAccess', 'Calendar access'],
-                      ['reportsAccess', 'Reports access'],
-                    ] as const
-                  ).map(([key, label]) => (
-                    <label className="setting-switch" key={key}>
-                      <span>{t(label)}</span>
-                      <Switch
-                        checked={settings[key]}
-                        onChange={(e) => void changeSettings({ [key]: e.target.checked })}
-                      />
-                    </label>
-                  ))}
-                </section>
-                <section className="settings-card">
-                  <h3>{t('Memory & host tools')}</h3>
-                  {(
-                    [
-                      ['memoryAccess', 'Memory recall'],
-                      ['terminalAccess', 'Host terminal commands'],
-                    ] as const
-                  ).map(([key, label]) => (
-                    <label className="setting-switch" key={key}>
-                      <span>{t(label)}</span>
-                      <Switch
-                        checked={settings[key]}
-                        onChange={(e) => void changeSettings({ [key]: e.target.checked })}
-                      />
-                    </label>
-                  ))}
+                  <div className="settings-action-row">
+                    <button onClick={() => onResources('notebooks')}>
+                      {t('Notebook sharing')}
+                    </button>
+                    <button onClick={() => onResources('tasks')}>{t('Task sharing')}</button>
+                  </div>
+                  <div className="resource-switches">
+                    {(
+                      [
+                        ['notebookAccess', 'Notebook access'],
+                        ['vaultAccess', 'Vault access'],
+                        ['kanbanAccess', 'Task board access'],
+                        ['calendarAccess', 'Calendar access'],
+                        ['reportsAccess', 'Reports access'],
+                        ['memoryAccess', 'Memory recall'],
+                      ] as const
+                    ).map(([key, label]) => (
+                      <label className="setting-switch" key={key}>
+                        <span>{t(label)}</span>
+                        <Switch
+                          checked={settings[key]}
+                          onChange={(e) => void changeSettings({ [key]: e.target.checked })}
+                        />
+                      </label>
+                    ))}
+                  </div>
                   <p className="settings-note">
                     {t(
                       'Resource switches suspend existing grants. Individual items and agent profiles still control what can be used.',
                     )}
                   </p>
-                  <p className="settings-note">
-                    {t(
-                      'Host commands have broader file access and follow your chosen approval mode.',
-                    )}
-                  </p>
                 </section>
+                <AgentAccessPanel snapshot={snapshot} onChanged={boot} onError={fail} />
+                <details className="settings-disclosure computer-disclosure">
+                  <summary>{t('Computer access')}</summary>
+                  <ComputerAccessPanel
+                    settings={settings}
+                    onUpdate={changeSettings}
+                    onError={fail}
+                    embedded
+                  />
+                </details>
               </div>
             </section>
           )}

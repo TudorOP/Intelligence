@@ -1,6 +1,6 @@
 {
   "name": "intelligence",
-  "version": "0.9.4",
+  "version": "1.0.6",
   "private": true,
   "description": "A thoughtful local-first AI companion for your Linux desktop.",
   "desktopName": "app.intelligence.desktop.desktop",
@@ -40,7 +40,10 @@
     "test:speech-reports": "node scripts/verify-speech-reports.mjs",
     "test:chat-tools": "node scripts/verify-chat-tools.mjs",
     "test:themes": "node scripts/verify-themes.mjs",
-    "test:chat-memory-order": "node scripts/verify-chat-memory-order.mjs"
+    "test:chat-memory-order": "node scripts/verify-chat-memory-order.mjs",
+    "test:onboarding": "node scripts/verify-onboarding.mjs",
+    "test:workspace-automation": "node scripts/verify-workspace-automation.mjs",
+    "test:performance": "node scripts/verify-performance.mjs"
   },
   "dependencies": {
     "@fontsource-variable/eb-garamond": "5.3.0",

@@ -106,7 +106,6 @@ const env = {
   ...process.env,
   INTELLIGENCE_TEST: '1',
   INTELLIGENCE_DATA_DIR: data,
-  INTELLIGENCE_DEV_URL: 'http://127.0.0.1:5173',
 };
 delete env.ELECTRON_RUN_AS_NODE;
 let app;
@@ -174,8 +173,8 @@ try {
   await input.fill('First response');
   await input.press('Enter');
   await page.getByText('Completed reply 1', { exact: false }).first().waitFor();
-  await page.waitForFunction(() =>
-    document.querySelector('.speak-message')?.getAttribute('aria-label') === 'Read aloud',
+  await page.waitForFunction(
+    () => document.querySelector('.speak-message')?.getAttribute('aria-label') === 'Read aloud',
   );
   assert.equal(spoken.length, 1);
   assert.equal(spoken[0].input, 'Completed reply 1. A readable result.');

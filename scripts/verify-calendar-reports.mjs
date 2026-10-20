@@ -228,7 +228,10 @@ try {
   await screenshot('task-and-activity');
   await page.getByRole('button', { name: 'Close activity', exact: true }).click();
   await page.getByRole('button', { name: 'Settings', exact: true }).click();
-  await page.getByRole('button', { name: 'Cognition Matrix', exact: true }).last().click();
+  await page
+    .locator('.settings-navigation')
+    .getByRole('button', { name: 'Cognition Matrix', exact: true })
+    .click();
   const geometry = await page.locator('.matrix-preload-control').evaluate((e) => {
     const input = e.querySelector('input'),
       range = document.createRange();

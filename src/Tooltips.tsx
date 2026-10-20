@@ -2,6 +2,28 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { t, useLanguage, sourceText } from './i18n';
 const help: Record<string, string> = {
+  'Add sources':
+    'Attach files, images or a folder snapshot, or identify an existing workspace resource. Choose whether external files stay with the chat or in a project.',
+  'Choose agent':
+    'Choose the profile that performs this work, including its model, skills and permission limits.',
+  'Search choices': 'Filter the list by name, provider or model.',
+  'File access scope':
+    'Choose project folders, selected additional folders or any file on the computer. Operating system permissions and agent restrictions still apply.',
+  'Folder permission': 'Allow reading only, or reading and editing, in this additional folder.',
+  'Ask before destructive or unclassified actions':
+    'Require native review for destructive computer-file operations and shell commands that cannot be classified safely.',
+  'Keep attached files':
+    'Conversation-only copies follow chat deletion. Project copies remain after the chat is deleted.',
+  'Attachment project':
+    'Choose where retained file copies are stored. Original external files are preserved.',
+  'Choose context':
+    'Choose resource names for this chat. Their content is shared only when this agent has effective access.',
+  Revoke:
+    'Remove this agent’s grant without deleting the resource or its contents. Global and profile restrictions still apply.',
+  'Still artwork': 'Choose a still background independently of the theme and automatic AI work.',
+  'Artwork strength': 'Adjust how visible the still background is behind your workspace.',
+  'Background blur':
+    'Soften the still background. Zero keeps it sharp; this does not affect AI work.',
   'New report':
     'Choose a saved template or a starting point, create a reusable template, or request a one-off custom report.',
   'New custom report': 'Create a report once without saving a template or enabling a schedule.',
@@ -266,10 +288,32 @@ const help: Record<string, string> = {
   'Open instructions ↗': 'Read or edit this skill’s reusable instructions.',
   'Skills view': 'Choose cards to browse skills or a compact list to scan more at once.',
 };
+function visibleExplanation(node: Element | null) {
+  if (!node?.textContent?.trim() || !node.getClientRects().length || node.id === 'app-help-tooltip')
+    return false;
+  const style = getComputedStyle(node),
+    rect = node.getBoundingClientRect();
+  return (
+    style.visibility !== 'hidden' &&
+    style.display !== 'none' &&
+    style.opacity !== '0' &&
+    style.clip === 'auto' &&
+    style.clipPath === 'none' &&
+    rect.width > 2 &&
+    rect.height > 2
+  );
+}
 function explanation(element: HTMLElement) {
   const explicit = element.dataset.tooltip || element.closest('label')?.dataset.tooltip;
-  if (explicit) return explicit;
   const label = element.closest('label');
+  if (visibleExplanation(label?.querySelector('small') || null)) return null;
+  const descriptions = element
+    .getAttribute('aria-describedby')
+    ?.split(/\s+/)
+    .map((id) => document.getElementById(id))
+    .filter(visibleExplanation);
+  if (descriptions?.length) return null;
+  if (explicit) return explicit;
   const labelText = label
     ? Array.from((label.querySelector(':scope > span') ?? label).childNodes)
         .filter((node) => node.nodeType === Node.TEXT_NODE)
@@ -282,15 +326,6 @@ function explanation(element: HTMLElement) {
     .map((v) => sourceText(v!.replace(/\s+/g, ' ').trim()).replace(/^[＋+]\s*/, ''));
   for (const candidate of candidates) if (help[candidate]) return t(help[candidate]);
   const text = candidates[0] || '';
-  const described = element
-    .getAttribute('aria-describedby')
-    ?.split(/\s+/)
-    .map((id) => document.getElementById(id)?.textContent?.trim())
-    .filter(Boolean)
-    .join(' ');
-  if (described) return described;
-  const description = label?.querySelector('small')?.textContent?.trim();
-  if (description) return description;
   if (text.startsWith('Move to Trash'))
     return t('Move this item to Trash. Restore it later from Settings → Your data.');
   if (text.startsWith('Delete permanently'))

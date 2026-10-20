@@ -2,6 +2,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { projectPath } from './projects.mjs';
+import { computerPath } from './computer-access.mjs';
+import { profileAllows } from './profiles.mjs';
+import { FileQueue } from './file-queue.mjs';
 function gitToken(file, event) {
   const fd = fs.openSync(file, 'r');
   try {
@@ -30,10 +33,28 @@ export class MatrixTriggers {
     this.systemTimer = null;
     this.systemEdges = new Map();
     this.gitTokens = new Map();
+    this.inbox = new FileQueue(matrix, { watch, now });
   }
   async target(task) {
+    const settings = this.matrix.profile(this.matrix.listFor(task.id));
+    if (
+      settings.profileId &&
+      !profileAllows(this.matrix.store, settings, 'computer_files', this.matrix.agent.connections)
+    )
+      throw Error('The assigned agent cannot use file tools');
+    const scope = this.matrix.agent.accessRequests?.scope(settings, 'watch:' + task.id);
+    return scope
+      ? this.matrix.store.withAgentScope(scope, () => this.targetScoped(task, settings))
+      : this.targetScoped(task, settings);
+  }
+  async targetScoped(task, settings) {
     const { store, agent } = this.matrix,
       trigger = task.data.trigger;
+    if (trigger.directory) {
+      const target = await computerPath(store, trigger.directory, { settings });
+      if (!target.allowed) throw Error('Authorize the monitored folder in Computer access first');
+      return { directory: target.file, file: null };
+    }
     const source = store.get(trigger.source);
     if (!source || !store.access(source.id))
       throw Error('The watched source is outside agent access.');
@@ -103,6 +124,10 @@ export class MatrixTriggers {
             task.id,
             task.data.trigger,
             source?.revision,
+            this.matrix.listFor(task.id)?.data.assignedAgent,
+            this.matrix.store.get(this.matrix.listFor(task.id)?.data.assignedAgent)?.revision,
+            this.matrix.store.settings().computerScope,
+            this.matrix.store.settings().computerFolders,
             this.matrix.agent.vault && source?.kind.startsWith('vault-')
               ? this.matrix.agent.vault.relative(source)
               : null,
@@ -122,9 +147,11 @@ export class MatrixTriggers {
     this.pending.clear();
     clearTimeout(this.timer);
     this.timer = null;
-    void this.install(tasks.slice(0, 64), generation).catch((e) =>
-      this.matrix.emit({ type: 'notice', error: e.message }),
-    );
+    void this.inbox.reconcile(tasks.slice(0, 64).filter((t) => t.data.trigger?.mode === 'inbox'));
+    void this.install(
+      tasks.slice(0, 64).filter((t) => t.data.trigger?.mode !== 'inbox'),
+      generation,
+    ).catch((e) => this.matrix.emit({ type: 'notice', error: e.message }));
     for (const task of tasks.slice(64))
       this.matrix.triggerError(task.id, 'At most 64 file-change tasks can be monitored at once.');
   }
@@ -276,6 +303,7 @@ export class MatrixTriggers {
     return { queued: count };
   }
   close() {
+    this.inbox.close();
     this.closed = true;
     ++this.generation;
     clearTimeout(this.timer);

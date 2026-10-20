@@ -1,0 +1,37 @@
+# Intelligence 1.0 — implemented setup and access
+
+The approved plan follows a separately verified cleanup commit on dev. Main remains the reviewed release branch; this work is local until explicitly authorized for upload. The original proposal and four ImageGen concepts/provenance remain in ONBOARDING_1_0_PLAN.md and docs/design/onboarding-1.0. Render concepts illustrate intent; actual app screenshots verify implementation.
+
+## Setup and help
+
+Getting started has welcome, profile/companion, model, access, memory/automation and review stages. Stable stages/outcomes and separate lesson progress persist in validated settings, never credentials or unsaved drafts. Profile description uses the existing protected sharing preference. Saves await native confirmation; failures stay visible. Leaving dirty profile/access fields offers save, discard or keep editing.
+
+Only a new workspace receives an automatic invitation, once per initial process session. An incomplete workspace can show a dismissible Continue setup reminder; neither it nor ordinary Settings opens a modal automatically. Explicit Review setup preserves completed status and lesson progress. A setup-origin Settings detour is session-scoped and resumes its saved stage when Settings closes, including navigation inside Settings. The marker disappears on completion/reload; advanced Settings use is independent.
+
+Shared provider controls explain local/cloud choices, official provider setup links, where Ollama/LM Studio show their server address, model discovery, manual model IDs and protected keys. Local providers support optional endpoint-bound tokens without changing provider kind. Authentication outside loopback requires HTTPS. Discovery and reply verification are separate. Test a reply explicitly sends a short greeting without profile, notes, prior messages or tools; it has cancellation, a 15-second limit and connection/credential invalidation. It cannot establish live tool quality or offline routing by an independently configured local server.
+
+Fresh production users start with profile sharing, automatic semantic downloads, consolidation, memory access, model preparation and background work off, plus selected-only resource policy. Existing users retain their preferences. Optional engines and user data stay outside the application/source archive. Pause AI still controls automatic work, not foreground chat or still artwork.
+
+Help & setup contains 14 offline chapters in English/Romanian and four optional lessons for chat, notes, tasks and memory. A lesson routes to its real screen, explains each step and saves its own position. Users perform actual work themselves; the guide never silently creates or edits their content. Guide links open the real Settings section. Tooltips remain for unexplained controls and avoid repeating visible explanatory copy.
+
+## Permission and configuration behavior
+
+Each agent can use legacy shared resources or selected resources only. Saved grants belong to a named profile and exact resource scope; read and edit remain distinct. Main Chat and the sidebar let the user select resource names/IDs before content is shared. The agent cannot enumerate private resources to solicit grants. A native tool may register a resource it has just created as a candidate for review during that same request; knowing its ID does not grant access. Pickers search the existing workspace and render at most 100 matches.
+
+request_access offers Allow for this request, Always allow for this agent and Decline through the shared native card. Approval requires the active controller, profile, conversation/provider/model binding, exact live resource/profile revisions and authorization fingerprint. Full Access never skips this review. Declined requests are deduplicated within the request. Already effective access does not ask again.
+
+Temporary access ends with the foreground user-request run, Stop, cancellation or steering; another message, chat, agent, branch or scheduled run cannot inherit it. Permanent access is intersected with the original run snapshot and live profile; only the exact reviewed overlay widens the approving run. Revocation takes effect live. Used-source revocation stops the affected run; saved replies/arguments retain bounded source provenance and are filtered before reuse under current access. The user-visible transcript stays intact. Already sent data cannot be withdrawn from a provider. Authorization/hierarchy changes invalidate stale grants without resurrecting them when fields are toggled back. Ordinary content/title edits do not scan profiles or revoke persistent authorization.
+
+Global category gates, native read-only modes, child exceptions, source access, memory-review/recall exclusions and live profile tool scopes still apply. Selecting a source never exposes its contents before effective access. Read access does not approve edits, task assignment, host commands or MCP setup. New selected-only notebooks/boards/projects require native creation/duration review; contents persist when temporary access expires and are not shared with every agent. Saved memory automatically preserves private resources used during the request even if the model omits source IDs; conversation recall also checks newly recorded reply sources. Backup export/restore strips the new agent grants so importing a workspace cannot silently authorize access.
+
+inspect_configuration exposes only redacted readiness. propose_configuration_change may propose the current agent's name, assistance style or default model from an already connected provider. Cards show exact current/proposed values; saved changes apply to future requests. It cannot enter keys, alter global security settings, grant itself resources, install dependencies or replace mandatory harness guidance. Existing native MCP setup remains separately reviewed. Broader arbitrary self-configuration is intentionally outside this milestone.
+
+Settings → Agent access → Access for each agent shows policy, request enablement, permanent grants and current temporary access with Revoke. Profile controls can disable setup/access tools. Native validation remains the authority independently of renderer presentation.
+
+## Performance and verification
+
+Setup, Settings, lessons and help are lazy UI modules; only the selected guide language loads. Closed features have no setup polling, background model calls, help scans, observers or recurring timers. One-time invitation selection uses persisted state during bootstrap. Approval listeners are event-driven; pending review/temporary grants are bounded and cleaned on run end. Bootstrap computes one actor scope and avoids a duplicate entity snapshot/profile lookup per card.
+
+The cleanup baseline and final host measurements are documented in VERIFICATION.md. These Windows fixture measurements cannot guarantee target Linux compositor, provider or hardware performance. Existing context-length and token-overhead deferrals remain unchanged. New backend checks cover lifecycle, stale scopes, revocation, creation, private inventory, configuration, backups and local authentication; the end-to-end setup fixture exercises real preload/IPC/SQLite and a local model server. No paid cloud request is needed for acceptance here.
+
+Linux Docker/AppImage, real models/providers/credentials, audio/device lifecycle, sleep/resume and the exact distributed binary/license/corresponding-source audit remain required before public binary distribution.
