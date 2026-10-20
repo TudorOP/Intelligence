@@ -114,7 +114,7 @@ The onboarding fixture passes 17 real Electron captures covering six stages, inl
 
 Applicable local desktop checks also cover profiles, comfort, large-workspace/Trash bounding, Vault, organization, Calendar/reports, optional modules/speech UI, provider search, icon ASAR decoding, Matrix scheduler wake/resource lifecycle and PDF/DOCX ASAR parsing. The 60-cycle renderer lifecycle pass retains bounded DOM/heap. Several old fixtures needed selectors updated for existing navigation/labels, provider-qualified model values and the production renderer; their semantic checks remain. The legacy update fixture mixes deferred context/compaction work and is excluded from final acceptance. The old startup comparison requires an obsolete baseline checkout; the new performance fixture provides the 0.94/1.0 comparison. Real consolidation is Linux-only and remains a target-host gate.
 
-Generated logs, screenshots and fixture databases are ignored and excluded from source distribution. Rebuild the source ZIP with scripts/archive-source.ps1; preserve licenses, artwork, lockfiles and source/build scripts.
+Generated logs, screenshots and fixture databases are ignored and excluded from source distribution. Rebuild the source archive with `node scripts/archive-source.mjs`; preserve licenses, artwork, lockfiles and source/build scripts.
 
 ## Local performance comparison
 

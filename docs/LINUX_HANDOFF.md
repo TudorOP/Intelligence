@@ -1,6 +1,6 @@
 # Linux build and acceptance
 
-Use the matching Intelligence-source.zip or this source checkout. Dev holds new work; main holds reviewed releases and remains the default branch. For ongoing development, first read [AGENT_HANDOFF.md](AGENT_HANDOFF.md); a source ZIP contains no Git history or user data. Install Docker Engine and the Compose plugin; no host Node/compiler/Electron SDK is needed for packaging.
+Use the matching Intelligence-source.tar.gz or this source checkout. Dev holds new work; main holds reviewed releases and remains the default branch. For ongoing development, first read [AGENT_HANDOFF.md](AGENT_HANDOFF.md); a source archive contains no Git history or user data. Install Docker Engine and the Compose plugin; no host Node/compiler/Electron SDK is needed for packaging.
 
 ```bash
 docker compose run --build --rm appimage
