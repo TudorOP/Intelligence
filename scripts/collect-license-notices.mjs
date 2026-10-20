@@ -64,6 +64,47 @@ for (const file of [
 entries.push(
   ...JSON.parse(fs.readFileSync(path.join(root, 'public/licenses/kokoro/index.json'), 'utf8')),
 );
+// Native libraries bundled by electron-builder into the AppImage (usr/lib); the
+// texts live in public/licenses/native/ and are pinned by public/licenses/index.json.
+entries.push(
+  {
+    id: 'appimage-libnotify',
+    title: 'libnotify (libnotify.so.4.0.0) · bundled AppImage native library · LGPL-2.1',
+    file: 'native/LGPL-2.1.txt',
+    format: 'text',
+  },
+  {
+    id: 'appimage-libgconf',
+    title: 'GConf (libgconf-2.so.4.1.5) · bundled AppImage native library · LGPL-2.1',
+    file: 'native/LGPL-2.1.txt',
+    format: 'text',
+  },
+  {
+    id: 'appimage-libindicator',
+    title: 'libindicator (libindicator3.so.7.0.0) · bundled AppImage native library · GPL-3.0',
+    file: 'GPL-3.0.txt',
+    format: 'text',
+  },
+  {
+    id: 'appimage-libappindicator',
+    title:
+      'libappindicator (libappindicator3.so.1.0.0) · bundled AppImage native library · LGPL-3.0',
+    file: 'native/LGPL-3.0.txt',
+    format: 'text',
+  },
+  {
+    id: 'appimage-libxtst',
+    title: 'libXtst (libXtst.so.6.1.0) · bundled AppImage native library · X11',
+    file: 'native/X11.txt',
+    format: 'text',
+  },
+  {
+    id: 'appimage-libxss',
+    title: 'libXss (libXss.so.1.0.0) · bundled AppImage native library · X11',
+    file: 'native/X11.txt',
+    format: 'text',
+  },
+);
 fs.writeFileSync(
   path.join(root, 'public/licenses/index.json'),
   JSON.stringify({ schema: 1, platform: process.platform, entries }, null, 2) + '\n',
