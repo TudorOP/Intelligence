@@ -1,6 +1,6 @@
 # Intelligence 1.06 — release acceptance
 
-The current workspace features are described in README.md. The 1.0 baseline passed 223 enabled backend checks. Current verification is recorded in docs/VERIFICATION.md. The 1.06 source is published on `main`; the acceptance gates below still apply before any binary/AppImage distribution. Verification procedures and limitations are documented in docs/VERIFICATION.md.
+The current workspace features are described in README.md. The 1.0 baseline passed 223 enabled backend checks. Current verification is recorded in docs/VERIFICATION.md. The 1.06 source is published on `main`; the acceptance gates below were closed on 20 October 2026 (binary/license/source gates by the recorded audit, runtime gates by manual user acceptance on the target Linux host). Verification procedures and limitations are documented in docs/VERIFICATION.md.
 
 ## Balanced profile — 1.06, 15 October 2026
 
@@ -45,10 +45,10 @@ The [repair checklist and six original screenshots](docs/design/ui-repairs-2026-
 
 ## Required on the target Linux host
 
-- [ ] Build the AppImage in Docker, run as a regular user, and verify Wayland/X11, fonts, scaling, tray and sandbox behavior.
-- [ ] Validate real inference providers/models, tool quality with smaller models, credentials, MCP servers, ZIM archives, speech/dictation engines and audio/microphone lifecycle.
-- [ ] Validate still-background decoding/blur/compositor behavior on target hardware at mixed DPI, 1080p and larger displays.
-- [ ] Validate actual model residency, memory workers, recurring work, triggers, sleep/resume and RTC permissions.
+- [x] Build the AppImage in Docker, run as a regular user, and verify Wayland/X11, fonts, scaling, tray and sandbox behavior. Manually accepted by the user on the target Linux host, 20 October 2026.
+- [x] Validate real inference providers/models, tool quality with smaller models, credentials, MCP servers, ZIM archives, speech/dictation engines and audio/microphone lifecycle. Manually accepted by the user on the target Linux host, 20 October 2026.
+- [x] Validate still-background decoding/blur/compositor behavior on target hardware at mixed DPI, 1080p and larger displays. Manually accepted by the user on the target Linux host, 20 October 2026.
+- [x] Validate actual model residency, memory workers, recurring work, triggers, sleep/resume and RTC permissions. Manually accepted by the user on the target Linux host, 20 October 2026.
 - [x] Review the eight moderate npm audit findings in the electron-builder dependency chain before packaging; validate any dependency change without blindly applying forced fixes. Reviewed 20 October 2026: all eight trace to one root cause (`sprintf-js` unbounded-precision DoS via `roarr` → `global-agent@3` → `@electron/get` → `app-builder-lib`) in the build-only chain. None of the vulnerable packages ship in the AppImage; the shipped `global-agent@4.1.3` (via `onnxruntime-node`) is outside the advisory range. No forced dependency change was applied.
 - [x] Audit the exact binary's dependency/content licenses and offer complete corresponding source matching each distributed AppImage. Completed 20 October 2026 for `release/Intelligence-1.0.6-x86_64.AppImage` (SHA-256 `96a6832100215650e17bc56a789b6fa7a2c3ec45348a1a62c7abc87b3a670eeb`): see docs/VERIFICATION.md. The six electron-builder native libs previously shipped without notices now carry complete texts in the offline catalog.
 

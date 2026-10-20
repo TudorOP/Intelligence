@@ -1,6 +1,6 @@
 # Intelligence 1.06 — verification
 
-> Status: development and verification now run on Linux. The entries below record each pass exactly as it was run; the 1.0x fixture results were produced on Windows and remain historical evidence, not fresh Linux results. Linux compositor/font/scaling/device acceptance and the binary release gates in TODO.md remain open until executed on this host.
+> Status: development and verification now run on Linux. The entries below record each pass exactly as it was run; the 1.0x fixture results were produced on Windows and remain historical evidence, not fresh Linux results. The binary release gates in TODO.md were closed on 20 October 2026: license/source gates by the recorded AppImage audit, runtime acceptance gates by manual user acceptance on the target Linux host.
 
 ## 1.06 binary license/corresponding-source audit and AppImage native notices — 20 October 2026
 
