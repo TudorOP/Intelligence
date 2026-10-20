@@ -4,7 +4,7 @@ Read README.md, TODO.md and UI_UX.md before starting. Develop new work on dev; m
 
 Read [docs/AGENT_HANDOFF.md](docs/AGENT_HANDOFF.md) for the harness-independent workflow, current checkpoint, verification commands and commit/archive procedure. Inspect Git status before editing and before committing. Local commits after verified requested work are part of this workflow; they do not authorize remote actions.
 
-Release 0.94 uses package 0.9.4. Normal updates add 0.01 to the public label: 0.95, 0.96, etc. Use scripts/bump-version.mjs; it maps the public label to a valid semantic package version. After verification, update release docs and Intelligence-source.zip, then run scripts/commit-version.mjs for a local commit. Do not push or publish without an explicit user request.
+The current release and package version are recorded in [docs/AGENT_HANDOFF.md](docs/AGENT_HANDOFF.md) and package.json; do not hardcode them in this file. Normal app updates add 0.01 to the public label (for example 1.06 → 1.07). Use scripts/bump-version.mjs; it maps the public label to a valid semantic package version. After verification, update release docs and Intelligence-source.zip, then run scripts/commit-version.mjs for a local commit. Do not push or publish without an explicit user request.
 
 Documentation-only follow-ups keep the current application version unless the user requests a new release. The source ZIP is intentionally ignored by \*.zip and must be refreshed locally, never force-added to Git. Stage intended new source/doc files before auditing and archiving. The commit helper runs git add .; use it only after confirming the tree contains no unrelated changes.
 
